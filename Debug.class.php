@@ -4,7 +4,7 @@
  * 
  * @author Carlos
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @version 1.0 (2008/06/16)
+ * @version 1.01 (2008/06/16)
  * @package Debug
  */
  
@@ -86,20 +86,22 @@ class Debug{
 	 */	
 	public function showSelfFilename($template_filename = '') {
 		if ($this->debugFilename) {
-			if ($template_filename) echo '<div class="filename">template_filename: ' . $template_filename . '</div>';
-			else echo '<div class="filename">PHP_SELF: ' . $_SERVER['PHP_SELF'] . '</div>';
+			if ($template_filename) $this->showFilename('template_filename: ' . $template_filename);
+			else $this->showFilename('PHP_SELF: ' . $template_filename);
 		}
 	}
 	/**
 	 * Shows the filename. Do not shows paths containing 'inc/connection', 'inc/7.' or 'classes/'.
 	 *
 	 * @param string $filename Name of the file.
+	 * @global string
 	 */	
 	public function showFilename($filename) {
 		if ($this->debugFilename) {
+			global $c_doc_root;
 			$ignore = array('inc/connection', 'inc/7.', 'classes/');
 			foreach ($ignore as $value) if (strpos($filename, $value) !== FALSE) return $filename;
-			echo '<div class="filename">' . $filename . '</div>';
+			echo '<div class="filename">' .  str_replace($c_doc_root, '/', $filename) . '</div>';
 		}
 		return $filename;
 	}
@@ -124,8 +126,8 @@ class Debug{
 	 * @param string $sql SQL query which was executed (optional).
  	 * @return string Formatted backtrace.
 	 */	
-	public function getBacktrace($msgErro = NULL, $sql = NULL) {
-		$backtrace = debug_backtrace();
+	public function getBacktrace($msgErro = NULL, $sql = NULL, $backtrace = NULL) {
+		if (!$backtrace) $backtrace = debug_backtrace();
 		krsort($backtrace);
 		$erroDetalhesArray = reset($backtrace);
 		$S = '<pre style="background-color:#FFFFFF;font-size:11px;text-align:left;padding:10px;">';	
@@ -136,14 +138,14 @@ class Debug{
 		if ($_SERVER["HTTP_REFERER"]) $S .= '<strong style="color:red">    REFERER:</strong> ' . $_SERVER["HTTP_REFERER"] . "\n";	
 		$S .= '<strong style="color:red">         IP:</strong> ' . $_SERVER["REMOTE_ADDR"] . "\n";
 		$S .= '<strong style="color:red"> USER_AGENT:</strong> ' . $_SERVER['HTTP_USER_AGENT'] . "\n";
-		if ($sql) $S .= '<strong style="color:red">        SQL:</strong> ' . $sql . "\n";
+		if ($sql) $S .= '<strong style="color:red">        SQL:</strong> ' . preg_replace(array('/(SELECT )/','/( FROM )/','/( WHERE )/','/( ORDER BY )/'),'<b>\1</b>', $sql, 1) . "\n";
 		$S .= '<strong style="color:red">  BACKTRACE:</strong> ' . print_r($backtrace, TRUE);
 		if (count($_POST)) $S .= '<strong style="color:red">       POST:</strong> ' . print_r($_POST, TRUE);	
 		if (count($_GET)) $S .= '<strong style="color:red">        GET:</strong> ' . print_r($_GET, TRUE);
 		if (count($_SESSION)) $S .= '<strong style="color:red">    SESSION:</strong> ' . print_r($_SESSION, TRUE);
 		if (count($_COOKIE)) $S .= '<strong style="color:red">     COOKIE:</strong> ' . print_r($_COOKIE, TRUE);
 		$S.="</pre>";
-		return $S;
+		return  wordwrap($S, 85, "\n");
 	}
 }
 ?>

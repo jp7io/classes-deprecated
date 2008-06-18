@@ -38,9 +38,9 @@ class FileCache{
 	 * @return FileCache
 	 */	
 	public function __construct($storeId = FALSE, $cachePath = 'cache') {
-		global $c_root, $c_path, $s_interadmin_preview, $interadmin_gerar_menu;
+		global $c_root, $c_path, $c_cache, $s_interadmin_preview, $interadmin_gerar_menu;
 		
-		if ($s_interadmin_preview || $interadmin_gerar_menu) return;
+		if ($s_interadmin_preview || $interadmin_gerar_menu || !$c_cache) return;
 		
 		$this->fileRoot = $c_root;
 		$this->cachePath = $this->fileRoot . $cachePath . '/';
