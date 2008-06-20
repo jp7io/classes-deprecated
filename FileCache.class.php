@@ -47,19 +47,18 @@ class FileCache{
 		$this->fileName = substr($_SERVER['REQUEST_URI'], strlen($c_path) + 1);
 		
 		$pos_query = strpos($this->fileName, '?');
-		if ($pos_query) $this->fileName = substr($this->fileName, 0, $pos_query);
+		if ($pos_query !== FALSE) $this->fileName = substr($this->fileName, 0, $pos_query);
 		$this->fileName = jp7_path($this->fileName, TRUE);
 				
 		$pathinfo = pathinfo($this->cachePath . $this->fileName);
 		
 		if ($storeId){
 			if ($pathinfo['extension']) $ext = '.' . $pathinfo['extension'];
-			$this->fileName = dirname($this->fileName) . '/' . basename($this->fileName, $ext) . '/' . $storeId . $ext;
+			$this->fileName = dirname($this->fileName) . '/' . basename($this->fileName, $ext) . '/' . $storeId . $ext . '.cache';
+		}else{
+			if ($pathinfo['extension']) $this->fileName .= '.cache';
+			else $this->fileName .= (($this->fileName) ? '/' : '') . 'index.cache';
 		}
-		
- 		if ($pathinfo['extension']) $this->fileName .= '.cache';
-		else $this->fileName .= '/index.cache';
-		
 		//$_SERVER['PHP_SELF'] = $this->fileName;
 				
 		if ($this->checkLog() && !$_GET['nocache_force']) $this->getCache();
@@ -104,9 +103,10 @@ class FileCache{
 	 * @return NULL
 	 */	
 	public function getCache() {
-		global $debugger;
+		global $debugger, $c_jp7;
 		readfile($this->cachePath . $this->fileName);
-		if ($debugger){
+		if ($debugger->debugStyle){
+			echo '<div class="preview_type" style="left:0px;border-width:0px 1px 1px 0px;background:#FFCC00;filter:alpha(opacity=70);z-index:1002">CACHED</div><div class="preview_type" style="right:0px;border-width:0px 0px 1px 1px;background:#FFCC00;filter:alpha(opacity=70);z-index:1002">CACHED</div>';
 			echo $debugger->debugStyle;
 			$debugger->showFilename('File from cache: ' . $this->cachePath . $this->fileName);
 		}

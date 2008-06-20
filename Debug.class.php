@@ -87,7 +87,7 @@ class Debug{
 	public function showSelfFilename($template_filename = '') {
 		if ($this->debugFilename) {
 			if ($template_filename) $this->showFilename('template_filename: ' . $template_filename);
-			else $this->showFilename('PHP_SELF: ' . $template_filename);
+			else $this->showFilename('PHP_SELF: ' . $_SERVER['PHP_SELF']);
 		}
 	}
 	/**
@@ -101,7 +101,7 @@ class Debug{
 			global $c_doc_root;
 			$ignore = array('inc/connection', 'inc/7.', 'classes/');
 			foreach ($ignore as $value) if (strpos($filename, $value) !== FALSE) return $filename;
-			echo '<div class="filename">' .  str_replace($c_doc_root, '/', $filename) . '</div>';
+			echo '<div class="filename">' .  str_replace($c_doc_root, '/', $filename ) . '</div>';
 		}
 		return $filename;
 	}
@@ -130,22 +130,23 @@ class Debug{
 		if (!$backtrace) $backtrace = debug_backtrace();
 		krsort($backtrace);
 		$erroDetalhesArray = reset($backtrace);
-		$S = '<pre style="background-color:#FFFFFF;font-size:11px;text-align:left;padding:10px;">';	
-		if ($msgErro) $S .= '<strong style="color:red">       ERRO:</strong> ' . $msgErro . "\n";
+		$S = '';
+		if ($msgErro) $S .= '<strong style="color:red">       ERRO:</strong> ' . wordwrap($msgErro, 85, "\n")  . "\n";
 		$S .= '<strong style="color:red">    ARQUIVO:</strong> ' . $erroDetalhesArray['file'] . "\n";	
 		$S .= '<strong style="color:red">      LINHA:</strong> ' . $erroDetalhesArray['line'] . "\n";	
 		$S .= '<strong style="color:red">        URL:</strong> ' . (($_SERVER['HTTPS'] == 'on') ? "https://" : "http://") . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"] . "\n";
 		if ($_SERVER["HTTP_REFERER"]) $S .= '<strong style="color:red">    REFERER:</strong> ' . $_SERVER["HTTP_REFERER"] . "\n";	
 		$S .= '<strong style="color:red">         IP:</strong> ' . $_SERVER["REMOTE_ADDR"] . "\n";
 		$S .= '<strong style="color:red"> USER_AGENT:</strong> ' . $_SERVER['HTTP_USER_AGENT'] . "\n";
-		if ($sql) $S .= '<strong style="color:red">        SQL:</strong> ' . preg_replace(array('/(SELECT )/','/( FROM )/','/( WHERE )/','/( ORDER BY )/'),'<b>\1</b>', $sql, 1) . "\n";
-		$S .= '<strong style="color:red">  BACKTRACE:</strong> ' . print_r($backtrace, TRUE);
+		if ($sql) $S .= '<strong style="color:red">        SQL:</strong> ' . preg_replace(array('/( FROM )/','/( WHERE )/','/( ORDER BY )/'), "\n" . '            \1', $sql)  . "\n";
+		$S .= '<strong style="color:red">  BACKTRACE:</strong> ' . preg_replace(array('/( FROM )/','/( WHERE )/','/( ORDER BY )/'), "\n" . '                          \1', print_r($backtrace, TRUE));
 		if (count($_POST)) $S .= '<strong style="color:red">       POST:</strong> ' . print_r($_POST, TRUE);	
 		if (count($_GET)) $S .= '<strong style="color:red">        GET:</strong> ' . print_r($_GET, TRUE);
 		if (count($_SESSION)) $S .= '<strong style="color:red">    SESSION:</strong> ' . print_r($_SESSION, TRUE);
 		if (count($_COOKIE)) $S .= '<strong style="color:red">     COOKIE:</strong> ' . print_r($_COOKIE, TRUE);
-		$S.="</pre>";
-		return  wordwrap($S, 85, "\n");
+		return '<pre style="background-color:#FFFFFF;font-size:11px;text-align:left;">' . $S . '</pre>';
 	}
 }
+
+
 ?>
