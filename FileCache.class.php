@@ -89,11 +89,15 @@ class FileCache{
 			$dir_path = '';
 			foreach ($dir_arr as $dir) {
 					$dir_path .= $dir . '/';
-					if (!is_dir($this->cachePath . $dir_path)) mkdir($this->cachePath . $dir_path);
+					if (!is_dir($this->cachePath . $dir_path)){
+						@mkdir($this->cachePath . $dir_path);
+						@chmod($this->cachePath . $dir_path, 0777);
+					}
 			}
 			$file = @fopen($this->cachePath . $this->fileName, 'w');
 			$file_content .= "\n" . '<!-- Published by JP7 InterAdmin in ' . date('Y/m/d - H:i:s') . ' -->';
 			@fwrite($file, $file_content);
+			@chmod($this->cachePath . $this->fileName, 0777);
 		}
 		ob_end_flush();
 	}
@@ -109,6 +113,7 @@ class FileCache{
 			echo '<div class="preview_type" style="left:0px;border-width:0px 1px 1px 0px;background:#FFCC00;filter:alpha(opacity=70);z-index:1002">CACHED</div><div class="preview_type" style="right:0px;border-width:0px 0px 1px 1px;background:#FFCC00;filter:alpha(opacity=70);z-index:1002">CACHED</div>';
 			echo $debugger->debugStyle;
 			$debugger->showFilename('File from cache: ' . $this->cachePath . $this->fileName);
+			$debugger->showTime();
 		}
 		exit();
 	}
