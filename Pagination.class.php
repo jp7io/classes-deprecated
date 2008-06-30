@@ -27,12 +27,13 @@ class Pagination{
 	 * @param string $records Total number of records, it is only used if no $sql is given. The default value is <tt>NULL</tt>.
 	 * @global ADOConnection
 	 * @global ADORecordSet
+	 * @global string
 	 * @return string|Pagination If neither $sql nor $records is given the string "[aa]" is returned.
 	 * @author JP, Cristiano
-	 * @version (2008/06/13) Update by Carlos
+	 * @version (2008/06/26) Update by Carlos
 	 */
 	function __construct($sql = NULL, $limit = 10, $page = 1, $type = '', $numbers_limit = 10, $parameters = '', $separador = '|', $next_char = '&gt;', $back_char = '&lt;', $last_char = '&raquo;', $first_char = '&laquo;', $records = NULL) {
-		global $db, $rs;
+		global $db, $rs, $seo;
 		if (!$page) $page = 1;
 
 		if ($sql) {
@@ -54,7 +55,8 @@ class Pagination{
 		
 		// HTM
 		$this->query_string = preg_replace('([&]?p_page=[0-9]+)', '', $_SERVER['QUERY_STRING']); // Retira a pagina atual da Query String
-		$this->query_string = str_replace('go_url=' . $_GET['go_url'], '', $this->query_string); // Retira a GO Url da Query String
+		if ($seo) $this->query_string = preg_replace('([&]?baseurl=true)', '', $this->query_string); // Retira a baseurl se a pagina tiver S.E.O.
+		$this->query_string = preg_replace('([&]?go_url=' . $_GET['go_url'] . ')', '', $this->query_string); // Retira a GO Url da Query String
 		$this->parameters = $parameters;
 		//$this->query_string=substr($this->query_string,1);
 		

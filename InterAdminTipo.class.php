@@ -85,7 +85,7 @@ class InterAdminTipo{
 		global $db;
 		$sql = "SELECT id" . (($fields) ? ',' . implode(',', $fields) : '') . " FROM " . $this->db_prefix.
 		" WHERE id_tipo=" . $this->id_tipo.
-		(($where) ? " AND " . $where : '').
+		//(($where) ? " AND " . $where : '').
 		" ORDER BY " . $this->interadminsOrderby;
 		//$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 		$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
