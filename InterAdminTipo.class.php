@@ -49,13 +49,16 @@ class InterAdminTipo{
 	/**
 	 * @return object
 	 */
-	function getParent(){
-		$parent = $this->getFieldsValues('parent_id_tipo');
-		if ($parent) {
-			eval('$return = new ' . get_class($this) . '(' . $parent . ', "' . $this->db_prefix . '");');
-			return $return;
-		} else {
-			return FALSE;
+	function getParent($cache = TRUE){
+		if ($this->parentInterAdminTipo && $cache) return $this->parentInterAdminTipo;
+		else{
+			$parent = $this->getFieldsValues('parent_id_tipo');
+			if ($parent) {
+				eval('$this->parentInterAdminTipo = new ' . get_class($this) . '(' . $parent . ', "' . $this->db_prefix . '");');
+				return $this->parentInterAdminTipo;
+			} else {
+				return FALSE;
+			}
 		}
 	}
 	/**
@@ -160,21 +163,22 @@ class InterAdminTipo{
 	/**
 	 * @return string
 	 */
-	function getURL($seo = false) {
+	function getURL() {
+		global $c_wwwroot, $implicit_parents_names, $seo;
 		$url='';
 		$url_arr='';
 		$parent=$this;
-		while($parent){
+		while($parent) {
 			if ($seo) {
-				$url_arr[]=toSeo($parent->getFieldsValues('nome'));
+				if (!in_array($parent->getFieldsValues('nome'), $implicit_parents_names)) $url_arr[] = toSeo($parent->getFieldsValues('nome'));
 			} else {
-				$url_arr[]=toId($parent->getFieldsValues('nome'));
+				$url_arr[] = toId($parent->getFieldsValues('nome'));
 			}
-			$parent=$parent->getParent();
+			$parent = $parent->getParent();
 		}
-		$url_arr=array_reverse($url_arr);
+		$url_arr=array_reverse((array)$url_arr);
 		if ($seo) {
-			$url=join("/",$url_arr);
+			$url = jp7_path($c_wwwroot) . join("/",$url_arr);
 		} else {
 			$url=join("_",$url_arr);
 		}
