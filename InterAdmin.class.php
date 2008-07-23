@@ -28,6 +28,9 @@ class InterAdmin{
 	 */
 	function getFieldsValues($fields, $forceAsString=false){   
 		/*if(!$this->fieldsValues)*/$this->fieldsValues=jp7_fields_values($this->db_prefix , 'id', $this->id, $fields/*, true*/);
+		foreach ((array)$this->fieldsValues as $key=>$value) {
+			$this->$key = $value;
+		}
 		if($forceAsString){
 			foreach($this->fieldsValues as $key=>$value){
 				if(strpos($key,"select_")===0)$this->fieldsValuesAsString->$key=jp7_fields_values($this->db_prefix , 'id', $value, 'varchar_key');

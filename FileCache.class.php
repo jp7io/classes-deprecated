@@ -27,6 +27,14 @@ class FileCache{
 	 */
 	public $cacheFileName;
 	/**
+	 * @var int Time delay before re-caching.
+	 */
+	protected $delay;
+	/**
+	 * @var bool If <tt>TRUE</tt> exits the script after retrieving the cached file. Set it as <tt>FALSE</tt> when caching parts of a page.
+	 */
+	public $exit;
+	/**
 	 * Constructor function, defines the path and filename and starts caching or loading it.
 	 *
 	 * @param mixed $storeId ID of the file. Only needed if the same page has different data deppending on the ID.
@@ -34,24 +42,28 @@ class FileCache{
 	 * @global string
  	 * @global string
  	 * @global bool
+  	 * @global int
+	 * @global array
+	 * @global Debug
   	 * @global bool
+	 * @global bool
 	 * @return FileCache
 	 */	
-	public function __construct($storeId = FALSE, $cachePath = 'cache') {
-		global $c_root, $c_path, $c_cache, $s_interadmin_preview, $interadmin_gerar_menu;
-		
-		if ($s_interadmin_preview || $interadmin_gerar_menu || !$c_cache) return;
-		
+	public function __construct($storeId = FALSE, $exit = TRUE, $cachePath = 'cache') {
+		global $c_root, $c_path, $c_cache, $c_cache_delay, $c_devIps, $debugger, $s_interadmin_preview, $interadmin_gerar_menu;
+		// Cache not desired
+		if (!$c_cache || $debugger->active || $s_interadmin_preview || $interadmin_gerar_menu) return;
+
 		$this->fileRoot = $c_root;
 		$this->cachePath = $this->fileRoot . $cachePath . '/';
+		// Parsing Filename
 		$this->fileName = substr($_SERVER['REQUEST_URI'], strlen($c_path) + 1);
-		
 		$pos_query = strpos($this->fileName, '?');
 		if ($pos_query !== FALSE) $this->fileName = substr($this->fileName, 0, $pos_query);
 		$this->fileName = jp7_path($this->fileName, TRUE);
 				
 		$pathinfo = pathinfo($this->cachePath . $this->fileName);
-		
+		// Parsing ID for dynamic content
 		if ($storeId){
 			if ($pathinfo['extension']) $ext = '.' . $pathinfo['extension'];
 			$this->fileName = dirname($this->fileName) . '/' . basename($this->fileName, $ext) . '/' . $storeId . $ext . '.cache';
@@ -59,10 +71,22 @@ class FileCache{
 			if ($pathinfo['extension']) $this->fileName .= '.cache';
 			else $this->fileName .= (($this->fileName) ? '/' : '') . 'index.cache';
 		}
-		//$_SERVER['PHP_SELF'] = $this->fileName;
-				
+		// Setting default behaviors
+		$this->exit = $exit;
+		$this->setDelay($c_cache_delay, $c_devIps);
+		// Retrieving/creating cache
 		if ($this->checkLog() && !$_GET['nocache_force']) $this->getCache();
 		else $this->startCache();
+	}
+	/**
+	 * Sets delay time
+	 *
+	 * @return NULL
+	 */	
+	public function setDelay($time, $devIps) {
+		if (!in_array($_SERVER['REMOTE_ADDR'], (array) $devIps)) {
+			$this->delay = $time;
+		}
 	}
 	/**
 	 * Starts caching the current file
@@ -70,7 +94,7 @@ class FileCache{
 	 * @return NULL
 	 */	
 	public function startCache() {
-		header('pragma: no-cache');
+		//if ($this->exit) header('pragma: no-cache');
 		ob_start();
 	}
 	/**
@@ -80,20 +104,24 @@ class FileCache{
 	 */	
 	public function endCache() {
 		if (!$this->fileName) return;
+		// Gets output buffer and takes out line breaks and tabs
 		$file_content = ob_get_contents();
 		$file_content = str_replace(chr(9), '', $file_content);
 		$file_content = str_replace(chr(13), '', $file_content);
+		// Checking if there is enough content to cache
 		if (strlen($file_content) > 10) {
+			// Creating directories
 			$dir_arr = explode('/', $this->fileName);
 			array_pop($dir_arr);
 			$dir_path = '';
 			foreach ($dir_arr as $dir) {
 					$dir_path .= $dir . '/';
-					if (!is_dir($this->cachePath . $dir_path)){
+					if (!is_dir($this->cachePath . $dir_path)) {
 						@mkdir($this->cachePath . $dir_path);
 						@chmod($this->cachePath . $dir_path, 0777);
 					}
 			}
+			// Saving file and changing permissions
 			$file = @fopen($this->cachePath . $this->fileName, 'w');
 			$file_content .= "\n" . '<!-- Published by JP7 InterAdmin in ' . date('Y/m/d - H:i:s') . ' -->';
 			@fwrite($file, $file_content);
@@ -105,17 +133,11 @@ class FileCache{
 	 * Opens the cached file and outputs it.
 	 *
 	 * @return NULL
-	 */	
+	 */
 	public function getCache() {
-		global $debugger, $c_jp7;
 		readfile($this->cachePath . $this->fileName);
-		if ($debugger->debugStyle){
-			echo '<div class="preview_type" style="left:0px;border-width:0px 1px 1px 0px;background:#FFCC00;filter:alpha(opacity=70);z-index:1002">CACHED</div><div class="preview_type" style="right:0px;border-width:0px 0px 1px 1px;background:#FFCC00;filter:alpha(opacity=70);z-index:1002">CACHED</div>';
-			echo $debugger->debugStyle;
-			$debugger->showFilename('File from cache: ' . $this->cachePath . $this->fileName);
-			$debugger->showTime();
-		}
-		exit();
+		if ($this->exit) exit();
+		else $this->isCached = TRUE;
 	}
 	/**
 	 * Checks if the log file is newer than the cached file,  and if the cached file is older than 1 day.
@@ -123,8 +145,11 @@ class FileCache{
 	 * @return bool
 	 */	
 	public function checkLog() {
-		$filemtime = @filemtime($this->cachePath . $this->fileName);
-		if (@filemtime($this->fileRoot . 'interadmin.log') < $filemtime && date('d', $filemtime) == date('d')) return TRUE;
+		$cache_time = @filemtime($this->cachePath . $this->fileName);
+		$log_time = @filemtime($this->fileRoot . 'interadmin.log');
+		
+		if ($cache_time && time() - $log_time < $this->delay) return TRUE;
+		if (($log_time < $cache_time) && date('d', $cache_time) == date('d')) return TRUE;
 	}
 }
 ?>

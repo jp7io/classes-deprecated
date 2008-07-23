@@ -67,10 +67,11 @@ class InterAdminTipo{
 	function getChildren($fields = NULL){
 		global $db;
 		global $jp7_app;
-		$sql="SELECT id_tipo" . (($fields) ? ',' . implode(',', $fields) : '') . " FROM ".$this->db_prefix."_tipos".
+		$sql="SELECT id_tipo" . (($fields) ? ',' . implode(',', (array)$fields) : '') . " FROM ".$this->db_prefix."_tipos".
 		" WHERE parent_id_tipo=".$this->id_tipo.
 		((!$jp7_app) ? " AND deleted_tipo=''" : "");
-		$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+		if ($GLOBALS['jp7_app']) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+		else $rs = interadmin_query($sql);
 		while($row = $rs->FetchNextObj()){
 			eval('$interadmintipo = new ' . get_class($this) . '(' . $row->id_tipo . ', ' . $this->db_prefix . ');');
 			foreach((array)$fields as $field){
@@ -86,12 +87,13 @@ class InterAdminTipo{
 	 */
 	function getInterAdmins(/*$where = null, */$fields = NULL){
 		global $db;
-		$sql = "SELECT id" . (($fields) ? ',' . implode(',', $fields) : '') . " FROM " . $this->db_prefix.
+		$sql = "SELECT id" . (($fields) ? ',' . implode(',', (array)$fields) : '') . " FROM " . $this->db_prefix.
 		" WHERE id_tipo=" . $this->id_tipo.
 		//(($where) ? " AND " . $where : '').
 		" ORDER BY " . $this->interadminsOrderby;
 		//$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-		$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+		if ($GLOBALS['jp7_app']) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+		else $rs = interadmin_query($sql);
 		while($row = $rs->FetchNextObj()){
 			$interadmin = new InterAdmin($row->id, $this->db_prefix);
 			foreach((array)$fields as $field){

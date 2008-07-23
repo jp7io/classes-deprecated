@@ -2,9 +2,9 @@
 /**
  * Debug class, used to display filenames, processing time and display formatted SQL queries.
  * 
- * @author Carlos
+ * @author Carlos Rodrigues
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @version 1.01 (2008/06/16)
+ * @version 1.02 (2008/07/18)
  * @package Debug
  */
  
@@ -15,25 +15,29 @@
  */
 class Debug{
 	/**
-	 * @var float Stores the start time which is used to calculate the processing time. Using the method startTime() you will be setting this variable.
+	 * @var bool Flag, it is <tt>TRUE</tt> if debugging filenames or SQL queries. Use $_GET['debug'] to set it.
 	 */
-	protected $startTime;
+	public $active;
 	/**
-	 * @var bool Flag indicating if filenames will be debugged or not. Use $_GET['debug_time'] or $_GET['cookie_debug_filename'] to set it.
+	 * @var bool Flag indicating if filenames will be showed or not. Use $_GET['debug_filename'] to set it.
 	 */
-	protected $debugFilename;
+	public $debugFilename;
 	/**
-	 * @var bool|string Flag indicating if the SQL queries will be debugged or not. Use $_GET['debug_sql'] to set it.
+	 * @var bool Flag indicating if the SQL queries will be showed or not. Use $_GET['debug_sql'] to set it.
 	 */
-	protected $debugSql;
+	public $debugSql;
 	/**
-	 * @var string CSS stylesheet used to display the filename and time debugging. Can be changed directly.
+	 * @var array Array containing the activity log for queries, filenames and their processing time.
 	 */
-	public $debugStyle;
+	protected $log;
 	/**
-	 * @var bool In order to prevent errors when output is sent before session is started, set this variable <tt>TRUE</tt> after the headers are sent.
+	 * @var bool In order to prevent errors with output and headers, set this variable <tt>TRUE</tt> after the headers are sent.
 	 */
 	public $safePoint;
+	/**
+	 * @var float|array Stores the start time which is used to calculate the processing time. Use the method startTime() to set this variable.
+	 */
+	protected $startTime;
 	/**
 	 * Constructor function, initial checks and settings when object is created.
 	 *
@@ -42,53 +46,42 @@ class Debug{
 	 */	
 	public function __construct() {
 		global $c_jp7;
-		if ($c_jp7){ // Only by Devs
-			// Debug - SQL
-			$this->debugSql = $_GET['debug_sql'];
-			// Debug - processing time
-			if (isset($_GET['debug_time'])){
-				setcookie('debug_time', $_GET['debug_time'], 0, '/');
-				$_COOKIE['debug_time'] = $_GET['debug_time'];
-			}
-			if ($_COOKIE['debug_time']) $this->startTime();
-			// Debug - filename
-			if (isset($_GET['cookie_debug_filename'])){
-				setcookie('cookie_debug_filename', $_GET['cookie_debug_filename'], 0, '/');
-				$_COOKIE['cookie_debug_filename'] = $_GET['cookie_debug_filename'];
-			}
-			$this->debugFilename = ($_GET['debug_filename']) ? $_GET['debug_filename'] : $_COOKIE['cookie_debug_filename'];
-			// CSS Stylesheet to display the divs
-			if ($this->debugFilename) $this->debugStyle = '<style>div.filename{display:block}</style>';
+		if (!$c_jp7) return; // Only by Devs
+		$this->startTime();
+		// Debug - SQL
+		$this->debugSql = $_GET['debug_sql'];
+		// Debug - filename
+		if (isset($_GET['debug_filename'])) {
+			setcookie('debug_filename', $_GET['debug_filename'], 0, '/');
+			$_COOKIE['debug_filename'] = $_GET['debug_filename'];
 		}
+		if ($_COOKIE['debug_filename']) $this->debugFilename = $_COOKIE['debug_filename'];
+		// Debugger toolbar
+		if (isset($_GET['debug'])){
+			setcookie('debug', $_GET['debug'], 0, '/');
+			$_COOKIE['debug'] = $_GET['debug'];
+		}
+		// Setting it as active
+		if ($this->debugFilename || $this->debugSql || $_COOKIE['debug']) $this->active = TRUE;
 	}
 	/**
-	 * Starts 'recording' the time spent on the code.
+	 * Starts recording the time spent on the code. When using more than one startTime(), the time will be displayed from the last to the first when getTime() is called.
 	 */	
 	public function startTime() {
-			$this->startTime = explode(' ', microtime());
-			$this->startTime = $this->startTime[1] + $this->startTime[0];
-			if (!$this->debugStyle) $this->debugStyle = '<style>div.filename{display:block}</style>';
+		$debug_mtime = explode(' ', microtime());
+		$this->startTime[] = $debug_mtime[1] + $debug_mtime[0];
 	}
 	/**
-	 * Calculates and displays the time spent from the moment you called startTime().
+	 * Calculates and displays the time spent from the moment startTime() was called.
 	 */	
-	public function showTime() {
-		if ($this->startTime){
-			$debug_mtime = explode(' ', microtime());
-			$debug_totaltime = $debug_mtime[0] + $debug_mtime[1] - $this->startTime;
-			printf('<div class="filename">Page created in:  %.3f seconds.</div>', $debug_totaltime);
-		}
-	}
-	/**
-	 * Shows the current filename using the PHP_SELF or shows the template filename if it is set.
-	 *
-	 * @param string $template_filename Name of the template used, if its passed the PHP_SELF will not be displayed.
-	 */	
-	public function showSelfFilename($template_filename = '') {
-		if ($this->debugFilename) {
-			if ($template_filename) $this->showFilename('template_filename: ' . $template_filename);
-			else $this->showFilename('PHP_SELF: ' . $_SERVER['PHP_SELF']);
-		}
+	public function getTime($output = FALSE) {
+		if (!count($this->startTime)) return FALSE;
+		$debug_mtime = explode(' ', microtime());
+		// Retrieves and deletes the last value
+		$debug_starttime = array_pop($this->startTime);
+		$debug_totaltime = round(($debug_mtime[0] + $debug_mtime[1] - $debug_starttime) * 1000);
+		if ($output && $this->safePoint) echo '<div class="debug_msg">Processed in: ' . $debug_totaltime . 'ms.</div>';
+		return $debug_totaltime;
 	}
 	/**
 	 * Shows the filename. Do not shows paths containing 'inc/connection', 'inc/7.' or 'classes/'.
@@ -97,27 +90,27 @@ class Debug{
 	 * @global string
 	 */	
 	public function showFilename($filename) {
-		if ($this->debugFilename) {
-			global $c_doc_root;
-			$ignore = array('inc/connection', 'inc/7.', 'classes/');
-			foreach ($ignore as $value) if (strpos($filename, $value) !== FALSE) return $filename;
-			echo '<div class="filename">' .  str_replace($c_doc_root, '/', $filename ) . '</div>';
+		global $c_doc_root;
+		if ($this->debugFilename && $this->safePoint) echo '<div class="debug_msg">' .  str_replace($c_doc_root, '/', $filename ) . '</div>';
+		if ($this->active) {
+			// Saves time of the previous file on the Log
+			$this->setLogTime('file');
+			// Creates a new log entry for this file
+			$this->addLog($filename, 'file');
+			$this->startTime();
 		}
 		return $filename;
 	}
 	/**
-	 * Formats and displays an SQL query. If $_GET['debug_sql'] = 'all' it will display the SQL even when $safePoint is not set.
+	 * Formats and displays an SQL query.
 	 *
 	 * @param string $sql SQL query to be formatted and displayed.
 	 * @param bool $forcedebug If <tt>TRUE</tt> it will show the SQL even when $_GET['debug_sql'] is not set, the default value is <tt>FALSE</tt>.
-	 * @param string Color of the font on the box displayed. The default value is '#FFFFFF'.
- 	 * @param string Color of the background on the box displayed. The default value is '#008888'.
+	 * @param string Stylesheet on the box displayed. The default value is ''.
 	 */	
-	public function showSql($sql, $forcedebug = FALSE, $color='#FFFFFF', $bgcolor='#008888') {
-		if ($this->debugSql || $forcedebug){
-			if ($this->debugSql != 'all' && !$this->safePoint) return FALSE;
-			echo '<div style="width:auto;color:' . $color . ';background:' . $bgcolor . ';padding:3px;font-weight:normal;text-align:left">' . preg_replace(array('/(SELECT )/','/( FROM )/','/( WHERE )/','/( ORDER BY )/'),'<b>\1</b>', $sql, 1) . '</div>';
-		}
+	public function showSql($sql, $forcedebug = FALSE, $style = '') {
+		if (!$this->safePoint) return FALSE;
+		if ($this->debugSql || $forcedebug) echo '<div class="debug_sql" style="' . $style . '">' . preg_replace(array('/(SELECT )/','/( FROM )/','/( WHERE )/','/( ORDER BY )/'),'<b>\1</b>', $sql, 1) . '</div>';
 	}
 	/**
 	 * Formats and returns the backtrace.
@@ -146,7 +139,32 @@ class Debug{
 		if (count($_COOKIE)) $S .= '<strong style="color:red">     COOKIE:</strong> ' . print_r($_COOKIE, TRUE);
 		return '<pre style="background-color:#FFFFFF;font-size:11px;text-align:left;">' . $S . '</pre>';
 	}
+	public function addLog($value, $tag = 'log', $time = 0) {
+		$this->log[] = array('tag' => $tag, 'value' => $value, 'time' => $time);
+	} 
+	protected function setLogTime($tag) {
+		if (count($this->startTime) === 1) return;
+		for($i = count($this->log) - 1; $i >= 0; $i--) {
+			if ($this->log[$i]['tag'] === $tag) {
+				$this->log[$i]['time'] = $this->getTime();
+				break;
+			}
+		}
+	} 
+	public function showToolbar() {
+		global $template_filename;
+		if (!$this->active) return FALSE;
+		
+		if ($template_filename) echo ('template_filename: ' . $template_filename);
+		else echo('PHP_SELF: ' . $_SERVER['PHP_SELF']);
+		
+		// Saves time of the previous file on the Log
+		$this->setLogTime('file');
+					
+		jp7_print_r($this->log);
+		
+		$this->getTime(TRUE);
+		//echo $this->getBacktrace();
+	}
 }
-
-
 ?>

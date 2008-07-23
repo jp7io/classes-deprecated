@@ -69,7 +69,7 @@ class Pagination{
 				// Numbers
 				$this->htm_numbers_extra = $this->htm_numbers = '<div class="numbers"><ul>';
 				
-				/* CÃ³digo antigo. Exemplo: [5] 6 7 8 9 10 11 12 13 14
+				/* Código antigo. Exemplo: [5] 6 7 8 9 10 11 12 13 14
 				$min = $page;
 				$max = $min + $numbers_limit - 1;
 				if ($max > $this->total) {
@@ -108,7 +108,7 @@ class Pagination{
 				$this->htm_numbers .= '</ul></div>';
 			}
 			// Combo
-			$this->htm_combo = '<div class="text">PÃ¡gina</div>' .
+			$this->htm_combo = '<div class="text">Página</div>' .
 			'<select onchange="location=\'?' . $parameters . $this->query_string . '&p_page=\'+this[selectedIndex].value">' . "\n" .
 			'<script>jp7_num_combo(1,' . $this->total . ',' . $page . ')</script>' .
 			'</select>' . "\n" . '<div class="text">de ' . $this->total . '</div>' . "\n";

@@ -1,28 +1,26 @@
-<?
+<?php
 /**
  * class RssFeed
  * 
- * @version (2008/06/27)
  * @package RssFeed
+ * @author Carlos Rodrigues
+ * @version (2008/07/11)
+ * @todo Add CDATA functionality, e.g. <description><![CDATA[this is <b>bold</b>]]></description>  
  */
-class RssFeed{
-	/**
-	 * @var string Configuration of the XML version.
-	 */			
-	public $xmlVersion = '1.0';
-	/**
-	 * @var string Configuration of the RSS version.
-	 */			
-	public $rssVersion = '2.0';
-	/**
-	 * @var string Line break char.
-	 */			
-	public $lineBreak = "\n";
-	/**
-	 * @var string encoding of the XML file, e.g. ISO-8859-1 or UTF-8.
-	 */			
-	public $encoding = 'ISO-8859-1';
-	/**
+class RssFeed extends DOMDocument {
+	/*
+	 * @var string The name of the channel.
+	 */
+ 	public $title;
+	/*
+	 * @var string The URL to the HTML website corresponding to the channel.
+	 */
+	public $link;
+	/*
+	 * @var string Phrase or sentence describing the channel.
+	 */
+	public $description;
+	/*
 	 * @var array Correspondences between the column and the xml tag names.
 	 */
 	public $rssRowItens = array('title' => 'varchar_key',
@@ -36,108 +34,73 @@ class RssFeed{
 	/**
 	 * @var array Configuration of channel properties.
 	 */
-	public $rssChannel = array('title' => '',
-			'link' => '',
-			'description' => '',
-			'language' => '',
-			'pubDate' => '',
-			'lastBuildDate' => '',
+	public $rssChannel = array(
 			'docs' => 'http://blogs.law.harvard.edu/tech/rss',
 			'generator' => 'JP7 InterAdmin',
 			'managingEditor' => '',
 			'webMaster' => 'debug@jp7.com.br');
 	/**
 	 * Creates a RssFeed object.
-	 *
-	 * @param string Title of the channel.
- 	 * @param string Link to the page which has this content.
- 	 * @param string Description of the channel.
+	 * 
+	 * @param string The version number of the document as part of the XML declaration. 
+	 * @param string The encoding of the document as part of the XML declaration. 
 	 * @return RssFeed
-	 * @author Carlos Rodrigues
 	 * @version (2008/06/27)
 	 */
-	function __construct($title = 'RSS Feed', $link = '', $description = '') {
-		global $lang;
-		$this->rssChannel['title'] = $title;
-		$this->rssChannel['link'] = $link;
-		$this->rssChannel['description'] = $description;
-		$this->rssChannel['language'] = $lang->lang;
-		$this->rssChannel['pubDate'] = date('r');
-		$this->rssChannel['lastBuildDate'] = date('r');
+	function __construct($version = '1.0', $encoding = 'ISO-8859-1') {
+		parent::__construct($version, $encoding);
 	}
 	/**
-	 * Creates a RSS feed from an array with records.
+	 * Creates a RSS feed from an array of recordsets.
 	 *
-	 * @param array Arary of records with columns matching the itens on rssRowItens.
- 	 * @return bool <tt>TRUE</tt> if it succeeds.
-	 * @author Carlos Rodrigues
-	 * @version (2008/06/30)
+	 * @param array Recordsets with columns matching the itens on rssRowItens.
+	 * @param string RSS version of the document.
+ 	 * @return string RSS Document.
+	 * @version (2008/07/11)
 	 */
-	function fetch($rows) {
-		$this->beginWrapper();
-		foreach ($this->rssChannel as $key=>$value) {
-			
+	function parseArray($rows, $rssVersion = '2.0') {
+		global $lang;
 		
+		$this->formatOutput = TRUE;
+				
+		$rss = $this->appendChild($this->createElement('rss'));
+		$rss->setAttribute('version', $rssVersion);
+		
+		$channel = $rss->appendChild($this->createElement('channel'));
+		
+		$channel->appendChild($this->createElement('title', $this->title));
+		$channel->appendChild($this->createElement('link', $this->link));
+		$channel->appendChild($this->createElement('description', $this->description));
+		$channel->appendChild($this->createElement('lang', $lang->lang));
+		$channel->appendChild($this->createElement('pubDate', date('r')));
+		$channel->appendChild($this->createElement('lastBuildDate', date('r')));
+				
+		foreach ($this->rssChannel as $child=>$value) {
+			$channel->appendChild($this->createElement($child, $value));
 		}
-		$this->endWrapper();
-	}
-	function getXml($tag, $value, $showEmptyTags = FALSE) {
-		if (!$value){
-			if ($showEmptyTags) return '<' . $tag . '/>';
-			else return;
+		foreach((array)$rows as $row) {
+			$row = (array) $row;
+			$item = $channel->appendChild($this->createElement('item'));
+			foreach($this->rssRowItens as $rssitem=>$rowitem) {
+				$item->appendChild($this->createElement($rssitem, $this->xmlEntities($row[$rowitem])));
+			}
 		}
-		return '<' . $tag . '>' . $value . '</' . $tag . '>';
+		header( "content-type: application/xml; charset=" . $this->encoding );
+		return $this->saveXML();
 	}
-	function beginWrapper() {
-		echo '<' . '?xml version="' . $this->xmlVersion . '" encoding="' . $this->encoding . '"?' . '>' . $this->lineBreak;
-		echo '<rss version="' .  $this->rssVersion . '">' . $this->lineBreak;
-  		echo '<channel>' . $this->lineBreak;
-	}
-	function endWrapper() {
-		echo '</channel>' . $this->lineBreak;
-		echo '</rss>';
+	/**
+	 * Converts special characters to NCR(Numeric Character Reference) since it is not handled by DOMDocument.
+	 *
+	 * @param string Input string.
+ 	 * @return string String with NCRs replacing special characters.
+	 * @version (2008/07/11)
+	 */
+	function xmlEntities($str){
+		$str = str_replace('&', '&amp;', $str);
+		foreach (get_html_translation_table(HTML_ENTITIES, ENT_QUOTES) as $k => $v) {
+			if ($k == '&') continue;
+			$str = str_replace($k, "&#" . ord($k) . ";", $str);
+		}
+		return $str;
 	}
 }
-return;
-?>
-<? // xml version="1.0"?>
-<rss version="2.0">
-   <channel>
-      <title>Liftoff News</title>
-      <link>http://liftoff.msfc.nasa.gov/</link>
-      <description>Liftoff to Space Exploration.</description>
-      <language>en-us</language>
-      <pubDate>Tue, 10 Jun 2003 04:00:00 GMT</pubDate>
-      <lastBuildDate>Tue, 10 Jun 2003 09:41:01 GMT</lastBuildDate>
-      <docs>http://blogs.law.harvard.edu/tech/rss</docs>
-      <generator>Weblog Editor 2.0</generator>
-      <managingEditor>editor@example.com</managingEditor>
-      <webMaster>webmaster@example.com</webMaster>
-      <item>
-         <title>Star City</title>
-         <link>http://liftoff.msfc.nasa.gov/news/2003/news-starcity.asp</link>
-         <description>How do Americans get ready to work with Russians aboard the International Space Station? They take a crash course in culture, language and protocol at Russia's &lt;a href="http://howe.iki.rssi.ru/GCTC/gctc_e.htm"&gt;Star City&lt;/a&gt;.</description>
-         <pubDate>Tue, 03 Jun 2003 09:39:21 GMT</pubDate>
-         <guid>http://liftoff.msfc.nasa.gov/2003/06/03.html#item573</guid>
-      </item>
-      <item>
-         <description>Sky watchers in Europe, Asia, and parts of Alaska and Canada will experience a &lt;a href="http://science.nasa.gov/headlines/y2003/30may_solareclipse.htm"&gt;partial eclipse of the Sun&lt;/a&gt; on Saturday, May 31st.</description>
-         <pubDate>Fri, 30 May 2003 11:06:42 GMT</pubDate>
-         <guid>http://liftoff.msfc.nasa.gov/2003/05/30.html#item572</guid>
-      </item>
-      <item>
-         <title>The Engine That Does More</title>
-         <link>http://liftoff.msfc.nasa.gov/news/2003/news-VASIMR.asp</link>
-         <description>Before man travels to Mars, NASA hopes to design new engines that will let us fly through the Solar System more quickly.  The proposed VASIMR engine would do that.</description>
-         <pubDate>Tue, 27 May 2003 08:37:32 GMT</pubDate>
-         <guid>http://liftoff.msfc.nasa.gov/2003/05/27.html#item571</guid>
-      </item>
-      <item>
-         <title>Astronauts' Dirty Laundry</title>
-         <link>http://liftoff.msfc.nasa.gov/news/2003/news-laundry.asp</link>
-         <description>Compared to earlier spacecraft, the International Space Station has many luxuries, but laundry facilities are not one of them.  Instead, astronauts have other options.</description>
-         <pubDate>Tue, 20 May 2003 08:56:02 GMT</pubDate>
-         <guid>http://liftoff.msfc.nasa.gov/2003/05/20.html#item570</guid>
-      </item>
-
-<description><![CDATA[this is <b>bold</b>]]></description> 
