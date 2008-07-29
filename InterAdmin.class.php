@@ -2,7 +2,7 @@
 /**
  * Instancia registros da tabela interadmin_cliente
  *
-*/
+ */
 class InterAdmin{
 	public $id;
 	public $id_tipo;
@@ -11,9 +11,10 @@ class InterAdmin{
 	 * @param varchar $_db_prefix
 	 * @return object
 	 */
-	function __construct($id = '', $_db_prefix = ''){
+	function __construct($id = '', $options = NULL) {
 		$this->id = $id;
-		$this->db_prefix = ($_db_prefix) ? $_db_prefix : $GLOBALS['db_prefix'];
+		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
+		if ($options['fields']) $this->getFieldsValues($options['fields']);
 	}
 	function __get($var){
 		if($var == 'id'){
@@ -24,9 +25,11 @@ class InterAdmin{
 		return $this->id;
 	}	
 	/**
+	 * @param mixed $fields
+	 * @param bool $forceAsString Gets the string value for fields referencing to another InterAdmin ID
 	 * @return mixed
 	 */
-	function getFieldsValues($fields, $forceAsString=false){   
+	function getFieldsValues($fields, $forceAsString = FALSE) {   
 		/*if(!$this->fieldsValues)*/$this->fieldsValues=jp7_fields_values($this->db_prefix , 'id', $this->id, $fields/*, true*/);
 		foreach ((array)$this->fieldsValues as $key=>$value) {
 			$this->$key = $value;
@@ -62,30 +65,19 @@ class InterAdmin{
 	 * @return object
 	 */
 	function getTipo(){
-		if(!$this->id_tipo)$this->id_tipo=new InterAdminTipo($this->getFieldsValues('id_tipo'), $this->db_prefix);
+		if(!$this->id_tipo)$this->id_tipo=new InterAdminTipo($this->getFieldsValues('id_tipo'), array('db_prefix' => $this->db_prefix));
 		return $this->id_tipo;
 	}
 	/**
 	 * @param mixed $tipo
 	 * @return array
 	 */
-	function getChildren($tipo, $orderby = '') {
+	function getChildren($tipo, $options = NULL) {
 		global $db;
 		global $jp7_app;
 		$children_tipo = new InterAdminTipo($tipo);
-		$sql="SELECT id FROM ".$this->db_prefix.
-		" WHERE 1=1".
-		((is_numeric($tipo)) ? " AND id_tipo=".$tipo : " AND nome='".$tipo."'").
-		((!$jp7_app) ? " AND deleted<>'S'" : "").
-		" AND parent_id=".$this->id.
-		(($orderby)?" ORDER BY ".$orderby:" ORDER BY " . $children_tipo->interadminsOrderby);
-		//echo $sql;
-		$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-		while($row = $rs->FetchNextObj()){
-			$interadmins[]=new InterAdmin($row->id, $this->db_prefix);
-		}
-		$rs->Close();
-		return $interadmins;
+		$options['where'] = " AND parent_id=".$this->id;
+		return $children_tipo->getInterAdmins($options);
 	}
 	/**
 	 * @return string

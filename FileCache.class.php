@@ -136,6 +136,7 @@ class FileCache{
 	 */
 	public function getCache() {
 		readfile($this->cachePath . $this->fileName);
+		echo '<!-- ' . $this->fileName . ' -->';
 		if ($this->exit) exit();
 		else $this->isCached = TRUE;
 	}

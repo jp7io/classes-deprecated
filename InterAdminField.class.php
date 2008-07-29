@@ -206,7 +206,7 @@ class InterAdminField{
 					"</td>".
 					"<td>".$S_ajuda."</td>".
 				"</tr>\n";
-			}elseif(strpos($campo,"special_")===0){
+			}elseif(strpos($campo,"special_")===0 || strpos($campo,"func_")===0){
 				if (function_exists($campo_nome)) echo $campo_nome($campo_array,$valor);
 				else echo 'Função ' . $campo_nome . ' não encontrada.';
 			}else{

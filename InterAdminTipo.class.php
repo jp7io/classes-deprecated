@@ -10,9 +10,10 @@ class InterAdminTipo{
 	 * @param int $id_tipo
 	 * @param varchar $_db_prefix
 	 */
-	function __construct($id_tipo, $_db_prefix=''){
-		$this->id_tipo=$id_tipo;
-		$this->db_prefix=($_db_prefix)?$_db_prefix:$GLOBALS['db_prefix'];
+	function __construct($id_tipo, $options = NULL){
+		$this->id_tipo = $id_tipo;
+		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
+		if ($options['fields']) $this->getFieldsValues($options['fields']);
 	}
 	function __toString(){
 		return $this->id_tipo;
@@ -43,38 +44,37 @@ class InterAdminTipo{
 	/**
 	 * @return mixed
 	 */
-	function getFieldsValues($fields){
+	function getFieldsValues($fields) {
 		return jp7_fields_values($this->db_prefix.'_tipos', 'id_tipo', $this->id_tipo, $fields);
 	}
 	/**
 	 * @return object
 	 */
-	function getParent($cache = TRUE){
+	function getParent($cache = TRUE) {
 		if ($this->parentInterAdminTipo && $cache) return $this->parentInterAdminTipo;
 		else{
 			$parent = $this->getFieldsValues('parent_id_tipo');
 			if ($parent) {
-				eval('$this->parentInterAdminTipo = new ' . get_class($this) . '(' . $parent . ', "' . $this->db_prefix . '");');
+				$class_name = get_class($this);
+				$this->parentInterAdminTipo = new $class_name($parent, $this->db_prefix);
 				return $this->parentInterAdminTipo;
-			} else {
-				return FALSE;
 			}
 		}
 	}
 	/**
 	 * @return array
 	 */
-	function getChildren($fields = NULL){
+	function getChildren($options = NULL){
 		global $db;
 		global $jp7_app;
-		$sql="SELECT id_tipo" . (($fields) ? ',' . implode(',', (array)$fields) : '') . " FROM ".$this->db_prefix."_tipos".
-		" WHERE parent_id_tipo=".$this->id_tipo.
-		((!$jp7_app) ? " AND deleted_tipo=''" : "");
-		if ($GLOBALS['jp7_app']) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+		$sql="SELECT id_tipo" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . " FROM ".$this->db_prefix."_tipos".
+		" WHERE parent_id_tipo=".$this->id_tipo;
+		if ($GLOBALS['jp7_app']) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		else $rs = interadmin_query($sql);
 		while($row = $rs->FetchNextObj()){
-			eval('$interadmintipo = new ' . get_class($this) . '(' . $row->id_tipo . ', ' . $this->db_prefix . ');');
-			foreach((array)$fields as $field){
+			$class_name = get_class($this);
+			$interadmintipo = new $class_name($row->id_tipo, array('db_prefix' => $this->db_prefix));
+			foreach((array)$options['fields'] as $field){
 				$interadmintipo->$field = $row->$field;
 			}
 			$interadminsTipos[] = $interadmintipo;
@@ -85,18 +85,25 @@ class InterAdminTipo{
 	/**
 	 * @return array
 	 */
-	function getInterAdmins(/*$where = null, */$fields = NULL){
+	function getChildrenByModel($model_id_tipo){
+		$options['where'] = " AND model_id_tipo=".$model_id_tipo;
+		return $this->getChildren($options);
+	}
+	/**
+	 * @return array
+	 */
+	function getInterAdmins($options = NULL){
 		global $db;
-		$sql = "SELECT id" . (($fields) ? ',' . implode(',', (array)$fields) : '') . " FROM " . $this->db_prefix.
+		$sql = "SELECT id" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . " FROM " . $this->db_prefix.
 		" WHERE id_tipo=" . $this->id_tipo.
 		//(($where) ? " AND " . $where : '').
-		" ORDER BY " . $this->interadminsOrderby;
-		//$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-		if ($GLOBALS['jp7_app']) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+		" ORDER BY " . $this->interadminsOrderby .
+		(($options['limit']) ? " LIMIT " . $options['limit'] : '');
+		if ($GLOBALS['jp7_app']) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		else $rs = interadmin_query($sql);
 		while($row = $rs->FetchNextObj()){
-			$interadmin = new InterAdmin($row->id, $this->db_prefix);
-			foreach((array)$fields as $field){
+			$interadmin = new InterAdmin($row->id, array('db_prefix' => $this->db_prefix));
+			foreach((array)$options['fields'] as $field){
 				$interadmin->$field = $row->$field;
 			}
 			$interadmins[] = $interadmin;
@@ -107,20 +114,9 @@ class InterAdminTipo{
 	/**
 	 * @return array
 	 */
-	function getFirstInterAdmin($where = null){
-		global $db;
-		$sql = "SELECT id FROM " . $this->db_prefix.
-		" WHERE id_tipo=" . $this->id_tipo.
-		(($where) ? " AND " . $where : '').
-		" ORDER BY " . $this->interadminsOrderby.
-		" LIMIT 1";
-		//$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-		$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
-		while($row = $rs->FetchNextObj()){
-			$interadmin = new InterAdmin($row->id, $this->db_prefix);
-		}
-		$rs->Close();
-		return $interadmin;
+	function getFirstInterAdmin($options){
+		$options['limit'] = 1;
+		return $this->getInterAdmins($options);
 	}
 	/**
 	 * @return ?
@@ -166,7 +162,7 @@ class InterAdminTipo{
 	 * @return string
 	 */
 	function getURL() {
-		global $c_wwwroot, $implicit_parents_names, $seo;
+		global $c_url, $implicit_parents_names, $seo;
 		$url='';
 		$url_arr='';
 		$parent=$this;
@@ -180,7 +176,7 @@ class InterAdminTipo{
 		}
 		$url_arr=array_reverse((array)$url_arr);
 		if ($seo) {
-			$url = jp7_path($c_wwwroot) . join("/",$url_arr);
+			$url = $c_url . join("/",$url_arr);
 		} else {
 			$url=join("_",$url_arr);
 		}
