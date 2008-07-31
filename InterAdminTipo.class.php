@@ -23,21 +23,17 @@ class InterAdminTipo{
 			$campos = $this->getCampos();
 			if($campos){
 				foreach($campos as $key=>$row){
-					if($row[orderby])$tipo_orderby[$row[orderby]]=$key;
+					if($row['orderby'])$tipo_orderby[$row['orderby']] = $key;
 				}
 				if($tipo_orderby){
 					ksort($tipo_orderby);
-					$tipo_orderby=implode(",",$tipo_orderby);
+					$tipo_orderby=implode(",", $tipo_orderby);
 				}
-				
 				$this->$var = $tipo_orderby;
 			}
-			
 			if (!count($tipo_orderby)) {
 				$this->$var = 'date_publish DESC';
 			}
-			
-			
 			return $this->$var;
 		}
 	}
@@ -45,18 +41,20 @@ class InterAdminTipo{
 	 * @return mixed
 	 */
 	function getFieldsValues($fields) {
-		return jp7_fields_values($this->db_prefix.'_tipos', 'id_tipo', $this->id_tipo, $fields);
+		$fieldsValues = jp7_fields_values($this->db_prefix.'_tipos', 'id_tipo', $this->id_tipo, $fields, TRUE);
+		if (is_array($fields)) return $fieldsValues;
+		else return $fieldsValues->$fields;
 	}
 	/**
 	 * @return object
 	 */
-	function getParent($cache = TRUE) {
-		if ($this->parentInterAdminTipo && $cache) return $this->parentInterAdminTipo;
+	function getParent() {
+		if ($this->parentInterAdminTipo) return $this->parentInterAdminTipo;
 		else{
 			$parent = $this->getFieldsValues('parent_id_tipo');
 			if ($parent) {
 				$class_name = get_class($this);
-				$this->parentInterAdminTipo = new $class_name($parent, $this->db_prefix);
+				$this->parentInterAdminTipo = new $class_name($parent->parent_id_tipo, $this->db_prefix);
 				return $this->parentInterAdminTipo;
 			}
 		}
@@ -68,7 +66,9 @@ class InterAdminTipo{
 		global $db;
 		global $jp7_app;
 		$sql="SELECT id_tipo" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . " FROM ".$this->db_prefix."_tipos".
-		" WHERE parent_id_tipo=".$this->id_tipo;
+		" WHERE parent_id_tipo=".$this->id_tipo . 
+		(($options['where']) ? $options['where'] : '') . 
+		(($options['limit']) ? " LIMIT " . $options['limit'] : '');
 		if ($GLOBALS['jp7_app']) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		else $rs = interadmin_query($sql);
 		while($row = $rs->FetchNextObj()){
@@ -94,9 +94,12 @@ class InterAdminTipo{
 	 */
 	function getInterAdmins($options = NULL){
 		global $db;
+		if ($options['fields_alias']) {
+			$campos = $this->getCampos();
+		}
 		$sql = "SELECT id" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . " FROM " . $this->db_prefix.
 		" WHERE id_tipo=" . $this->id_tipo.
-		//(($where) ? " AND " . $where : '').
+		(($options['where']) ? $options['where'] : '') .
 		" ORDER BY " . $this->interadminsOrderby .
 		(($options['limit']) ? " LIMIT " . $options['limit'] : '');
 		if ($GLOBALS['jp7_app']) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
@@ -104,7 +107,20 @@ class InterAdminTipo{
 		while($row = $rs->FetchNextObj()){
 			$interadmin = new InterAdmin($row->id, array('db_prefix' => $this->db_prefix));
 			foreach((array)$options['fields'] as $field){
-				$interadmin->$field = $row->$field;
+				if ($options['fields_alias']) {
+					if ($campos[$field]['nome_id']) {
+						$alias = $campos[$field]['nome_id'];
+					} else {
+						$alias = $campos[$field]['nome'];
+						if (is_numeric($alias)) {
+							$alias = jp7_fields_values($this->db_prefix . '_tipos', 'id_tipo', $alias, 'nome');
+						}
+						$alias = toId($alias);
+					}
+				} else {
+					$alias = $field;
+				}
+				$interadmin->$alias = $row->$field;
 			}
 			$interadmins[] = $interadmin;
 		}
@@ -114,9 +130,10 @@ class InterAdminTipo{
 	/**
 	 * @return array
 	 */
-	function getFirstInterAdmin($options){
+	function getFirstInterAdmin($options = NULL){
 		$options['limit'] = 1;
-		return $this->getInterAdmins($options);
+		$interadmin = $this->getInterAdmins($options);
+		return $interadmin[0];
 	}
 	/**
 	 * @return ?
@@ -135,8 +152,8 @@ class InterAdminTipo{
 	 */
 	function getCampos(){
 		$model = $this->getModel();
-		$campos				= $model->getFieldsValues('campos');
-		$campos_parameters	= array("tipo", "nome", "ajuda", "tamanho", "obrigatorio", "separador", "xtra", "lista", "orderby", "combo", "readonly", "form", "label", "permissoes", "default");
+		$campos = $model->getFieldsValues('campos');
+		$campos_parameters	= array("tipo", "nome", "ajuda", "tamanho", "obrigatorio", "separador", "xtra", "lista", "orderby", "combo", "readonly", "form", "label", "permissoes", "default", "nome_id");
 		$campos				= split("{;}", $campos);
 		for($i = 0; $i < count($campos); $i++){
 			$parameters = split("{,}", $campos[$i]);
@@ -161,7 +178,7 @@ class InterAdminTipo{
 	/**
 	 * @return string
 	 */
-	function getURL() {
+	function getUrl() {
 		global $c_url, $implicit_parents_names, $seo;
 		$url='';
 		$url_arr='';

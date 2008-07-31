@@ -14,7 +14,7 @@ class InterAdmin{
 	function __construct($id = '', $options = NULL) {
 		$this->id = $id;
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
-		if ($options['fields']) $this->getFieldsValues($options['fields']);
+		if ($options['fields']) $this->getFieldsValues($options['fields'], FALSE, $options['fields_alias']);
 	}
 	function __get($var){
 		if($var == 'id'){
@@ -29,27 +29,34 @@ class InterAdmin{
 	 * @param bool $forceAsString Gets the string value for fields referencing to another InterAdmin ID
 	 * @return mixed
 	 */
-	function getFieldsValues($fields, $forceAsString = FALSE) {   
-		/*if(!$this->fieldsValues)*/$this->fieldsValues=jp7_fields_values($this->db_prefix , 'id', $this->id, $fields/*, true*/);
-		foreach ((array)$this->fieldsValues as $key=>$value) {
-			$this->$key = $value;
+	function getFieldsValues($fields, $forceAsString = FALSE, $fields_alias = FALSE, $fromtipo = FALSE) {   
+		
+		/* fields_aliases */
+		if (!$this->tipo && !$fromtipo && $fields_alias) {
+			$tipo = $this->getTipo();
+			$campos = $tipo->getCampos();
 		}
-		if($forceAsString){
-			foreach($this->fieldsValues as $key=>$value){
-				if(strpos($key,"select_")===0)$this->fieldsValuesAsString->$key=jp7_fields_values($this->db_prefix , 'id', $value, 'varchar_key');
-				else $this->fieldsValuesAsString->$key=$value;
-			}
-			return $this->fieldsValuesAsString;
-		}else{
-			/*
-			foreach($this->fieldsValues as $key=>$value){
-				if(strpos($key,'varchar_') === 0){
-					$this->fieldsValues->$key = toHTML($value);
+		
+		$fieldsValues = jp7_fields_values($this->db_prefix, 'id', $this->id, $fields, TRUE);
+		foreach((array)$fieldsValues as $key=>$value){
+			if ($forceAsString && strpos($key, 'select_') === 0) $value = jp7_fields_values($this->db_prefix, 'id', $value, 'varchar_key');
+			if ($fields_alias) {
+				if ($campos[$key]['nome_id']) {
+					$alias = $campos[$key]['nome_id'];
+				} else {
+					$alias = $campos[$key]['nome'];
+					if (is_numeric($alias)) {
+						$alias = jp7_fields_values($this->db_prefix . '_tipos', 'id_tipo', $alias, 'nome');
+					}
+					$alias = toId($alias);
 				}
+			} else {
+				$alias = $key;
 			}
-			*/
-			return $this->fieldsValues;
+			$this->$alias = $value;
 		}
+		if (is_array($fields)) return $fieldsValues;
+		else return $fieldsValues->$fields;
 	}
 	/**
 	 * @return mixed
@@ -65,8 +72,8 @@ class InterAdmin{
 	 * @return object
 	 */
 	function getTipo(){
-		if(!$this->id_tipo)$this->id_tipo=new InterAdminTipo($this->getFieldsValues('id_tipo'), array('db_prefix' => $this->db_prefix));
-		return $this->id_tipo;
+		if(!$this->tipo)$this->tipo=new InterAdminTipo($this->getFieldsValues('id_tipo', FALSE, FALSE, TRUE), array('db_prefix' => $this->db_prefix));
+		return $this->tipo;
 	}
 	/**
 	 * @param mixed $tipo
