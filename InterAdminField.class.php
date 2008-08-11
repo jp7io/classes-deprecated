@@ -72,7 +72,7 @@ class InterAdminField{
 			echo "<tr><th colspan=\"4\" class=\"inserir_tit_".(($xtra=="hidden")?"closed":"opened")."\" onclick=\"interadmin_showTitContent(this)\">".$campo_nome."</th></tr><tbody".(($xtra=="hidden")?" style=\"display:none\"":"").">";
 			$tit_start=true;
 		}elseif(strpos($campo,"text_")===0){
-			$form="<textarea".(($xtra)?" textarea_trigger=\"true\"":"")." name=\"".$campo."[]\" id=\"".$campo."_".$j."\" rows=".($tamanho+(($xtra)?((($xtra=="html_light"&&$tamanho<=5)||$quantidade>1)?2:5):0)).(($xtra)?" wrap=\"off\"":"")." xtra=\"".$xtra."\" class=\"inputs_width\" style=\"width:".(($s_interadmin_screenwidth<=800)?"400":"470")."px;".(($xtra)?";color:#000066;font-family:courier new;font-size:11px;visibility:hidden":"")."\"".(((($campo=="text_0"||$campo=="text_1")&&$tamanho<=5)||$quantidade>1)?" smallToolbar=\"true\"":"").">".$valor."</textarea>";
+			$form="<textarea".(($xtra)?" textarea_trigger=\"true\"":"")." name=\"".$campo."[]\" id=\"".$campo."_".$j."\" rows=".($tamanho+(($xtra)?((($xtra=="html_light"&&$tamanho<=5)||$quantidade>1)?2:5):0)).(($xtra)?" wrap=\"off\"":"")." xtra=\"".$xtra."\" class=\"inputs_width\" style=\"width:".(($s_interadmin_screenwidth<=800)?"400":"470")."px;".(($xtra)?";color:#000066;font-family:courier new;font-size:11px;visibility:hidden":"")."\"".(((($campo=="text_0"||$campo=="text_1")&&$tamanho<=5)||$quantidade>1)?" smallToolbar=\"true\"":"").$readonly.">".$valor."</textarea>";
 			if($xtra)$form.="<script type=\"text/javascript\">interadmin_iframes[".$iframes_i."]='".$campo."_".$iframes_i++."'</script>";
 		}elseif(strpos($campo,"char_")===0){
 			if($xtra&&!$id)$GLOBALS[$campo]="S";

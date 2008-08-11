@@ -15,7 +15,7 @@
  */
 class Debug{
 	/**
-	 * @var bool Flag, it is <tt>TRUE</tt> if debugging filenames or SQL queries. Use $_GET['debug'] to set it.
+	 * @var bool Flag, it is <tt>TRUE</tt> if its displaying filenames or SQL queries.
 	 */
 	public $active;
 	/**
@@ -50,19 +50,19 @@ class Debug{
 		$this->startTime();
 		// Debug - SQL
 		$this->debugSql = $_GET['debug_sql'];
-		// Debug - filename
+		// Debug - Filename
 		if (isset($_GET['debug_filename'])) {
 			setcookie('debug_filename', $_GET['debug_filename'], 0, '/');
 			$_COOKIE['debug_filename'] = $_GET['debug_filename'];
 		}
 		if ($_COOKIE['debug_filename']) $this->debugFilename = $_COOKIE['debug_filename'];
-		// Debugger toolbar
+		// Debug - Toolbar
 		if (isset($_GET['debug'])){
 			setcookie('debug', $_GET['debug'], 0, '/');
 			$_COOKIE['debug'] = $_GET['debug'];
 		}
 		// Setting it as active
-		if ($this->debugFilename || $this->debugSql || $_COOKIE['debug']) $this->active = TRUE;
+		if ($_COOKIE['debug']) $this->active = TRUE;
 	}
 	/**
 	 * Starts recording the time spent on the code. When using more than one startTime(), the time will be displayed from the last to the first when getTime() is called.
@@ -93,11 +93,8 @@ class Debug{
 		global $c_doc_root;
 		if ($this->debugFilename && $this->safePoint) echo '<div class="debug_msg">' .  str_replace($c_doc_root, '/', $filename ) . '</div>';
 		if ($this->active) {
-			// Saves time of the previous file on the Log
-			$this->setLogTime('file');
 			// Creates a new log entry for this file
 			$this->addLog($filename, 'file');
-			$this->startTime();
 		}
 		return $filename;
 	}
@@ -139,17 +136,8 @@ class Debug{
 		if (count($_COOKIE)) $S .= '<strong style="color:red">     COOKIE:</strong> ' . print_r($_COOKIE, TRUE);
 		return '<pre style="background-color:#FFFFFF;font-size:11px;text-align:left;">' . $S . '</pre>';
 	}
-	public function addLog($value, $tag = 'log', $time = 0) {
+	public function addLog($value, $tag = 'log', $time = NULL) {
 		$this->log[] = array('tag' => $tag, 'value' => $value, 'time' => $time);
-	} 
-	protected function setLogTime($tag) {
-		if (count($this->startTime) === 1) return;
-		for($i = count($this->log) - 1; $i >= 0; $i--) {
-			if ($this->log[$i]['tag'] === $tag) {
-				$this->log[$i]['time'] = $this->getTime();
-				break;
-			}
-		}
 	} 
 	public function showToolbar() {
 		global $template_filename;
@@ -158,13 +146,25 @@ class Debug{
 		if ($template_filename) echo ('template_filename: ' . $template_filename);
 		else echo('PHP_SELF: ' . $_SERVER['PHP_SELF']);
 		
-		// Saves time of the previous file on the Log
-		$this->setLogTime('file');
-					
 		jp7_print_r($this->log);
-		
 		$this->getTime(TRUE);
-		//echo $this->getBacktrace();
+	
+		?>
+		<script type="text/javascript" src="/_default/js/jquery/jquery.jp7.js"></script>
+		<script type="text/javascript" src="/_default/js/jquery/ui.core.js"></script>
+		<script type="text/javascript" src="/_default/js/jquery/ui.dialog.js"></script>
+		<script type="text/javascript" src="/_default/js/jquery/ui.draggable.js"></script>
+		<script type="text/javascript" src="/_default/js/jquery/ui.resizable.js"></script>
+		<script type="text/javascript">
+			dialog_options = {
+				resizable: true,
+				draggable: true,
+				overlay: null,
+				position: 'top'
+			}
+			$.dialog.open("<?= 'PHP_SELF: ' . $_SERVER['PHP_SELF'] ?>", null, dialog_options);
+		</script>
+		<?
 	}
 }
 ?>

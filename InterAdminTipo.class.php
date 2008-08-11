@@ -43,20 +43,18 @@ class InterAdminTipo{
 	function getFieldsValues($fields) {
 		$fieldsValues = jp7_fields_values($this->db_prefix.'_tipos', 'id_tipo', $this->id_tipo, $fields, TRUE);
 		if (is_array($fields)) return $fieldsValues;
-		else return $fieldsValues->$fields;
+		elseif($fields) return $fieldsValues->$fields;
 	}
 	/**
 	 * @return object
 	 */
 	function getParent() {
 		if ($this->parentInterAdminTipo) return $this->parentInterAdminTipo;
-		else{
-			$parent = $this->getFieldsValues('parent_id_tipo');
-			if ($parent) {
-				$class_name = get_class($this);
-				$this->parentInterAdminTipo = new $class_name($parent->parent_id_tipo, $this->db_prefix);
-				return $this->parentInterAdminTipo;
-			}
+		$parent = $this->getFieldsValues(array('parent_id_tipo'));
+		if ($parent) {
+			$class_name = get_class($this);
+			$this->parentInterAdminTipo = new $class_name($parent->parent_id_tipo, array('db_prefix' => $this->db_prefix));
+			return $this->parentInterAdminTipo;
 		}
 	}
 	/**
@@ -69,7 +67,7 @@ class InterAdminTipo{
 		" WHERE parent_id_tipo=".$this->id_tipo . 
 		(($options['where']) ? $options['where'] : '') . 
 		(($options['limit']) ? " LIMIT " . $options['limit'] : '');
-		if ($GLOBALS['jp7_app']) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
+		if ($jp7_app) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		else $rs = interadmin_query($sql);
 		while($row = $rs->FetchNextObj()){
 			$class_name = get_class($this);
@@ -94,15 +92,18 @@ class InterAdminTipo{
 	 */
 	function getInterAdmins($options = NULL){
 		global $db;
+		global $lang;
+		global $jp7_app;
 		if ($options['fields_alias']) {
 			$campos = $this->getCampos();
 		}
-		$sql = "SELECT id" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . " FROM " . $this->db_prefix.
+		$sql = "SELECT id" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . 
+		" FROM " . $this->db_prefix . (($this->getFieldsValues('language')) ? $lang->prefix : '') .
 		" WHERE id_tipo=" . $this->id_tipo.
 		(($options['where']) ? $options['where'] : '') .
 		" ORDER BY " . $this->interadminsOrderby .
 		(($options['limit']) ? " LIMIT " . $options['limit'] : '');
-		if ($GLOBALS['jp7_app']) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
+		if ($jp7_app) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		else $rs = interadmin_query($sql);
 		while($row = $rs->FetchNextObj()){
 			$interadmin = new InterAdmin($row->id, array('db_prefix' => $this->db_prefix));
@@ -117,6 +118,7 @@ class InterAdminTipo{
 						}
 						$alias = toId($alias);
 					}
+					if (!$alias) $alias = $field;
 				} else {
 					$alias = $field;
 				}
@@ -159,7 +161,7 @@ class InterAdminTipo{
 			$parameters = split("{,}", $campos[$i]);
 			if($parameters[0]){
 				$A[$parameters[0]]['ordem'] = ($i+1);
-				$isSelect = (strpos($parameters[0], 'select_') !== false);
+				$isSelect = (strpos($parameters[0], 'select_') !== FALSE);
 				for($j = 0 ; $j < count($parameters); $j++){
 					$A[$parameters[0]][$campos_parameters[$j]] = $parameters[$j];
 				}
@@ -180,26 +182,28 @@ class InterAdminTipo{
 	 */
 	function getUrl() {
 		global $c_url, $implicit_parents_names, $seo;
-		$url='';
-		$url_arr='';
-		$parent=$this;
-		while($parent) {
+		$c_url = jp7_path($c_url, TRUE);
+		$url = '';
+		$url_arr = '';
+		$parent = $this;
+		while ($parent) {
 			if ($seo) {
-				if (!in_array($parent->getFieldsValues('nome'), $implicit_parents_names)) $url_arr[] = toSeo($parent->getFieldsValues('nome'));
+				if (!in_array($parent->getFieldsValues('nome'), (array)$implicit_parents_names)) $url_arr[] = toSeo($parent->getFieldsValues('nome'));
 			} else {
 				$url_arr[] = toId($parent->getFieldsValues('nome'));
 			}
 			$parent = $parent->getParent();
 		}
-		$url_arr=array_reverse((array)$url_arr);
+
+		$url_arr = array_reverse((array)$url_arr);
 		if ($seo) {
-			$url = $c_url . join("/",$url_arr);
+			$url = $c_url . join("/", $url_arr);
 		} else {
-			$url=join("_",$url_arr);
+			$url = join("_", $url_arr);
 		}
 		if (!$seo) {
-			$url=substr_replace($url,'/',strpos($url,'_'),1);
-			$url.=(count($url_arr)>1)?'.php':'/';
+			$url = substr_replace($url, '/', strpos($url, '_'), 1);
+			$url .= (count($url_arr) > 1) ? '.php' : '/';
 		}
 		return $url;
 	}

@@ -25,7 +25,7 @@ class FileCache{
 	/**
 	 * @var string Name of the file to be cached or loaded from cache.
 	 */
-	public $cacheFileName;
+	public $fileName;
 	/**
 	 * @var int Time delay before re-caching.
 	 */
@@ -52,7 +52,7 @@ class FileCache{
 	public function __construct($storeId = FALSE, $exit = TRUE, $cachePath = 'cache') {
 		global $c_root, $c_path, $c_cache, $c_cache_delay, $c_devIps, $debugger, $s_interadmin_preview, $interadmin_gerar_menu;
 		// Cache not desired
-		if (!$c_cache || $debugger->active || $s_interadmin_preview || $interadmin_gerar_menu) return;
+		if (!$c_cache || $debugger->debugFilename || $debugger->debugSql || $s_interadmin_preview || $interadmin_gerar_menu) return;
 
 		$this->fileRoot = $c_root;
 		$this->cachePath = $this->fileRoot . $cachePath . '/';
@@ -136,9 +136,11 @@ class FileCache{
 	 */
 	public function getCache() {
 		readfile($this->cachePath . $this->fileName);
-		echo '<!-- ' . $this->fileName . ' -->';
-		if ($this->exit) exit();
-		else $this->isCached = TRUE;
+		$this->isCached = TRUE;
+		if ($this->exit) {
+			$debugger->showToolbar();
+		 	exit();
+		}
 	}
 	/**
 	 * Checks if the log file is newer than the cached file,  and if the cached file is older than 1 day.
@@ -148,7 +150,7 @@ class FileCache{
 	public function checkLog() {
 		$cache_time = @filemtime($this->cachePath . $this->fileName);
 		$log_time = @filemtime($this->fileRoot . 'interadmin.log');
-		
+		// TRUE = Cache is ok, no need to refresh
 		if ($cache_time && time() - $log_time < $this->delay) return TRUE;
 		if (($log_time < $cache_time) && date('d', $cache_time) == date('d')) return TRUE;
 	}
