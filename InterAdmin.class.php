@@ -75,7 +75,8 @@ class InterAdmin{
 	 * @return object
 	 */
 	function getTipo(){
-		if (!$this->tipo) $this->tipo = new InterAdminTipo($this->getFieldsValues('id_tipo', FALSE, FALSE, TRUE), array('db_prefix' => $this->db_prefix));
+		if (!$this->id_tipo) $this->id_tipo = $this->getFieldsValues('id_tipo', FALSE, FALSE, TRUE);
+		if (!$this->tipo) $this->tipo = new InterAdminTipo($this->id_tipo, array('db_prefix' => $this->db_prefix));
 		return $this->tipo;
 	}
 	/**

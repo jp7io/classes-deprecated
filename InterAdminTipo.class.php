@@ -23,7 +23,7 @@ class InterAdminTipo{
 			$campos = $this->getCampos();
 			if($campos){
 				foreach($campos as $key=>$row){
-					if($row['orderby'])$tipo_orderby[$row['orderby']] = $key;
+					if ($row['orderby'])$tipo_orderby[$row['orderby']] = $key;
 				}
 				if($tipo_orderby){
 					ksort($tipo_orderby);
@@ -63,13 +63,13 @@ class InterAdminTipo{
 	function getChildren($options = NULL){
 		global $db;
 		global $jp7_app;
-		$sql="SELECT id_tipo" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . " FROM ".$this->db_prefix."_tipos".
+		$sql = "SELECT id_tipo" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . " FROM ".$this->db_prefix."_tipos".
 		" WHERE parent_id_tipo=".$this->id_tipo . 
 		(($options['where']) ? $options['where'] : '') . 
 		(($options['limit']) ? " LIMIT " . $options['limit'] : '');
 		if ($jp7_app) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		else $rs = interadmin_query($sql);
-		while($row = $rs->FetchNextObj()){
+		while ($row = $rs->FetchNextObj()) {
 			$class_name = get_class($this);
 			$interadmintipo = new $class_name($row->id_tipo, array('db_prefix' => $this->db_prefix));
 			foreach((array)$options['fields'] as $field){
@@ -105,8 +105,10 @@ class InterAdminTipo{
 		(($options['limit']) ? " LIMIT " . $options['limit'] : '');
 		if ($jp7_app) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		else $rs = interadmin_query($sql);
-		while($row = $rs->FetchNextObj()){
+		while ($row = $rs->FetchNextObj()) {
 			$interadmin = new InterAdmin($row->id, array('db_prefix' => $this->db_prefix));
+			$interadmin->id_tipo = $this->id_tipo;
+			$interadmin->tipo = $this;
 			foreach((array)$options['fields'] as $field){
 				if ($options['fields_alias']) {
 					if ($campos[$field]['nome_id']) {

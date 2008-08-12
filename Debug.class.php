@@ -57,10 +57,10 @@ class Debug{
 		}
 		if ($_COOKIE['debug_filename']) $this->debugFilename = $_COOKIE['debug_filename'];
 		// Debug - Toolbar
-		if (isset($_GET['debug'])){
+		/*if (isset($_GET['debug'])){
 			setcookie('debug', $_GET['debug'], 0, '/');
 			$_COOKIE['debug'] = $_GET['debug'];
-		}
+		}*/
 		// Setting it as active
 		if ($_COOKIE['debug']) $this->active = TRUE;
 	}
