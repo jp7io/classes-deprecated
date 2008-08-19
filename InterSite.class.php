@@ -220,10 +220,11 @@ class InterSite extends InterAdmin {
 			// This server is not there, it might be an alias
 			foreach ($this->servers as $host=>$server) {
 				// InterAdmin Remote
-				if ($this->interadmin_remote && $GLOBALS['jp7_app'] && $server->type == 'Principal') {
+				if ($this->interadmin_remote && $GLOBALS['jp7_app'] && $server->type == 'Produção') {
+					$this->servers[$this->interadmin_remote] = $server;
 					$this->server = $server;
 					break;
-				}			
+				}
 				if (in_array($_SERVER['HTTP_HOST'], (array) $server->aliases)) {
 					// Alias found, redirect it to the host
 					header('Location: http://' . $host . $_SERVER['REQUEST_URI']);
@@ -249,7 +250,7 @@ class InterSite extends InterAdmin {
 		$GLOBALS['db_prefix'] = 'interadmin_' . $this->name_id;
 		$GLOBALS['c_path'] = $this->server->path;
 		$GLOBALS['c_analytics'] = $this->google_analytics;
-		if ($this->interadmin_remote == $_SERVER['HTTP_HOST']) $GLOBALS['c_remote'] = $this->interadmin_remote;
+		if ($this->interadmin_remote == $_SERVER['HTTP_HOST'] || $this->interadmin_remote == 'www.' . $_SERVER['HTTP_HOST']) $GLOBALS['c_remote'] = $this->interadmin_remote;
 		$GLOBALS['googlemaps_key'] = $this->google_maps;
 		$GLOBALS['c_w3c'] = TRUE;
 		$GLOBALS['c_doc_root'] = jp7_doc_root();

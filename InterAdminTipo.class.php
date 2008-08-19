@@ -4,7 +4,6 @@
  *
  */
 class InterAdminTipo{
-	public $id;
 	public $id_tipo;
 	/**
 	 * @param int $id_tipo
@@ -50,10 +49,10 @@ class InterAdminTipo{
 	 */
 	function getParent() {
 		if ($this->parentInterAdminTipo) return $this->parentInterAdminTipo;
-		$parent = $this->getFieldsValues(array('parent_id_tipo'));
+		$parent = $this->getFieldsValues(array('parent_id_tipo'))->parent_id_tipo;
 		if ($parent) {
 			$class_name = get_class($this);
-			$this->parentInterAdminTipo = new $class_name($parent->parent_id_tipo, array('db_prefix' => $this->db_prefix));
+			$this->parentInterAdminTipo = new $class_name($parent, array('db_prefix' => $this->db_prefix));
 			return $this->parentInterAdminTipo;
 		}
 	}
@@ -183,8 +182,7 @@ class InterAdminTipo{
 	 * @return string
 	 */
 	function getUrl() {
-		global $c_url, $implicit_parents_names, $seo;
-		$c_url = jp7_path($c_url, TRUE);
+		global $c_url, $implicit_parents_names, $seo, $lang;
 		$url = '';
 		$url_arr = '';
 		$parent = $this;
@@ -196,12 +194,12 @@ class InterAdminTipo{
 			}
 			$parent = $parent->getParent();
 		}
-
 		$url_arr = array_reverse((array)$url_arr);
+
 		if ($seo) {
 			$url = $c_url . join("/", $url_arr);
 		} else {
-			$url = join("_", $url_arr);
+			$url = $c_url . $lang->path_url . join("_", $url_arr);
 		}
 		if (!$seo) {
 			$url = substr_replace($url, '/', strpos($url, '_'), 1);

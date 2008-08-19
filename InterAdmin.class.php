@@ -85,6 +85,7 @@ class InterAdmin{
 	 */
 	function getChildren($tipo, $options = NULL) {
 		global $db;
+		if (!$tipo) return;
 		$children_tipo = new InterAdminTipo($tipo);
 		$options['where'] = " AND parent_id=".$this->id;
 		return $children_tipo->getInterAdmins($options);

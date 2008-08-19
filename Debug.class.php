@@ -6,6 +6,7 @@
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
  * @version 1.02 (2008/07/18)
  * @package Debug
+ * @todo Documentation, and showToolbar
  */
  
 /**
@@ -39,6 +40,10 @@ class Debug{
 	 */
 	protected $startTime;
 	/**
+	 * @var bool Indicates the current template file loaded. Used on the showToolbar() method.
+	 */
+	protected $templateFilename;
+	/**
 	 * Constructor function, initial checks and settings when object is created.
 	 *
 	 * @global bool
@@ -57,12 +62,12 @@ class Debug{
 		}
 		if ($_COOKIE['debug_filename']) $this->debugFilename = $_COOKIE['debug_filename'];
 		// Debug - Toolbar
-		/*if (isset($_GET['debug'])){
-			setcookie('debug', $_GET['debug'], 0, '/');
-			$_COOKIE['debug'] = $_GET['debug'];
-		}*/
+		if (isset($_GET['debug_toolbar'])){
+			setcookie('debug_toolbar', $_GET['debug_toolbar'], 0, '/');
+			$_COOKIE['debug_toolbar'] = $_GET['debug_toolbar'];
+		}
 		// Setting it as active
-		if ($_COOKIE['debug']) $this->active = TRUE;
+		if ($_COOKIE['debug_toolbar'] || $this->debugSql || $this->debugFilename) $this->active = TRUE;
 	}
 	/**
 	 * Starts recording the time spent on the code. When using more than one startTime(), the time will be displayed from the last to the first when getTime() is called.
@@ -139,16 +144,24 @@ class Debug{
 	public function addLog($value, $tag = 'log', $time = NULL) {
 		$this->log[] = array('tag' => $tag, 'value' => $value, 'time' => $time);
 	} 
+	public function getLog() {
+		return $this->log;
+	} 
+	public function setTemplateFilename($filename) {
+		$this->templateFilename = $filename;
+	}
+	public function getTemplateFilename() {
+		return $this->templateFilename;
+	}
 	public function showToolbar() {
-		global $template_filename;
-		if (!$this->active) return FALSE;
+		if (!$this->active || !$this->safePoint) return FALSE;
 		
-		if ($template_filename) echo ('template_filename: ' . $template_filename);
+		if ($this->templateFilename ) echo ('Template: ' . $this->templateFilename );
 		else echo('PHP_SELF: ' . $_SERVER['PHP_SELF']);
 		
 		jp7_print_r($this->log);
 		$this->getTime(TRUE);
-	
+	/*
 		?>
 		<script type="text/javascript" src="/_default/js/jquery/jquery.jp7.js"></script>
 		<script type="text/javascript" src="/_default/js/jquery/ui.core.js"></script>
@@ -164,7 +177,7 @@ class Debug{
 			}
 			$.dialog.open("<?= 'PHP_SELF: ' . $_SERVER['PHP_SELF'] ?>", null, dialog_options);
 		</script>
-		<?
+		<?*/
 	}
 }
 ?>
