@@ -182,7 +182,7 @@ class InterAdminTipo{
 	 * @return string
 	 */
 	function getUrl() {
-		global $c_url, $implicit_parents_names, $seo, $lang;
+		global $c_url, $c_cliente_url, $c_cliente_url_path, $implicit_parents_names, $jp7_app, $seo, $lang;
 		$url = '';
 		$url_arr = '';
 		$parent = $this;
@@ -199,7 +199,7 @@ class InterAdminTipo{
 		if ($seo) {
 			$url = $c_url . join("/", $url_arr);
 		} else {
-			$url = $c_url . $lang->path_url . join("_", $url_arr);
+			$url = (($jp7_app) ? $c_cliente_url . $c_cliente_url_path : $c_url) . $lang->path_url . join("_", $url_arr);
 		}
 		if (!$seo) {
 			$url = substr_replace($url, '/', strpos($url, '_'), 1);
