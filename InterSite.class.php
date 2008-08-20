@@ -215,14 +215,18 @@ class InterSite extends InterAdmin {
 	function __wakeup() {
 		// This server is a main host
 		$this->server = $this->servers[$_SERVER['HTTP_HOST']];
-		
 		if (!$this->server) {
 			// This server is not there, it might be an alias
 			foreach ($this->servers as $host=>$server) {
+				// Dev Local
+				if ($_SERVER['HTTP_HOST'] == 'localhost') {
+					if ($server->type == 'Desenvolvimento') {
+						$this->server = $this->servers[$_SERVER['HTTP_HOST']] = $server;
+						break;
+					}
 				// InterAdmin Remote
-				if ($this->interadmin_remote && $GLOBALS['jp7_app'] && $server->type == 'Produção') {
-					$this->servers[$this->interadmin_remote] = $server;
-					$this->server = $server;
+				} elseif ($this->interadmin_remote && $GLOBALS['jp7_app'] && $server->type == 'Produção') {
+					$this->server = $this->servers[$this->interadmin_remote] = $server;
 					break;
 				}
 				if (in_array($_SERVER['HTTP_HOST'], (array) $server->aliases)) {
@@ -231,8 +235,8 @@ class InterSite extends InterAdmin {
 					exit();
 				}
 			}
-			// No alias found, die
-			die(jp7_debug('Host não está presente nas configurações.'));
+			// No server found, die
+			if (!$this->server) die(jp7_debug('Host não está presente nas configurações.'));
 		}
 		$this->db = $this->server->db;
 				
