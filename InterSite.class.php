@@ -14,6 +14,15 @@
  * @package InterSite
  */
 class InterSite extends InterAdmin {
+	/**
+	 * @var Array containning the servers for this site.
+	 */
+	public $servers;
+	/**
+	 * Populates and returns the array of servers for this site.
+	 * 
+	 * @return array
+	 */
 	public function getServers() {
 		$options = array(
 			'fields' => array('varchar_key', 'select_1', 'varchar_1', 'varchar_2',  'varchar_3', 'varchar_4', 'password_key', 'select_2'),
@@ -23,7 +32,7 @@ class InterSite extends InterAdmin {
 		
 		// Languages
 		$options = array(
-			'fields' => array('select_key', 'varchar_1', 'text_1', 'text_2'),
+			'fields' => array('select_key', 'varchar_1', 'text_1', 'text_2', 'char_1'),
 			'fields_alias' => TRUE
 		);
 		$languages = $this->getChildren(37, $options);
@@ -33,6 +42,7 @@ class InterSite extends InterAdmin {
 			$language->lang = $lang->varchar_1;
 			$language->name = $lang->varchar_key;
 			$language->multibyte = $lang->char_1;
+			unset($language->tipo);
 			unset($language->db_prefix);
 			$this->langs[$language->lang] = $language;
 		}
@@ -211,7 +221,17 @@ class InterSite extends InterAdmin {
 			}
 		}
 	}
+	/*
+	function __sleep() {
+		echo 'im being called';
+		unset($this->db->db_prefix);
+		unset($this->db->id_tipo);
+		$this->db->id_tipo = 'teste';
+		return array_keys(get_object_vars($this));
 	
+	
+	}
+	*/
 	function __wakeup() {
 		// This server is a main host
 		$this->server = $this->servers[$_SERVER['HTTP_HOST']];
@@ -271,7 +291,10 @@ class InterSite extends InterAdmin {
 			$GLOBALS['c_cliente_domains'][] = $host;
 			$GLOBALS['c_cliente_domains'] = array_merge($GLOBALS['c_cliente_domains'], (array) $server->aliases);
 		}
-		foreach($this->langs as $acron=>$value) $GLOBALS['c_lang'][] = array($acron, $value->name, (bool) $value->multibyte);
+		foreach($this->langs as $acron=>$value) {
+			$GLOBALS['c_lang'][] = array($acron, $value->name, (bool) $value->multibyte);
+			if ($value->default) $GLOBALS['c_lang_default'] = $acron;
+		}
 		/* TEMP - Creating old globals */
 	}
 }
