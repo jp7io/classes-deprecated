@@ -45,7 +45,7 @@ class Pagination{
 		
 		$this->total = ceil($this->records / $limit); // Total de Paginas
 		$this->page = $page; // Pagina Atual
-		//$this->sql_limit=" LIMIT ".(($page-1)*$limit).",".$limit;
+		$this->sql_limit=" LIMIT ".(($page-1)*$limit).",".$limit;
 		$this->limit = $limit; // Itens por pagina
 		$this->init = (($page - 1) * $limit); // Item inicial
 		
