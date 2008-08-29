@@ -30,7 +30,7 @@ class Pagination{
 	 */
 	function __construct($sql = NULL, $limit = 10, $page = 1, $type = '', $numbers_limit = 10, $parameters = '', $separador = '|', $next_char = '&gt;', $back_char = '&lt;', $last_char = '&raquo;', $first_char = '&laquo;', $records = NULL) {
 		global $db, $rs, $seo;
-		if (!$page) $page = 1;
+		if (!intval($page)) $page = 1;
 
 		if ($sql) {
 			if ($GLOBALS["jp7_app"]) $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
@@ -44,7 +44,7 @@ class Pagination{
 		}
 		
 		$this->total = ceil($this->records / $limit); // Total de Paginas
-		$this->page = $page; // Pagina Atual
+		$this->page = ($page > $this->total) ? $this->total : $page; // Pagina Atual
 		$this->sql_limit=" LIMIT ".(($page-1)*$limit).",".$limit;
 		$this->limit = $limit; // Itens por pagina
 		$this->init = (($page - 1) * $limit); // Item inicial
@@ -53,6 +53,7 @@ class Pagination{
 		$this->query_string = preg_replace('([&]?p_page=[0-9]+)', '', $_SERVER['QUERY_STRING']); // Retira a pagina atual da Query String
 		if ($seo) $this->query_string = preg_replace('([&]?baseurl=true)', '', $this->query_string); // Retira a baseurl se a pagina tiver S.E.O.
 		$this->query_string = preg_replace('([&]?go_url=' . $_GET['go_url'] . ')', '', $this->query_string); // Retira a GO Url da Query String
+		if ($this->query_string[0] == '&') $this->query_string = substr($this->query_string,1); // Limpa & que sobrou no começo da string
 		$this->parameters = $parameters;
 		$this->request_uri = preg_replace('/[?](.*)/', '', $_SERVER['REQUEST_URI']);
 		//$this->query_string=substr($this->query_string,1);
