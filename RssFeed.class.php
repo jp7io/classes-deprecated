@@ -58,7 +58,7 @@ class RssFeed extends DOMDocument {
  	 * @return string RSS Document.
 	 * @version (2008/07/11)
 	 */
-	function parseArray($rows, $rssVersion = '2.0') {
+	public function parseArray($rows, $rssVersion = '2.0') {
 		global $lang;
 		
 		$this->formatOutput = TRUE;
@@ -95,11 +95,13 @@ class RssFeed extends DOMDocument {
  	 * @return string String with NCRs replacing special characters.
 	 * @version (2008/07/11)
 	 */
-	function xmlEntities($str){
+	public function xmlEntities($str){
+		static $conversionTable;
+		if (!$conversionTable) $conversionTable = get_html_translation_table(HTML_ENTITIES, ENT_QUOTES);
 		$str = str_replace('&', '&amp;', $str);
-		foreach (get_html_translation_table(HTML_ENTITIES, ENT_QUOTES) as $k => $v) {
+		foreach ($conversionTable  as $k => $v) {
 			if ($k == '&') continue;
-			$str = str_replace($k, "&#" . ord($k) . ";", $str);
+			$str = str_replace($k, '&#' . ord($k) . ';', $str);
 		}
 		return $str;
 	}
