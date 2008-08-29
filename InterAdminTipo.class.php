@@ -5,6 +5,7 @@
  */
 class InterAdminTipo{
 	public $id_tipo;
+	protected $url;
 	/**
 	 * @param int $id_tipo
 	 * @param varchar $_db_prefix
@@ -182,6 +183,7 @@ class InterAdminTipo{
 	 * @return string
 	 */
 	function getUrl() {
+		if ($this->url) return $this->url;
 		global $c_url, $c_cliente_url, $c_cliente_url_path, $implicit_parents_names, $jp7_app, $seo, $lang;
 		$url = '';
 		$url_arr = '';
@@ -205,7 +207,7 @@ class InterAdminTipo{
 			$url = substr_replace($url, '/', strpos($url, '_'), 1);
 			$url .= (count($url_arr) > 1) ? '.php' : '/';
 		}
-		return $url;
+		return $this->url = $url;
 	}
 }
 ?>
