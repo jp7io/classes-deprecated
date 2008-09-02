@@ -135,6 +135,7 @@ class FileCache{
 	 * @return NULL
 	 */
 	public function getCache() {
+		global $debugger;
 		readfile($this->cachePath . $this->fileName);
 		$this->isCached = TRUE;
 		if ($this->exit) {
