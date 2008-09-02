@@ -51,6 +51,7 @@ class InterAdmin{
 					}
 					$alias = toId($alias);
 				}
+				if (!$alias) $alias = $key;
 			} else {
 				$alias = $key;
 			}
