@@ -209,5 +209,26 @@ class InterAdminTipo{
 		}
 		return $this->url = $url;
 	}
+	/**
+	 * @return string
+	 */
+	function getTreePath() {
+		global $c_url, $implicit_parents_names, $seo, $lang;
+		$url = '';
+		$url_arr = '';
+		$parent = $this;
+		while ($parent) {
+			if ($seo) {
+				if (!in_array($parent->getFieldsValues('nome'), (array)$implicit_parents_names)) $url_arr[] = toSeo($parent->getFieldsValues('nome'));
+			} else {
+				$url_arr[] = $parent->getFieldsValues('nome');
+			}
+			$parent = $parent->getParent();
+		}
+		$url_arr = array_reverse((array)$url_arr);
+
+			$url = $c_url . join("/", $url_arr);
+		return $url;
+	}
 }
 ?>
