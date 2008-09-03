@@ -94,6 +94,7 @@ class InterAdminTipo{
 		global $db;
 		global $lang;
 		global $jp7_app;
+		$interadmins = array();
 		//if ($options['fields_alias']) {
 			$campos = $this->getCampos();
 		//}
@@ -125,10 +126,22 @@ class InterAdminTipo{
 					$alias = $field;
 				}
 				if (strpos($field, 'select_') === 0 && $row->$field) {
-					if ($campos[$field]['xtra'] === 'S') {
-						$row->$field = new InterAdminTipo($row->$field);
-					} else {
-						$row->$field = new InterAdmin($row->$field);
+					if (is_numeric($row->$field)) {
+						if ($campos[$field]['xtra'] === 'S') {
+							$row->$field = new InterAdminTipo($row->$field);
+						} else {
+							$row->$field = new InterAdmin($row->$field);
+						}
+					} elseif (strpos($field, 'select_multi') === 0) {
+						$value_arr = explode(',', $row->$field);
+						foreach ($value_arr as $key2 => $value2) {
+							if ($campos[$field]['xtra'] === 'S') {
+								$value_arr[$key2] = new InterAdminTipo($value2);
+							} else {
+								$value_arr[$key2] = new InterAdmin($value2);
+							}
+						}
+						$row->$field = $value_arr;
 					}
 				}
 				$interadmin->$alias = $row->$field;
@@ -166,6 +179,7 @@ class InterAdminTipo{
 		$campos = $model->getFieldsValues('campos');
 		$campos_parameters	= array("tipo", "nome", "ajuda", "tamanho", "obrigatorio", "separador", "xtra", "lista", "orderby", "combo", "readonly", "form", "label", "permissoes", "default", "nome_id");
 		$campos				= split("{;}", $campos);
+		$A = array();
 		for($i = 0; $i < count($campos); $i++){
 			$parameters = split("{,}", $campos[$i]);
 			if($parameters[0]){
@@ -177,7 +191,7 @@ class InterAdminTipo{
 				if($isSelect && $A[$parameters[0]]['nome']!='all'){
 					$id_tipo = $A[$parameters[0]]['nome'];
 					$Cadastro_r = new InterAdminTipo($id_tipo);	
-					$A[$parameters[0]]['children'] = $Cadastro_r->getCampos();
+					$A[$parameters[0]]['nome'] = $Cadastro_r;
 					//jp7_print_r($parameters[0]);
 					//jp7_print_r($A[$parameters[0]]['nome']);
 				}
@@ -185,6 +199,22 @@ class InterAdminTipo{
 		}
 		return $A;
 		//return interadmin_tipos_campos($this->getFieldsValues('campos'));
+	}
+	/**
+	 * @return string
+	 */
+	function getStringValue($simple = FALSE) {
+		$campos = $this->getCampos();
+		$return[] = $this->getFieldsValues('nome');
+		//if (!$simple) {
+			foreach ($campos as $row) {
+				if (($row['combo'] || strpos($row['tipo'],'_key') !== FALSE) && $row['tipo'] !== 'char_key') {
+					if (is_object($row['nome'])) $return[] = $row['nome']->getStringValue();
+					else $return[] = $row['nome'];
+				}
+			}
+		//}
+		return implode(' - ', $return);
 	}
 	/**
 	 * @return string
