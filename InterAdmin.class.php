@@ -23,7 +23,7 @@ class InterAdmin{
 		}
 	}
 	function __toString(){
-		return $this->id;
+		return (string) $this->id;
 	}	
 	/**
 	 * Gets values from this record on the database.
@@ -39,7 +39,7 @@ class InterAdmin{
 		global $lang;
 		// Prevents function from entering in an infinite looping
 		if (!$this->tipo && !$fromtipo) $this->getTipo();
-		if ($fields_alias) $campos = $this->tipo->getCampos();
+		if ($this->tipo/*$fields_alias*/) $campos = $this->tipo->getCampos();
 		if ($this->tipo) $tipo_language = $this->tipo->getFieldsValues('language');
 		
 		$fieldsValues = jp7_fields_values($this->db_prefix . (($tipo_language) ? $lang->prefix : ''), 'id', $this->id, $fields, TRUE);
@@ -61,16 +61,48 @@ class InterAdmin{
 				$alias = $key;
 			}
 			if (!$forceAsString && strpos($key, 'select_') === 0 && $value) {
-				if ($campos[$key]['xtra'] === 'S') {
-					$value = new InterAdminTipo($value);
-				} else {
-					$value = new InterAdmin($value);
+				//jp7_print_r($campos);
+				if (is_numeric($value)) {
+					if ($campos[$key]['xtra'] === 'S') {
+						$value = $fieldsValues->$key = new InterAdminTipo($value);
+					} else {
+						$value = $fieldsValues->$key = new InterAdmin($value);
+					}
+				} elseif (strpos($key, 'select_multi') === 0) {
+					$value_arr = explode(',', $value);
+					foreach ($value_arr as $key2 => $value2) {
+						if ($campos[$key]['xtra'] === 'S') {
+							$value_arr[$key2] = new InterAdminTipo($value2);
+						} else {
+							$value_arr[$key2] = new InterAdmin($value2);
+						}
+					}
+					$value = $fieldsValues->$key = $value_arr;
 				}
 			}
 			$this->$alias = $value;
 		}
 		if (is_array($fields)) return $fieldsValues;
 		else return $fieldsValues->$fields;
+	}
+	/**
+	 * @return string
+	 */
+	function getStringValue($simple = FALSE) {
+		$campos = $this->getTipo()->getCampos();
+		//jp7_print_r($campos);
+		foreach ($campos as $row) {
+			if (($row['combo'] || strpos($row['tipo'],'_key') !== FALSE) && $row['tipo'] !== 'char_key') {
+				$return[] = $row['tipo'];
+			}
+		}
+		$return_str = $this->getFieldsValues($return);
+		foreach ($return_str as $key=>$value) {
+			
+			if (strpos($key, 'select_') === 0 && $value) $value = $value->getStringValue();
+			$return_final[] = $value;
+		}
+		return implode(' - ', $return_final);
 	}
 	/**
 	 * @return mixed
