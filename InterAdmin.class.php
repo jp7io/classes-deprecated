@@ -55,6 +55,13 @@ class InterAdmin{
 			} else {
 				$alias = $key;
 			}
+			if (!$forceAsString && strpos($key, 'select_') === 0 && $value) {
+				if ($campos[$key]['xtra'] === 'S') {
+					$value = new InterAdminTipo($value);
+				} else {
+					$value = new InterAdmin($value);
+				}
+			}
 			$this->$alias = $value;
 		}
 		if (is_array($fields)) return $fieldsValues;
