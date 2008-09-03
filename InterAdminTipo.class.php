@@ -16,7 +16,7 @@ class InterAdminTipo{
 		if ($options['fields']) $this->getFieldsValues($options['fields']);
 	}
 	function __toString(){
-		return $this->id_tipo;
+		return (string) $this->id_tipo;
 	}
 	function __get($var){
 		if($var == 'interadminsOrderby'){
@@ -210,10 +210,13 @@ class InterAdminTipo{
 		} else {
 			$url = (($jp7_app) ? $c_cliente_url . $c_cliente_url_path : $c_url) . $lang->path_url . join("_", $url_arr);
 		}
+			
 		if (!$seo) {
-			$url = substr_replace($url, '/', strpos($url, '_'), 1);
+			$pos = strpos($url, '_');
+			if ($pos) $url = substr_replace($url, '/', $pos, 1);
 			$url .= (count($url_arr) > 1) ? '.php' : '/';
 		}
+		
 		return $this->url = $url;
 	}
 	/**
