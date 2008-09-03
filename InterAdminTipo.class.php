@@ -94,9 +94,9 @@ class InterAdminTipo{
 		global $db;
 		global $lang;
 		global $jp7_app;
-		if ($options['fields_alias']) {
+		//if ($options['fields_alias']) {
 			$campos = $this->getCampos();
-		}
+		//}
 		$sql = "SELECT id" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . 
 		" FROM " . $this->db_prefix . (($this->getFieldsValues('language')) ? $lang->prefix : '') .
 		" WHERE id_tipo=" . $this->id_tipo.
@@ -123,6 +123,13 @@ class InterAdminTipo{
 					if (!$alias) $alias = $field;
 				} else {
 					$alias = $field;
+				}
+				if (strpos($field, 'select_') === 0 && $row->$field) {
+					if ($campos[$field]['xtra'] === 'S') {
+						$row->$field = new InterAdminTipo($row->$field);
+					} else {
+						$row->$field = new InterAdmin($row->$field);
+					}
 				}
 				$interadmin->$alias = $row->$field;
 			}
