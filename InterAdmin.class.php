@@ -26,9 +26,14 @@ class InterAdmin{
 		return $this->id;
 	}	
 	/**
-	 * @param mixed $fields
-	 * @param bool $forceAsString Gets the string value for fields referencing to another InterAdmin ID
-	 * @return mixed
+	 * Gets values from this record on the database.
+	 *
+	 * @param mixed $fields Array (recommended) or string (an unique field) containning the names of the fields to be retrieved.
+	 * @param bool $forceAsString Gets the string value for fields referencing to another InterAdmin ID (fields started by "select_").
+	 * @param bool $fields_alias If <tt>TRUE</tt> the names of the fields are replaced by the Alias that were inserted on the InterAdmin.
+	 * @param bool $fromtipo Flag for preventing looping when InterAdminTipo is retireved for the first time.
+	 * @return mixed If fields were an array an object will be returned, otherwise it will return the result as a string.
+	 * @todo (Multiple languages only) When $fields_alias is <tt>TRUE</tt> and there is no id_tipo yet, the function is unable to decide which language table it should use.
 	 */
 	function getFieldsValues($fields, $forceAsString = FALSE, $fields_alias = FALSE, $fromtipo = FALSE) {   
 		global $lang;
