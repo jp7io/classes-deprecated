@@ -99,14 +99,24 @@ class InterAdminField{
 				if($campo_array[label])$campo_nome=$campo_array[label];
 			}
 		}elseif(strpos($campo,"select_")===0){
-			if($campo_array[label])$campo_nome_2=$campo_array[label];
-			else $campo_nome_2=($campo_nome=="all"&&$xtra)?"Tipos":interadmin_tipos_nome($campo_nome);
-			$form="".
-			"<select name=\"".$campo."[]\" label=\"".$campo_nome_2."\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\">".
-			"<option value=\"0\">Selecione</option>".
+			if ($campo_array['label']) $campo_nome_2 = $campo_array['label'];
+			else $campo_nome_2 = ($campo_nome == "all" && $xtra) ? "Tipos" : interadmin_tipos_nome($campo_nome);
+			$form = "" .
+			"<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly . " class=\"inputs_width\">" .
+			"<option value=\"0\">Selecione</option>" .
 			"<option value=\"0\">--------------------</option>";
-			if($xtra){
-				if($campo_nome=="all"){
+			if ($xtra == 'radio') {
+				$sql = "SELECT id,varchar_key FROM ".$db_prefix.
+				" WHERE id_tipo=".$campo_nome.
+				" ORDER BY int_key,varchar_key";
+				$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));;
+				$form = '';
+				while ($row = $rs->FetchNextObj()) {
+					$form.="<input type=\"radio\" name=\"" . $campo . "[".$j."]\" id=\"" . $campo . "[".$j."]_".$row->id."\" value=\"".$row->id."\"".(($row->id==$valor)?" checked":"")."> <label for=\"" . $campo . "[".$j."]_".$row->id."\">".toHTML($row->varchar_key)."</label><br />";
+				}
+				$rs->Close();
+			} elseif ($xtra) {
+				if ($campo_nome == "all") {
 					ob_start();
 					interadmin_tipos_combo($valor,0);
 					$form.=ob_get_contents();
@@ -122,13 +132,13 @@ class InterAdminField{
 					$rs->Close();
 				}
 			}else{
-				$form="<select name=\"".$campo."[]\" label=\"".$campo_nome_2."\" xtype=\"autocomplete\"".(($obrigatorio)?" obligatory=\"yes\"":"").$readonly." class=\"inputs_width\">".
-				"<option value=\"0\">Selecione ou Procure (Beta)".(($select_campos_2_nomes)?$select_campos_2_nomes:"")."</option>".
-				"<option value=\"0\">--------------------</option>".
-				interadmin_combo($valor,(is_numeric($campo_nome))?$campo_nome:0,0,"","","combo",$campo."[".$j."]",$temp_campo_nome,$obrigatorio);
+				$form = "<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\" xtype=\"autocomplete\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly." class=\"inputs_width\">" .
+				"<option value=\"0\">Selecione ou Procure (Beta)" . (($select_campos_2_nomes) ? $select_campos_2_nomes : "") . "</option>" .
+				"<option value=\"0\">--------------------</option>" .
+				interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", "", "combo", $campo . "[".$j."]", $temp_campo_nome, $obrigatorio);
 			}
-			$form.="</select>";
-			$campo_nome=$campo_nome_2;
+			$form .= "</select>";
+			$campo_nome = $campo_nome_2;
 		}elseif(strpos($campo,"int_")===0||strpos($campo,"float_")===0){
 			$onkeypress=" onkeypress=\"return DFonlyThisChars(true,false,' -.,()')\"";
 			if($campo=="int_key"&&!$valor&&$quantidade>1)$valor=$registros+1+$j;
