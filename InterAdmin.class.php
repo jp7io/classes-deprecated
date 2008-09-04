@@ -51,8 +51,8 @@ class InterAdmin{
 					$alias = $campos[$key]['nome_id'];
 				} else {
 					$alias = $campos[$key]['nome'];
-					if (is_numeric($alias)) {
-						$alias = jp7_fields_values($this->db_prefix . '_tipos', 'id_tipo', $alias, 'nome');
+					if (is_object($alias)) {
+						$alias = jp7_fields_values($this->db_prefix . '_tipos', 'id_tipo', $alias->id_tipo, 'nome');
 					}
 					$alias = toId($alias);
 				}
@@ -62,13 +62,7 @@ class InterAdmin{
 			}
 			if (!$forceAsString && strpos($key, 'select_') === 0 && $value) {
 				//jp7_print_r($campos);
-				if (is_numeric($value)) {
-					if ($campos[$key]['xtra'] === 'S') {
-						$value = $fieldsValues->$key = new InterAdminTipo($value);
-					} else {
-						$value = $fieldsValues->$key = new InterAdmin($value);
-					}
-				} elseif (strpos($key, 'select_multi') === 0) {
+				if (strpos($key, 'select_multi') === 0) {
 					$value_arr = explode(',', $value);
 					foreach ($value_arr as $key2 => $value2) {
 						if ($campos[$key]['xtra'] === 'S') {
@@ -78,6 +72,12 @@ class InterAdmin{
 						}
 					}
 					$value = $fieldsValues->$key = $value_arr;
+				} elseif (is_numeric($value)) {
+					if ($campos[$key]['xtra'] === 'S') {
+						$value = $fieldsValues->$key = new InterAdminTipo($value);
+					} else {
+						$value = $fieldsValues->$key = new InterAdmin($value);
+					}
 				}
 			}
 			$this->$alias = $value;
