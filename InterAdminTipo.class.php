@@ -102,7 +102,7 @@ class InterAdminTipo{
 		" FROM " . $this->db_prefix . (($this->getFieldsValues('language')) ? $lang->prefix : '') .
 		" WHERE id_tipo=" . $this->id_tipo.
 		(($options['where']) ? $options['where'] : '') .
-		" ORDER BY " . $this->interadminsOrderby .
+		" ORDER BY " . (($options['order']) ? $options['order'] . ',' : '') . $this->interadminsOrderby .
 		(($options['limit']) ? " LIMIT " . $options['limit'] : '');
 		if ($jp7_app) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		else $rs = interadmin_query($sql);
