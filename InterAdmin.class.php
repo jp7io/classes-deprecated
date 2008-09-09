@@ -91,8 +91,8 @@ class InterAdmin{
 	function getStringValue($simple = FALSE) {
 		$campos = $this->getTipo()->getCampos();
 		//jp7_print_r($campos);
-		foreach ($campos as $row) {
-			if (($row['combo'] || strpos($row['tipo'],'_key') !== FALSE) && $row['tipo'] !== 'char_key') {
+		foreach ($campos as $key => $row) {
+			if (($row['combo'] || $key == 'varchar_key' || $key == 'select_key') && $key !== 'char_key') {
 				$return[] = $row['tipo'];
 			}
 		}
