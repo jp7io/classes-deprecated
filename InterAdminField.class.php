@@ -244,7 +244,7 @@ class InterAdminField{
 				echo "</tbody>";
 				$tit_start=false;
 			}
-			echo "<tr><td height=\"".(($quantidade>1||$s_interadmin_screenwidth<=800)?5:10)."\" colspan=\"4\"></td></tr>\n";
+			echo "<tr><td height=\"".(($quantidade>1||$s_interadmin_screenwidth<=800)?5:10)."\" colspan=\"4\" style=\"padding:0px\"></td></tr>\n";
 		}
 	}
 }
