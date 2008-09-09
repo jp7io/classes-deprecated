@@ -14,7 +14,6 @@ class InterAdmin{
 	function __construct($id = '', $options = NULL) {
 		$this->id = $id;
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
-		
 		if ($options['fields']) $this->getFieldsValues($options['fields'], FALSE, $options['fields_alias']);
 	}
 	function __get($var){
@@ -31,37 +30,31 @@ class InterAdmin{
 	 * @param mixed $fields Array (recommended) or string (an unique field) containning the names of the fields to be retrieved.
 	 * @param bool $forceAsString Gets the string value for fields referencing to another InterAdmin ID (fields started by "select_").
 	 * @param bool $fields_alias If <tt>TRUE</tt> the names of the fields are replaced by the Alias that were inserted on the InterAdmin.
-	 * @param bool $fromtipo Flag for preventing looping when InterAdminTipo is retireved for the first time.
 	 * @return mixed If fields were an array an object will be returned, otherwise it will return the result as a string.
 	 * @todo (Multiple languages only) When $fields_alias is <tt>TRUE</tt> and there is no id_tipo yet, the function is unable to decide which language table it should use.
 	 */
-	function getFieldsValues($fields, $forceAsString = FALSE, $fields_alias = FALSE, $fromtipo = FALSE) {   
+	function getFieldsValues($fields, $forceAsString = FALSE, $fields_alias = FALSE) {   
 		global $lang;
-		// Prevents function from entering in an infinite looping
-		if (!$this->tipo && !$fromtipo) $this->getTipo();
-		if ($this->tipo/*$fields_alias*/) $campos = $this->tipo->getCampos();
-		if ($this->tipo) $tipo_language = $this->tipo->getFieldsValues('language');
+		if (!$this->tipo) $this->getTipo();
+		if ($this->tipo->id_tipo /*$fields_alias*/) $campos = $this->tipo->getCampos();
+		if ($this->tipo->id_tipo) $tipoLanguage = $this->tipo->getFieldsValues('language');
 		
 		$fieldsValues = jp7_fields_values($this->db_prefix . (($tipo_language) ? $lang->prefix : ''), 'id', $this->id, $fields, TRUE);
 		
 		foreach((array)$fieldsValues as $key=>$value) {
-			if ($forceAsString && strpos($key, 'select_') === 0) $value = jp7_fields_values($this->db_prefix . (($tipo_language) ? $lang->prefix : ''), 'id', $value, 'varchar_key');
-			if ($fields_alias) {
-				if ($campos[$key]['nome_id']) {
-					$alias = $campos[$key]['nome_id'];
-				} else {
-					$alias = $campos[$key]['nome'];
-					if (is_object($alias)) {
-						$alias = jp7_fields_values($this->db_prefix . '_tipos', 'id_tipo', $alias->id_tipo, 'nome');
-					}
-					$alias = toId($alias);
+			// Force As String
+			if ($forceAsString && strpos($key, 'select_') === 0) {
+				$value_arr = explode(',', $value);
+				$str_arr = array();
+				foreach($value_arr as $value_id) {
+					$str_arr[] = jp7_fields_values($this->db_prefix . (($tipoLanguage) ? $lang->prefix : ''), 'id', $value_id, 'varchar_key');
 				}
-				if (!$alias) $alias = $key;
-			} else {
-				$alias = $key;
+				$value = implode(', ', $str_arr);
 			}
+			// Fields Alias
+			$alias = ($fields_alias) ? $this->tipo->getCamposAlias($key) : $key;
+			// Objeto Relacional
 			if (!$forceAsString && strpos($key, 'select_') === 0 && $value) {
-				//jp7_print_r($campos);
 				if (strpos($key, 'select_multi') === 0) {
 					$value_arr = explode(',', $value);
 					foreach ($value_arr as $key2 => $value2) {
@@ -98,7 +91,6 @@ class InterAdmin{
 		}
 		$return_str = $this->getFieldsValues($return);
 		foreach ($return_str as $key=>$value) {
-			
 			if (strpos($key, 'select_') === 0 && $value) $value = $value->getStringValue();
 			$return_final[] = $value;
 		}
@@ -107,21 +99,21 @@ class InterAdmin{
 	/**
 	 * @return mixed
 	 */
-	function setFieldsValues($fields_values, $force_magic_quotes_gpc=FALSE){
+	function setFieldsValues($fields_values, $force_magic_quotes_gpc = FALSE){
 		global $lang;
-		$tipo_language = $this->getTipo()->getFieldsValues('language');
+		$tipoLanguage = $this->getTipo()->getFieldsValues('language');
 		if ($this->id) {
-			jp7_db_insert($this->db_prefix . (($tipo_language) ? $lang->prefix : ''), 'id', $this->id, $fields_values, TRUE, $force_magic_quotes_gpc);
+			jp7_db_insert($this->db_prefix . (($tipoLanguage) ? $lang->prefix : ''), 'id', $this->id, $fields_values, TRUE, $force_magic_quotes_gpc);
 		} else {
-			$this->id = jp7_db_insert($this->db_prefix . (($tipo_language) ? $lang->prefix : ''), 'id', 0, $fields_values, TRUE, $force_magic_quotes_gpc);
+			$this->id = jp7_db_insert($this->db_prefix . (($tipoLanguage) ? $lang->prefix : ''), 'id', 0, $fields_values, TRUE, $force_magic_quotes_gpc);
 		}
 	}
 	/**
 	 * @return object
 	 */
 	function getTipo(){
-		if (!$this->id_tipo) $this->id_tipo = $this->getFieldsValues('id_tipo', FALSE, FALSE, TRUE);
 		if (!$this->tipo) $this->tipo = new InterAdminTipo($this->id_tipo, array('db_prefix' => $this->db_prefix));
+		if (!$this->id_tipo) $this->tipo->id_tipo = $this->id_tipo = $this->getFieldsValues('id_tipo');
 		return $this->tipo;
 	}
 	/**
@@ -132,7 +124,7 @@ class InterAdmin{
 		global $db;
 		if (!$tipo) return;
 		$children_tipo = new InterAdminTipo($tipo);
-		$options['where'] = " AND parent_id=".$this->id;
+		$options['where'] = " AND parent_id=" . $this->id;
 		return $children_tipo->getInterAdmins($options);
 	}
 	/**
