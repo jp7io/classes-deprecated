@@ -207,8 +207,8 @@ class InterAdminTipo{
 		$campos = $this->getCampos();
 		$return[] = $this->getFieldsValues('nome');
 		//if (!$simple) {
-			foreach ($campos as $row) {
-				if (($row['combo'] || strpos($row['tipo'],'_key') !== FALSE) && $row['tipo'] !== 'char_key') {
+			foreach ($campos as $key => $row) {
+				if (($row['combo'] || $key == 'varchar_key' || $key == 'select_key') && $key !== 'char_key') {
 					if (is_object($row['nome'])) $return[] = $row['nome']->getStringValue();
 					else $return[] = $row['nome'];
 				}
