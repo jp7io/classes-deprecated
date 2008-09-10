@@ -54,7 +54,7 @@ class InterAdmin{
 			// Fields Alias
 			$alias = ($fields_alias) ? $this->tipo->getCamposAlias($key) : $key;
 			// Objeto Relacional
-			if (!$forceAsString && strpos($key, 'select_') === 0 && $value) {
+			if (!$forceAsString && strpos($key, 'select_') === 0) {
 				if (strpos($key, 'select_multi') === 0) {
 					$value_arr = explode(',', $value);
 					foreach ($value_arr as $key2 => $value2) {
