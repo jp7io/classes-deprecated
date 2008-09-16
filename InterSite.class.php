@@ -239,7 +239,7 @@ class InterSite extends InterAdmin {
 			// This server is not there, it might be an alias
 			foreach ($this->servers as $host=>$server) {
 				// Dev Local
-				if ($_SERVER['HTTP_HOST'] == 'localhost') {
+				if ($_SERVER['HTTP_HOST'] == 'localhost' || strpos($_SERVER['SERVER_ADDR'],'192.168.0.') === 0) {
 					if ($server->type == 'Desenvolvimento') {
 						$this->server = $this->servers[$_SERVER['HTTP_HOST']] = $server;
 						break;
