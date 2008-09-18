@@ -39,7 +39,7 @@ class InterAdmin{
 		if ($this->tipo->id_tipo /*$fields_alias*/) $campos = $this->tipo->getCampos();
 		if ($this->tipo->id_tipo) $tipoLanguage = $this->tipo->getFieldsValues('language');
 		
-		$fieldsValues = jp7_fields_values($this->db_prefix . (($tipo_language) ? $lang->prefix : ''), 'id', $this->id, $fields, TRUE);
+		$fieldsValues = jp7_fields_values($this->db_prefix . (($tipoLanguage) ? $lang->prefix : ''), 'id', $this->id, $fields, TRUE);
 		
 		foreach((array)$fieldsValues as $key=>$value) {
 			// Force As String
