@@ -115,7 +115,7 @@ class InterAdminTipo{
 			$interadmin->tipo = $this;
 			foreach((array)$options['fields'] as $field){
 				$alias = ($options['fields_alias']) ? $this->getCamposAlias($field) : $field;
-				if ($row->$field && strpos($field, 'select_') === 0) {
+				if (strpos($field, 'select_') === 0) {
 					if (strpos($field, 'select_multi') === 0) {
 						$value_arr = explode(',', $row->$field);
 						foreach ($value_arr as $key2 => $value2) {
@@ -126,7 +126,7 @@ class InterAdminTipo{
 							}
 						}
 						$row->$field = $value_arr;
-					} elseif(is_numeric($row->$field)) {
+					} elseif($row->$field && is_numeric($row->$field)) {
 						if ($campos[$field]['xtra'] === 'S') {
 							$row->$field = new InterAdminTipo($row->$field);
 						} else {
