@@ -115,7 +115,7 @@ class InterAdminTipo{
 			$interadmin->tipo = $this;
 			foreach((array)$options['fields'] as $field){
 				$alias = ($options['fields_alias']) ? $this->getCamposAlias($field) : $field;
-				if (strpos($field, 'select_') === 0) {
+				if ($row->$field && strpos($field, 'select_') === 0) {
 					if (strpos($field, 'select_multi') === 0) {
 						$value_arr = explode(',', $row->$field);
 						foreach ($value_arr as $key2 => $value2) {
