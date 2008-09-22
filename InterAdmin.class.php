@@ -14,6 +14,7 @@ class InterAdmin{
 	function __construct($id = '', $options = NULL) {
 		$this->id = $id;
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
+		$this->table = ($options['table']) ? '_' . $options['table'] : '';
 		if ($options['fields']) $this->getFieldsValues($options['fields'], FALSE, $options['fields_alias']);
 	}
 	function __get($var){
@@ -39,7 +40,7 @@ class InterAdmin{
 		if ($this->tipo->id_tipo /*$fields_alias*/) $campos = $this->tipo->getCampos();
 		if ($this->tipo->id_tipo) $tipoLanguage = $this->tipo->getFieldsValues('language');
 		
-		$fieldsValues = jp7_fields_values($this->db_prefix . (($tipoLanguage) ? $lang->prefix : ''), 'id', $this->id, $fields, TRUE);
+		$fieldsValues = jp7_fields_values($this->db_prefix . $this->table . (($tipoLanguage) ? $lang->prefix : ''), 'id', $this->id, $fields, TRUE);
 		
 		foreach((array)$fieldsValues as $key=>$value) {
 			// Force As String
@@ -54,7 +55,7 @@ class InterAdmin{
 			// Fields Alias
 			$alias = ($fields_alias) ? $this->tipo->getCamposAlias($key) : $key;
 			// Objeto Relacional
-			if (!$forceAsString && strpos($key, 'select_') === 0) {
+			if ($value && !$forceAsString && strpos($key, 'select_') === 0) {
 				if (strpos($key, 'select_multi') === 0) {
 					$value_arr = explode(',', $value);
 					foreach ($value_arr as $key2 => $value2) {
