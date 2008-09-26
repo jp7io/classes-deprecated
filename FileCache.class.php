@@ -106,8 +106,12 @@ class FileCache{
 		if (!$this->fileName) return;
 		// Gets output buffer and takes out line breaks and tabs
 		$file_content = ob_get_contents();
-		$file_content = str_replace(chr(9), '', $file_content);
+		
+		/* Comentando, estava gerando resultados diferentes entre conteudo cacheado ou não
+		$file_content = str_replace(chr(9), '', $file_content); 
 		$file_content = str_replace(chr(13), '', $file_content);
+		*/
+		
 		// Checking if there is enough content to cache
 		if (strlen($file_content) > 10) {
 			// Creating directories
