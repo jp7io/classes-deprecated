@@ -101,6 +101,15 @@ class InterAdminTipo{
 		//if ($options['fields_alias']) {
 			$campos = $this->getCampos();
 		//}
+		if ($options['fields'] == '*') {
+			$options['fields'] = array();
+			$invalid_fields = array('tit', 'func', 'special');
+			$all_fields = array_keys($campos);
+			foreach ($all_fields as $field) {
+				$field_arr = explode('_', $field);
+				if (!in_array($field_arr[0], $invalid_fields)) $options['fields'][] = $field;
+			}
+		}
 		$sql = "SELECT id" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . 
 		" FROM " . $this->db_prefix . (($this->getFieldsValues('language')) ? $lang->prefix : '') .
 		" WHERE id_tipo=" . $this->id_tipo.

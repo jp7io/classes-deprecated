@@ -38,8 +38,16 @@ class InterAdmin{
 		global $lang;
 		if (!$this->tipo) $this->getTipo();
 		if ($this->tipo->id_tipo /*$fields_alias*/) $campos = $this->tipo->getCampos();
-		if ($this->tipo->id_tipo) $tipoLanguage = $this->tipo->getFieldsValues('language');
-		
+		if ($this->tipo->id_tipo && $lang->prefix) $tipoLanguage = $this->tipo->getFieldsValues('language');
+		if ($fields == '*') {
+			$fields = array();
+			$invalid_fields = array('tit', 'func', 'special');
+			$all_fields = array_keys($campos);
+			foreach ($all_fields as $field) {
+				$field_arr = explode('_', $field);
+				if (!in_array($field_arr[0], $invalid_fields)) $fields[] = $field;
+			}
+		}
 		$fieldsValues = jp7_fields_values($this->db_prefix . $this->table . (($tipoLanguage) ? $lang->prefix : ''), 'id', $this->id, $fields, TRUE);
 		
 		foreach((array)$fieldsValues as $key=>$value) {
@@ -104,9 +112,9 @@ class InterAdmin{
 		global $lang;
 		$tipoLanguage = $this->getTipo()->getFieldsValues('language');
 		if ($this->id) {
-			jp7_db_insert($this->db_prefix . (($tipoLanguage) ? $lang->prefix : ''), 'id', $this->id, $fields_values, TRUE, $force_magic_quotes_gpc);
+			jp7_db_insert($this->db_prefix . $this->table . (($tipoLanguage) ? $lang->prefix : ''), 'id', $this->id, $fields_values, TRUE, $force_magic_quotes_gpc);
 		} else {
-			$this->id = jp7_db_insert($this->db_prefix . (($tipoLanguage) ? $lang->prefix : ''), 'id', 0, $fields_values, TRUE, $force_magic_quotes_gpc);
+			$this->id = jp7_db_insert($this->db_prefix . $this->table . (($tipoLanguage) ? $lang->prefix : ''), 'id', 0, $fields_values, TRUE, $force_magic_quotes_gpc);
 		}
 	}
 	/**
