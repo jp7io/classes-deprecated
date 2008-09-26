@@ -127,6 +127,7 @@ class InterAdminTipo{
 				if (strpos($field, 'select_') === 0) {
 					if (strpos($field, 'select_multi') === 0) {
 						$value_arr = explode(',', $row->$field);
+						if (!$value_arr[0]) $value_arr = array();
 						foreach ($value_arr as $key2 => $value2) {
 							if ($campos[$field]['xtra'] === 'S') {
 								$value_arr[$key2] = new InterAdminTipo($value2);

@@ -66,6 +66,7 @@ class InterAdmin{
 			if (!$forceAsString && strpos($key, 'select_') === 0) {
 				if (strpos($key, 'select_multi') === 0) {
 					$value_arr = explode(',', $value);
+					if (!$value_arr[0]) $value_arr = array();
 					foreach ($value_arr as $key2 => $value2) {
 						if ($campos[$key]['xtra'] === 'S') {
 							$value_arr[$key2] = new InterAdminTipo($value2);
@@ -133,7 +134,7 @@ class InterAdmin{
 		global $db;
 		if (!$tipo) return;
 		$children_tipo = new InterAdminTipo($tipo);
-		$options['where'] = " AND parent_id=" . $this->id;
+		$options['where'] .= " AND parent_id=" . $this->id;
 		return $children_tipo->getInterAdmins($options);
 	}
 	/**
