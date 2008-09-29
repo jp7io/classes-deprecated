@@ -68,6 +68,7 @@ class InterAdminTipo{
 		$sql = "SELECT id_tipo" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . " FROM ".$this->db_prefix."_tipos".
 		" WHERE parent_id_tipo=".$this->id_tipo . 
 		(($options['where']) ? $options['where'] : '') . 
+		" ORDER BY " . (($options['order']) ? $options['order'] : 'ordem, nome') .
 		(($options['limit']) ? " LIMIT " . $options['limit'] : '');
 		if ($jp7_app) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		else $rs = interadmin_query($sql);
