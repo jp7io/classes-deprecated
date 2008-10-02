@@ -220,12 +220,12 @@ class InterAdminField{
 				$plugin_function = 'interadmin_plugin_' . $xtra;
 				$plugin_include = '../../plugins/' . $xtra . '.php';
 				if (file_exists($plugin_include)) include $plugin_include;
-				else echo 'Include ' . $plugin_include . ' não encontrado.';
+				else echo 'Include ' . $plugin_include . ' não encontrado.<br />';
 				if (function_exists($plugin_function)) echo $plugin_function($campo_array,$valor);
-				else echo 'Função ' . $plugin_function . ' não encontrada.';
+				else echo 'Função ' . $plugin_function . ' não encontrada.<br />';
 			}elseif(strpos($campo,"special_")===0 || strpos($campo,"func_")===0){
 				if (function_exists($campo_nome)) echo $campo_nome($campo_array,$valor);
-				else echo 'Função ' . $campo_nome . ' não encontrada.';
+				else echo 'Função ' . $campo_nome . ' não encontrada.<br />';
 			}else{
 				if(!$readonly_hidden){
 					echo "".
