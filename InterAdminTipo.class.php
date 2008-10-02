@@ -101,6 +101,7 @@ class InterAdminTipo{
 		$interadmins = array();
 		//if ($options['fields_alias']) {
 			$campos = $this->getCampos();
+			$this->table = ($this->getFieldsValues('tabela')) ? '_' . $this->getFieldsValues('tabela') :'';
 		//}
 		if ($options['fields'] == '*') {
 			$options['fields'] = array();
@@ -112,7 +113,7 @@ class InterAdminTipo{
 			}
 		}
 		$sql = "SELECT id" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . 
-		" FROM " . $this->db_prefix . (($this->getFieldsValues('language')) ? $lang->prefix : '') .
+		" FROM " . $this->db_prefix . $this->table . (($this->getFieldsValues('language')) ? $lang->prefix : '') .
 		" WHERE id_tipo=" . $this->id_tipo.
 		(($options['where']) ? $options['where'] : '') .
 		" ORDER BY " . (($options['order']) ? $options['order'] . ',' : '') . $this->interadminsOrderby .
