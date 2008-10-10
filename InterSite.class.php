@@ -221,17 +221,12 @@ class InterSite extends InterAdmin {
 			}
 		}
 	}
-	/*
+	
 	function __sleep() {
-		echo 'im being called';
-		unset($this->db->db_prefix);
-		unset($this->db->id_tipo);
-		$this->db->id_tipo = 'teste';
+		unset($this->tipo);
 		return array_keys(get_object_vars($this));
-	
-	
 	}
-	*/
+	
 	function __wakeup() {
 		// This server is a main host
 		$this->server = $this->servers[$_SERVER['HTTP_HOST']];
@@ -239,7 +234,7 @@ class InterSite extends InterAdmin {
 			// This server is not there, it might be an alias
 			foreach ($this->servers as $host=>$server) {
 				// Dev Local
-				if ($_SERVER['HTTP_HOST'] == 'localhost' || strpos($_SERVER['SERVER_ADDR'],'192.168.0.') === 0) {
+				if ($_SERVER['HTTP_HOST'] == 'localhost' || $_SERVER['SERVER_ADDR'] == '127.0.0.1' || strpos($_SERVER['SERVER_ADDR'], '192.168.0.') === 0) {
 					if ($server->type == 'Desenvolvimento') {
 						$this->server = $this->servers[$_SERVER['HTTP_HOST']] = $server;
 						break;
