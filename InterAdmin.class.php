@@ -41,7 +41,7 @@ class InterAdmin{
 		if ($this->tipo->id_tipo && $lang->prefix) $tipoLanguage = $this->tipo->getFieldsValues('language');
 		if ($fields == '*') {
 			$fields = array();
-			$invalid_fields = array('tit', 'func', 'special');
+			$invalid_fields = array('tit', 'func');
 			$all_fields = array_keys($campos);
 			foreach ($all_fields as $field) {
 				$field_arr = explode('_', $field);

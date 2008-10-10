@@ -105,7 +105,7 @@ class InterAdminTipo{
 		//}
 		if ($options['fields'] == '*') {
 			$options['fields'] = array();
-			$invalid_fields = array('tit', 'func', 'special');
+			$invalid_fields = array('tit', 'func');
 			$all_fields = array_keys($campos);
 			foreach ($all_fields as $field) {
 				$field_arr = explode('_', $field);
