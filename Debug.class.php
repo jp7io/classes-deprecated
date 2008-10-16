@@ -141,6 +141,16 @@ class Debug{
 		if (count($_COOKIE)) $S .= '<strong style="color:red">     COOKIE:</strong> ' . print_r($_COOKIE, TRUE);
 		return '<pre style="background-color:#FFFFFF;font-size:11px;text-align:left;">' . $S . '</pre>';
 	}
+	
+	public function errorHandler($code, $msgErro) {
+			if ($code == E_STRICT || $code == E_NOTICE || $code == E_DEPRECATED) return FALSE; // FALSE -> the default error handler will take care of it.
+			if (error_reporting() == 0) return FALSE; // Programmer used @ so the error reporting value is 0.
+
+			$backtrace = debug_backtrace();
+			array_shift($backtrace);
+			die(jp7_debug($msgErro, NULL, $backtrace));
+	}
+	
 	public function addLog($value, $tag = 'log', $time = NULL) {
 		$this->log[] = array('tag' => $tag, 'value' => $value, 'time' => $time);
 	} 
@@ -161,23 +171,6 @@ class Debug{
 		
 		jp7_print_r($this->log);
 		$this->getTime(TRUE);
-	/*
-		?>
-		<script type="text/javascript" src="/_default/js/jquery/jquery.jp7.js"></script>
-		<script type="text/javascript" src="/_default/js/jquery/ui.core.js"></script>
-		<script type="text/javascript" src="/_default/js/jquery/ui.dialog.js"></script>
-		<script type="text/javascript" src="/_default/js/jquery/ui.draggable.js"></script>
-		<script type="text/javascript" src="/_default/js/jquery/ui.resizable.js"></script>
-		<script type="text/javascript">
-			dialog_options = {
-				resizable: true,
-				draggable: true,
-				overlay: null,
-				position: 'top'
-			}
-			$.dialog.open("<?= 'PHP_SELF: ' . $_SERVER['PHP_SELF'] ?>", null, dialog_options);
-		</script>
-		<?*/
 	}
 }
 ?>
