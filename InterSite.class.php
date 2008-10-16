@@ -251,7 +251,7 @@ class InterSite extends InterAdmin {
 				}
 			}
 			// No server found, die
-			if (!$this->server) die(jp7_debug('Host não está presente nas configurações.'));
+			if (!$this->server) die('Host não está presente nas configurações.');
 		}
 		$this->db = $this->server->db;
 				
