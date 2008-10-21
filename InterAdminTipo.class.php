@@ -44,6 +44,9 @@ class InterAdminTipo{
 	 */
 	function getFieldsValues($fields) {
 		$fieldsValues = jp7_fields_values($this->db_prefix.'_tipos', 'id_tipo', $this->id_tipo, $fields, TRUE);
+		foreach ((array) $fieldsValues as $field=>$value) {
+			$this->$field = $value;
+		}
 		if (is_array($fields)) return $fieldsValues;
 		elseif ($fields) return $fieldsValues->$fields;
 	}
