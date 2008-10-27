@@ -199,6 +199,37 @@ class InterAdmin{
 		return $childrenTipo->getInterAdmins($options);
 	}
 	/**
+	 * @return array
+	 */
+	function getArquivos($options = array()) {
+		global $db;
+		global $lang;
+		global $jp7_app;
+		$arquivos = array();
+	
+		if ($options['fields'] == '*')  $options['fields'] = array('id_arquivo', 'id_tipo', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'url_mac', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted');
+
+		$sql = "SELECT id_arquivo" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . 
+		" FROM " . $this->db_prefix .(($this->getTipo()->getFieldsValues('language')) ? $lang->prefix : '') . '_arquivos' .
+		" WHERE id=" . $this->id .
+		(($options['where']) ? $options['where'] : '') .
+		" ORDER BY " . (($options['order']) ? $options['order'] . ',' : '') . ' ordem' .
+		(($options['limit']) ? " LIMIT " . $options['limit'] : '');
+		if ($jp7_app) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
+		else $rs = interadmin_query($sql);
+		while ($row = $rs->FetchNextObj()) {
+			$arquivo = new InterAdminArquivo($row->id_arquivo, array('db_prefix' => $this->db_prefix));
+			$arquivo->setTipo($this->getTipo());
+			$arquivo->setParent($this);
+			foreach((array)$options['fields'] as $field) {
+				$arquivo->$field = $row->$field;
+			}
+			$arquivos[] = $arquivo;
+		}
+		$rs->Close();
+		return $arquivos;
+	}
+	/**
 	 * @return string
 	 */
 	function getUrl(){
