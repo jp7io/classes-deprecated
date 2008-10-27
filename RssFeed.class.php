@@ -1,11 +1,21 @@
-<?php
+<?
 /**
- * class RssFeed
+ * JP7's PHP Functions 
  * 
+ * Contains the main custom functions and classes.
+ * @author JP7
+ * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
+ * @category JP7
  * @package RssFeed
- * @author Carlos Rodrigues
+ */
+ 
+/**
+ * Gererates a RSS Feed from an array. <b>Class UNDER DEVELOPMENT</b>.
+ *
  * @version (2008/07/11)
- * @todo Add CDATA functionality, e.g. <description><![CDATA[this is <b>bold</b>]]></description>  
+ * @author Carlos Rodrigues
+ * @package RssFeed
+ * @todo Add CDATA functionality, e.g. <description><![CDATA[this is <b>bold</b>]]></description>
  */
 class RssFeed extends DOMDocument {
 	/*
@@ -44,7 +54,6 @@ class RssFeed extends DOMDocument {
 	 * 
 	 * @param string The version number of the document as part of the XML declaration. 
 	 * @param string The encoding of the document as part of the XML declaration. 
-	 * @return RssFeed
 	 * @version (2008/06/27)
 	 */
 	function __construct($version = '1.0', $encoding = 'ISO-8859-1') {

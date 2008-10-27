@@ -1,41 +1,46 @@
 <?
 /**
- * FileCache class, used to store copies of pages to save database connections and processing time.
+ * JP7's PHP Functions 
  * 
- * @author Carlos Rodrigues
+ * Contains the main custom functions and classes.
+ * @author JP7
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @version 1.0 (2008/06/16)
- * @package FileCache
+ * @package JP7
  */
  
 /**
- * class FileCache
+ * FileCache class, used to store copies of pages to save database connections and processing time.
  *
- * @package FileCache
+ * @subpackage FileCache
  */
 class FileCache{
 	/**
-	 * @var string Site root directory.
+	 * Site root directory.
+	 * @var string 
 	 */
 	public $fileRoot;
 	/**
-	 * @var string Path used to store cached files.
+	 * Path used to store cached files.
+	 * @var string 
 	 */
 	public $cachePath;
 	/**
-	 * @var string Name of the file to be cached or loaded from cache.
+	 * Name of the file to be cached or loaded from cache.
+	 * @var string 
 	 */
 	public $fileName;
 	/**
-	 * @var int Time delay before re-caching.
+	 * Time delay before re-caching.
+	 * @var int 
 	 */
 	protected $delay;
 	/**
-	 * @var bool If <tt>TRUE</tt> exits the script after retrieving the cached file. Set it as <tt>FALSE</tt> when caching parts of a page.
+	 * If <tt>TRUE</tt> exits the script after retrieving the cached file. Set it as <tt>FALSE</tt> when caching parts of a page.
+	 * @var bool
 	 */
 	public $exit;
 	/**
-	 * Constructor function, defines the path and filename and starts caching or loading it.
+	 * Public Constructor, defines the path and filename and starts caching or loading it.
 	 *
 	 * @param mixed $storeId ID of the file. Only needed if the same page has different data deppending on the ID.
 	 * @param string $cachePath Sets the directory where the cache will be saved, the default value is 'cache'.
@@ -47,7 +52,6 @@ class FileCache{
 	 * @global Debug
   	 * @global bool
 	 * @global bool
-	 * @return FileCache
 	 */	
 	public function __construct($storeId = FALSE, $exit = TRUE, $cachePath = 'cache') {
 		global $c_root, $c_path, $c_cache, $c_cache_delay, $c_devIps, $debugger, $s_interadmin_preview, $interadmin_gerar_menu;
@@ -79,9 +83,9 @@ class FileCache{
 		else $this->startCache();
 	}
 	/**
-	 * Sets delay time
+	 * Sets delay time.
 	 *
-	 * @return NULL
+	 * @return void
 	 */	
 	public function setDelay($time, $devIps) {
 		if (!in_array($_SERVER['REMOTE_ADDR'], (array) $devIps)) {
@@ -89,22 +93,22 @@ class FileCache{
 		}
 	}
 	/**
-	 * Starts caching the current file
+	 * Starts caching the current file.
 	 *
-	 * @return NULL
+	 * @return void
 	 */	
 	public function startCache() {
 		//if ($this->exit) header('pragma: no-cache');
 		ob_start();
 	}
 	/**
-	 * Stops caching and saves the current file, the file is saved without line breaks and spaces and with a commentary saying when it was published.
+	 * Stops caching and saves the current file, the file is saved with a commentary saying when it was published.
 	 *
-	 * @return NULL
+	 * @return void
 	 */	
 	public function endCache() {
 		if (!$this->fileName) return;
-		// Gets output buffer and takes out line breaks and tabs
+
 		$file_content = ob_get_contents();
 		
 		/* Comentando, estava gerando resultados diferentes entre conteudo cacheado ou não
@@ -136,7 +140,7 @@ class FileCache{
 	/**
 	 * Opens the cached file and outputs it.
 	 *
-	 * @return NULL
+	 * @return void
 	 */
 	public function getCache() {
 		global $debugger;
@@ -158,6 +162,6 @@ class FileCache{
 		// TRUE = Cache is ok, no need to refresh
 		if ($cache_time && time() - $log_time < $this->delay) return TRUE;
 		if (($log_time < $cache_time) && date('d', $cache_time) == date('d')) return TRUE;
+		return FALSE;
 	}
 }
-?>

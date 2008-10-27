@@ -1,34 +1,73 @@
 <?
 /**
- * Instancia registros da tabela interadmin_cliente
+ * JP7's PHP Functions 
+ * 
+ * Contains the main custom functions and classes.
+ * @author JP7
+ * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
+ * @category JP7
+ * @package InterAdmin
+ */
+ 
+/**
+ * Class which represents records on the table interadmin_{client name}.
  *
+ * @package InterAdmin
  */
 class InterAdmin{
+	/**
+	 * This record's 'id'.
+	 * @var int
+	 */
 	public $id;
+	/**
+	 * This record's 'id_tipo', this values can be used to get the InterAdminTipo for a InterAdmin object.
+	 * @var int
+	 */
 	public $id_tipo;
 	/**
-	 * @param int $id
-	 * @param varchar $_db_prefix
-	 * @return object
+	 * Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
+	 * @var string
 	 */
-	function __construct($id = '', $options = NULL) {
+	public $db_prefix;
+	/**
+	 * Table suffix of this record. e.g.: the table 'interadmin_client_registrations' would have 'registrations' as $table.
+	 * @var string
+	 */
+	public $table;
+	/**
+	 * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
+	 * @var InterAdminTipo
+	 */
+	protected $_tipo;
+	/**
+	 * Contains the parent InterAdmin object, i.e. the record with an 'id' equal to this record's 'parent_id'.
+	 * @var InterAdminTipo
+	 */
+	protected $_parent;
+	/**
+	 * Public Constructor, creates a new InterAdmin. If $options['fields'] was passed the method $this->getFieldsValues() is called.
+	 * @param int $id This record's 'id'.
+	 * @param array $options Array of options with the keys 'db_prefix', 'table', 'fields', and 'fields_alias'.
+	 */
+	public function __construct($id = 0, $options = array()) {
 		$this->id = $id;
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
 		$this->table = ($options['table']) ? '_' . $options['table'] : '';
 		if ($options['fields']) $this->getFieldsValues($options['fields'], FALSE, $options['fields_alias']);
 	}
-	function __get($var){
-		if($var == 'id'){
-			return $this->$var;
-		}
-	}
+	/**
+	 * String value of this record´s 'id'.
+	 * 
+	 * @return Casts the string value of its $id property.
+	 */
 	function __toString(){
 		return (string) $this->id;
 	}	
 	/**
 	 * Gets values from this record on the database.
 	 *
-	 * @param mixed $fields Array (recommended) or string (an unique field) containning the names of the fields to be retrieved.
+	 * @param array|string $fields Array (recommended) or string (an unique field) containning the names of the fields to be retrieved.
 	 * @param bool $forceAsString Gets the string value for fields referencing to another InterAdmin ID (fields started by "select_").
 	 * @param bool $fields_alias If <tt>TRUE</tt> the names of the fields are replaced by the Alias that were inserted on the InterAdmin.
 	 * @return mixed If fields were an array an object will be returned, otherwise it will return the result as a string.
@@ -36,9 +75,9 @@ class InterAdmin{
 	 */
 	function getFieldsValues($fields, $forceAsString = FALSE, $fields_alias = FALSE) {   
 		global $lang;
-		if (!$this->tipo) $this->getTipo();
-		if ($this->tipo->id_tipo /*$fields_alias*/) $campos = $this->tipo->getCampos();
-		if ($this->tipo->id_tipo && $lang->prefix) $tipoLanguage = $this->tipo->getFieldsValues('language');
+		if (!$this->_tipo) $this->getTipo();
+		if ($this->_tipo->id_tipo /*$fields_alias*/) $campos = $this->_tipo->getCampos();
+		if ($this->_tipo->id_tipo && $lang->prefix) $tipoLanguage = $this->_tipo->getFieldsValues('language');
 		if ($fields == '*') {
 			$fields = array();
 			$invalid_fields = array('tit', 'func');
@@ -61,7 +100,7 @@ class InterAdmin{
 				$value = implode(', ', $str_arr);
 			}
 			// Fields Alias
-			$alias = ($fields_alias) ? $this->tipo->getCamposAlias($key) : $key;
+			$alias = ($fields_alias) ? $this->_tipo->getCamposAlias($key) : $key;
 			// Objeto Relacional
 			if (!$forceAsString && strpos($key, 'select_') === 0) {
 				if (strpos($key, 'select_multi') === 0) {
@@ -121,27 +160,48 @@ class InterAdmin{
 	/**
 	 * @return object
 	 */
-	function getTipo(){
-		if (!$this->tipo) $this->tipo = new InterAdminTipo($this->id_tipo, array('db_prefix' => $this->db_prefix));
-		if (!$this->id_tipo) $this->tipo->id_tipo = $this->id_tipo = $this->getFieldsValues('id_tipo');
-		return $this->tipo;
+	function getTipo() {
+		if (!$this->_tipo) $this->_tipo = new InterAdminTipo($this->id_tipo, array('db_prefix' => $this->db_prefix));
+		if (!$this->id_tipo) $this->_tipo->id_tipo = $this->getFieldsValues('id_tipo');
+		return $this->_tipo;
+	}
+	/**
+	 *
+	 */
+	function setTipo($tipo) {
+		$this->id_tipo = $tipo->id_tipo;
+		$this->_tipo = $tipo;
+	}
+	/**
+	 * @return InterAdmin
+	 */
+	function getParent() {
+		if ($this->_parent) return $this->_parent;
+		$parent_id = $this->getFieldsValues(array('parent_id'))->parent_id;
+		if ($parent_id) {
+			$class_name = get_class($this);
+			$this->_parent = new $class_name($parent_id, array('db_prefix' => $this->db_prefix, 'table' => $this->table));
+			return $this->_parent;
+		}
+	}
+	function setParent($parent) {
+		$this->_parent = $parent;
 	}
 	/**
 	 * @param mixed $tipo
 	 * @return array
 	 */
-	function getChildren($tipo, $options = NULL) {
+	function getChildren($tipo, $options = array()) {
 		global $db;
-		if (!$tipo) return;
-		$children_tipo = new InterAdminTipo($tipo);
+		if (!$tipo) return array();
+		$childrenTipo = new InterAdminTipo($tipo);
 		$options['where'] .= " AND parent_id=" . $this->id;
-		return $children_tipo->getInterAdmins($options);
+		return $childrenTipo->getInterAdmins($options);
 	}
 	/**
 	 * @return string
 	 */
-	function getURL(){
-		return $this->getTipo()->getURL() . '?id=' . $this->id;
+	function getUrl(){
+		return $this->getTipo()->getUrl() . '?id=' . $this->id;
 	}
 }
-?>

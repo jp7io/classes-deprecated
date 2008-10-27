@@ -1,16 +1,18 @@
 <? 
 /**
- * Class which represents a site on InterSite.
+ * JP7's PHP Functions 
  * 
- * @author Carlos Rodrigues
+ * Contains the main custom functions and classes.
+ * @author JP7
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @version (2008/07/30)
+ * @category JP7
  * @package InterSite
  */
  
 /**
- * class InterSite
+ * Class which represents a site on InterSite.
  *
+ * @version (2008/07/30)
  * @package InterSite
  */
 class InterSite extends InterAdmin {
@@ -92,7 +94,7 @@ class InterSite extends InterAdmin {
 		return $this->servers;
 	}
 	
-	protected function socketRequest($host, $url, $parameters, $method = 'GET', $referer = '', $debug = false, $cookie = '') {
+	protected function _socketRequest($host, $url, $parameters, $method = 'GET', $referer = '', $debug = false, $cookie = '') {
 		$header = "" .
 		$method . " " . $url . " HTTP/1.1\r\n" .
 		"Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash, */*\r\n" .
@@ -136,26 +138,26 @@ class InterSite extends InterAdmin {
 				}
 				@ftp_close($conn_id);
 				// PHP Info
-				$content = $this->socketRequest($server->host, '/_admin/phpinfo.php', '', 'GET', 'http://' . $server->host . '/_admin/phpinfo.php');
+				$content = $this->_socketRequest($server->host, '/_admin/phpinfo.php', '', 'GET', 'http://' . $server->host . '/_admin/phpinfo.php');
 				$pos1_str = 'login/index.php?error=3';
 				$pos1 = strpos($content, $pos1_str);
 				$cookie = '';
 				// Login required
 				if ($pos1 !== FALSE) {
 					$WS_parameters = 'user=jp7_jp&pass=jpb5727';
-					$content_2 = $this->socketRequest($server->host, '/_admin/login/login.php', $WS_parameters, 'POST', 'http://' . $server->host . '/_admin/login/index.php');
+					$content_2 = $this->_socketRequest($server->host, '/_admin/login/login.php', $WS_parameters, 'POST', 'http://' . $server->host . '/_admin/login/index.php');
 					$content_header = explode('\r\n\r\n', $content_2);
 					$pos1_str = 'Set-Cookie: ';
 					$pos1 = strpos($content_2, $pos1_str) + strlen($pos1_str);
 					$pos2 = strpos($content_2, ';', $pos1);
 					$cookie = substr($content_2, $pos1, $pos2-$pos1);
-					$content = $this->socketRequest($server->host, '/_admin/phpinfo.php', '', 'GET', 'http://' . $server->host . '/_admin/phpinfo.php', FALSE, $cookie);
+					$content = $this->_socketRequest($server->host, '/_admin/phpinfo.php', '', 'GET', 'http://' . $server->host . '/_admin/phpinfo.php', FALSE, $cookie);
 				}
 				// Version not found - Trying another file
 				$pos1_str = 'PHP Version';
 				$pos1 = strpos($content, $pos1_str);
 				if ($pos1 === FALSE) {
-					$content = $this->socketRequest($server->host, '/_admin/phpinfo_manual.php', '', 'GET', 'http://' . $server->host . '/_admin/phpinfo.php', FALSE, $cookie);
+					$content = $this->_socketRequest($server->host, '/_admin/phpinfo_manual.php', '', 'GET', 'http://' . $server->host . '/_admin/phpinfo.php', FALSE, $cookie);
 					$content = str_replace("phpversion:", "PHP Version", $content);
 				}
 				// Preparing to update file

@@ -1,6 +1,16 @@
 <?
 /**
- * class Pagination
+ * JP7's PHP Functions 
+ * 
+ * Contains the main custom functions and classes.
+ * @author JP7
+ * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
+ * @category JP7
+ * @package Pagination
+ */
+
+/**
+ * Creates HTML pagination.
  *
  * @version (2007/06/13)
  * @package Pagination
@@ -75,19 +85,19 @@ class Pagination{
 				}
 				if ($max > $this->total) $max = $this->total;
 						
-				if ($page !=1 && $this->total > 2 && $page > 2) $this->htm_numbers_extra .= $this->createLink(1, $first_char , ' class="' . (($page == 1) ? 'back-off"' :'bgleft_plus"'));
-				$this->htm_numbers_extra .= $this->createLink($page - 1, $back_char, ' class="' . (($page == 1) ? 'back-off"' :'bgleft"'));
+				if ($page !=1 && $this->total > 2 && $page > 2) $this->htm_numbers_extra .= $this->_createLink(1, $first_char , ' class="' . (($page == 1) ? 'back-off"' :'bgleft_plus"'));
+				$this->htm_numbers_extra .= $this->_createLink($page - 1, $back_char, ' class="' . (($page == 1) ? 'back-off"' :'bgleft"'));
 				for ($i = $min; $i <= $max; $i++) {
-					$this->htm_numbers .= $this->createLink($i, $i, ($i == $page) ? ' class="on"' : '');
-					$this->htm_numbers_extra .= $this->createLink($i, $i, ($i == $page) ? ' class="on"' : '');
+					$this->htm_numbers .= $this->_createLink($i, $i, ($i == $page) ? ' class="on"' : '');
+					$this->htm_numbers_extra .= $this->_createLink($i, $i, ($i == $page) ? ' class="on"' : '');
 					if ($i != $max) {
 						$this->htm_numbers .= '<li>' . $separador."</li>";
 						$this->htm_numbers_extra .= '<li>' . $separador . '</li>';
 					}
 				}
 				rs . $this->query_string . '&p_page=' . $this->total . '\'">' . $go_char_plus . '</li>';
-				$this->htm_numbers_extra .= $this->createLink($page + 1, $next_char, ' class="' . (($page == $this->total) ? 'go-off"' : 'bgright"'));
-				if ($page != $this->total && $this->total > 2 && $page < ($this->total - 1)) $this->htm_numbers_extra .= $this->createLink($this->total, $last_char, ' class="' . (($page == $this->total) ? 'go-off"' : 'bgright_plus"'));
+				$this->htm_numbers_extra .= $this->_createLink($page + 1, $next_char, ' class="' . (($page == $this->total) ? 'go-off"' : 'bgright"'));
+				if ($page != $this->total && $this->total > 2 && $page < ($this->total - 1)) $this->htm_numbers_extra .= $this->_createLink($this->total, $last_char, ' class="' . (($page == $this->total) ? 'go-off"' : 'bgright_plus"'));
 				$this->htm_numbers_extra .= '</ul></div>';
 				$this->htm_numbers .= '</ul></div>';
 			}
@@ -110,20 +120,17 @@ class Pagination{
 			$this->htm .= '</div></div>' . "\n";
 		}
 	}
-	
 	/**
 	 * Creates links for the pagination numbers.
 	 *
 	 * @param int $pageNumber Number of the page the link will point to.
 	 * @param int $pageLabel Label of the link.
 	 * @param int $className Class used in the link, e.g. class="on".
- 	 * @return string Returns a "li" tag containing an online script.
-	 * @todo Change it from ONCLICK to a A HREF.
+ 	 * @return string Returns a "li" tag containing an "a" tag with a link.
 	 * @author Carlos
 	 * @version (2008/06/13)
 	 */
-	private function createLink($pageNumber, $pageLabel, $className = ''){
+	private function _createLink($pageNumber, $pageLabel, $className = ''){
 		return '<li' . $className . '><a href="' .  $this->request_uri . '?' . $this->parameters . $this->query_string . (($this->parameters || $this->query_string) ? '&' : '') . 'p_page=' . $pageNumber . '">' . $pageLabel . '</a></li>';
 	}
 }
-?>

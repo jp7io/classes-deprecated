@@ -1,53 +1,59 @@
 <?
 /**
- * Debug class, used to display filenames, processing time and display formatted SQL queries.
+ * JP7's PHP Functions 
  * 
- * @author Carlos Rodrigues
+ * Contains the main custom functions and classes.
+ * @author JP7
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @version 1.02 (2008/07/18)
+ * @category JP7
  * @package Debug
- * @todo Documentation, and showToolbar
  */
  
 /**
- * class Debug
+ * Debug class, used to display filenames, processing time and display formatted SQL queries.
  *
  * @package Debug
  */
 class Debug{
 	/**
-	 * @var bool Flag, it is <tt>TRUE</tt> if its displaying filenames or SQL queries.
+	 * Flag, it is <tt>TRUE</tt> if its displaying filenames or SQL queries.
+	 * @var bool
 	 */
 	public $active;
 	/**
-	 * @var bool Flag indicating if filenames will be showed or not. Use $_GET['debug_filename'] to set it.
+	 * Flag indicating if filenames will be showed or not. Use $_GET['debug_filename'] to set it.
+	 * @var bool 
 	 */
 	public $debugFilename;
 	/**
-	 * @var bool Flag indicating if the SQL queries will be showed or not. Use $_GET['debug_sql'] to set it.
+	 * Flag indicating if the SQL queries will be showed or not. Use $_GET['debug_sql'] to set it.
+	 * @var bool
 	 */
 	public $debugSql;
 	/**
-	 * @var array Array containing the activity log for queries, filenames and their processing time.
-	 */
-	protected $log;
-	/**
-	 * @var bool In order to prevent errors with output and headers, set this variable <tt>TRUE</tt> after the headers are sent.
+	 * In order to prevent errors with output and headers, set this variable <tt>TRUE</tt> after the headers are sent.
+	 * @var bool 
 	 */
 	public $safePoint;
 	/**
-	 * @var float|array Stores the start time which is used to calculate the processing time. Use the method startTime() to set this variable.
+	 * Array containing the activity log for queries, filenames and their processing time.
+	 * @var array 
 	 */
-	protected $startTime;
+	protected $_log;
 	/**
-	 * @var bool Indicates the current template file loaded. Used on the showToolbar() method.
+	 * Stores the start time which is used to calculate the processing time. Use the method startTime() to set this variable.
+	 * @var float|array
 	 */
-	protected $templateFilename;
+	protected $_startTime;
 	/**
-	 * Constructor function, initial checks and settings when object is created.
+	 * Indicates the current template file loaded. Used on the showToolbar() method.
+	 * @var bool
+	 */
+	protected $_templateFilename;
+	/**
+	 * Public Constructor, it checks the flags and settings, will do nothing if $c_jp7 is <tt>FALSE</tt>.
 	 *
 	 * @global bool
-	 * @return Debug
 	 */	
 	public function __construct() {
 		global $c_jp7;
@@ -71,27 +77,33 @@ class Debug{
 	}
 	/**
 	 * Starts recording the time spent on the code. When using more than one startTime(), the time will be displayed from the last to the first when getTime() is called.
+	 *
+	 * @return void
 	 */	
 	public function startTime() {
 		$debug_mtime = explode(' ', microtime());
-		$this->startTime[] = $debug_mtime[1] + $debug_mtime[0];
+		$this->_startTime[] = $debug_mtime[1] + $debug_mtime[0];
 	}
 	/**
 	 * Calculates and displays the time spent from the moment startTime() was called.
+	 *
+	 * @param bool Sets whether the time will be outputted or not.
+	 * @return void
 	 */	
 	public function getTime($output = FALSE) {
-		if (!count($this->startTime)) return FALSE;
+		if (!count($this->_startTime)) return;
 		$debug_mtime = explode(' ', microtime());
 		// Retrieves and deletes the last value
-		$debug_starttime = array_pop($this->startTime);
+		$debug_starttime = array_pop($this->_startTime);
 		$debug_totaltime = round(($debug_mtime[0] + $debug_mtime[1] - $debug_starttime) * 1000);
 		if ($output && $this->safePoint) echo '<div class="debug_msg">Processed in: ' . $debug_totaltime . 'ms.</div>';
 		return $debug_totaltime;
 	}
 	/**
-	 * Shows the filename. Do not shows paths containing 'inc/connection', 'inc/7.' or 'classes/'.
+	 * Shows the filename if $safePoint and $debugFilename are <tt>TRUE</tt>. Adds the filename to $_log.
 	 *
 	 * @param string $filename Name of the file.
+	 * @return string Returns the $filename value unchanged.
 	 * @global string
 	 */	
 	public function showFilename($filename) {
@@ -107,19 +119,21 @@ class Debug{
 	 * Formats and displays an SQL query.
 	 *
 	 * @param string $sql SQL query to be formatted and displayed.
-	 * @param bool $forcedebug If <tt>TRUE</tt> it will show the SQL even when $_GET['debug_sql'] is not set, the default value is <tt>FALSE</tt>.
+	 * @param bool $forceDebug If <tt>TRUE</tt> it will show the SQL even when $_GET['debug_sql'] is not set, the default value is <tt>FALSE</tt>.
 	 * @param string Stylesheet on the box displayed. The default value is ''.
+	 * @return void
 	 */	
-	public function showSql($sql, $forcedebug = FALSE, $style = '') {
-		if (!$this->safePoint) return FALSE;
-		if ($this->debugSql || $forcedebug) echo '<div class="debug_sql" style="' . $style . '">' . preg_replace(array('/(SELECT )/','/( FROM )/','/( WHERE )/','/( ORDER BY )/'),'<b>\1</b>', $sql, 1) . '</div>';
+	public function showSql($sql, $forceDebug = FALSE, $style = '') {
+		if (!$this->safePoint) return;
+		if ($this->debugSql || $forceDebug) echo '<div class="debug_sql" style="' . $style . '">' . preg_replace(array('/(SELECT )/','/( FROM )/','/( WHERE )/','/( ORDER BY )/'),'<b>\1</b>', $sql, 1) . '</div>';
 	}
 	/**
 	 * Formats and returns the backtrace.
 	 *
 	 * @param string $msgErro Error message (optional).
 	 * @param string $sql SQL query which was executed (optional).
- 	 * @return string Formatted backtrace.
+	 * @param array $backtrace Backtrace generated by debug_backtrace() (optional).
+ 	 * @return string Formatted HTML backtrace.
 	 */	
 	public function getBacktrace($msgErro = NULL, $sql = NULL, $backtrace = NULL) {
 		if (!$backtrace) $backtrace = debug_backtrace();
@@ -141,36 +155,72 @@ class Debug{
 		if (count($_COOKIE)) $S .= '<strong style="color:red">     COOKIE:</strong> ' . print_r($_COOKIE, TRUE);
 		return '<pre style="background-color:#FFFFFF;font-size:11px;text-align:left;">' . $S . '</pre>';
 	}
-	
+	/**
+	 * Method to be used as default error handler with set_error_handler() function.
+	 *
+	 * @param $code Error type code, like E_STRICT, E_NOTICE and so on.
+	 * @param $msgErro Error message.
+	 * @return bool
+	 */
 	public function errorHandler($code, $msgErro) {
-			if ($code == E_STRICT || $code == E_NOTICE || $code == E_DEPRECATED) return FALSE; // FALSE -> the default error handler will take care of it.
-			if (error_reporting() == 0) return FALSE; // Programmer used @ so the error reporting value is 0.
+		if ($code == E_STRICT || $code == E_NOTICE || $code == E_DEPRECATED) return FALSE; // FALSE -> the default error handler will take care of it.
+		if (error_reporting() == 0) return FALSE; // Programmer used @ so the error reporting value is 0.
 
-			$backtrace = debug_backtrace();
-			array_shift($backtrace);
-			die(jp7_debug($msgErro, NULL, $backtrace));
+		$backtrace = debug_backtrace();
+		array_shift($backtrace);
+		die(jp7_debug($msgErro, NULL, $backtrace));
 	}
-	
+	/**
+	 * Adds a log to the $_log array.
+	 *
+	 * @param string $value Value to be displayed.
+	 * @param string $tag Tag which represents the type of data stored.
+	 * @param int $time Time this proccess took in miliseconds, e.g. ammount of time a SQL query took to be executed.
+ 	 * @return void
+	 */	
 	public function addLog($value, $tag = 'log', $time = NULL) {
-		$this->log[] = array('tag' => $tag, 'value' => $value, 'time' => $time);
-	} 
+		$this->_log[] = array('tag' => $tag, 'value' => $value, 'time' => $time);
+	}
+	/**
+	 * Returns the log array.
+	 *
+	 * @param string $value Value to be displayed.
+	 * @param string $tag Tag which represents the type of data stored.
+	 * @param int $time Time this proccess took in miliseconds, e.g. ammount of time a SQL query took to be executed.
+ 	 * @return array Returns the value of $_log.
+	 */
 	public function getLog() {
-		return $this->log;
+		return $this->_log;
 	} 
+	/**
+	 * Sets the filename of the current template.
+	 *
+	 * @param string $filename Name of the current template file.
+ 	 * @return void
+	 */
 	public function setTemplateFilename($filename) {
-		$this->templateFilename = $filename;
+		$this->_templateFilename = $filename;
 	}
+	/**
+	 * Returns the filename of the current template.
+	 *
+ 	 * @return string Name of the current template file.
+	 */
 	public function getTemplateFilename() {
-		return $this->templateFilename;
+		return $this->_templateFilename;
 	}
+	/**
+	 * Displays current template, log data, and time for the page.
+	 *
+ 	 * @return void
+	 */
 	public function showToolbar() {
-		if (!$this->active || !$this->safePoint) return FALSE;
+		if (!$this->active || !$this->safePoint) return;
 		
-		if ($this->templateFilename ) echo ('Template: ' . $this->templateFilename );
+		if ($this->_templateFilename ) echo ('Template: ' . $this->_templateFilename );
 		else echo('PHP_SELF: ' . $_SERVER['PHP_SELF']);
 		
-		jp7_print_r($this->log);
+		jp7_print_r($this->_log);
 		$this->getTime(TRUE);
 	}
 }
-?>

@@ -1,8 +1,19 @@
 <?
 /**
- * Instancia campos da tabela interadmin_cliente_tipos
+ * JP7's PHP Functions 
+ * 
+ * Contains the main custom functions and classes.
+ * @author JP7
+ * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
+ * @category JP7
+ * @package InterAdminField
+ */
+ 
+/**
+ * Generates the HTML output for a field based on its type, such as varchar, int or text.
  *
-*/
+ * @package InterAdminField
+ */
 class InterAdminField{
 	public $id;
 	public $id_tipo;
@@ -13,11 +24,6 @@ class InterAdminField{
 	 */
 	function __construct($field = ''){
 		$this->field = $field;
-	}
-	function __get($var){
-		if($var == 'id'){
-			return $this->$var;
-		}
 	}
 	function __toString(){
 		return $this->field;

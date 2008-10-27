@@ -1,18 +1,53 @@
-<? 
+<?
 /**
- * class Browser
+ * JP7's PHP Functions 
+ * 
+ * Contains the main custom functions and classes.
+ * @author JP7
+ * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
+ * @category JP7
+ * @package Browser
+ */
+
+/**
+ * Checks browser, browser version, and whether it's a robot or not.
  *
  * @version (2005/11/18)
  * @package Browser
  */
 class Browser{
 	/**
-	 * Checks browser, browser version, and whether it's a robot or not.
+	 * User Agent string.
+	 * @var string
+	 */
+	public $userAgent;
+	/**
+	 * Browser: 'sa' for Safari/Chrome, 'op' for Opera, 'ie' for Internet Explorer, 'ns' for Netscape, 'mo' for Mozilla/Firefox, or 'robot' for bots.
+	 * @var string
+	 */
+	public $browser;
+	/**
+	 * Version of the browser, -1 if its not detected.
+	 * @var int
+	 */
+	public $v;
+	/**
+	 * Operating System: 'win' for Windows, 'mac' for Mac OS, 'unx' for Unix, 'lnx' for Linux and 'sol' for Solaris.
+	 * @var string
+	 */
+	public $os;
+	/**
+	 * Name of the bot, such as wget, getright, yahoo, slurp, google or '' if its not a bot.
+	 * @var string
+	 */
+	public $robot;
+	/**
+	 * Public Constructor. Checks browser, browser version, and whether it's a robot or not.
 	 *
-	 * @param string $useragent Browser information from $HTTP_USER_AGENT.
+	 * @param string $useragent Browser information from $_SERVER['HTTP_USER_AGENT'].
 	 * @return Browser
 	 */	
-	function Browser($useragent){
+	public function __construct($useragent){
 		$this->userAgent = $useragent;
 		$i = 0;
 		if (strpos($useragent, 'Safari')) {
@@ -81,5 +116,4 @@ class Browser{
 			}
 		}
 	}
-} 
-?>
+}

@@ -5,13 +5,14 @@
  * Contains the main custom functions and classes.
  * @author JP7
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @package JP7
+ * @category JP7
+ * @package InterAdminArquivo
  */
  
 /**
  * Class which represents records on the table interadmin_{client name}_arquivos.
  *
- * @subpackage InterAdminArquivo
+ * @package InterAdminArquivo
  */
 class InterAdminArquivo{
 	public $id_arquivo;
