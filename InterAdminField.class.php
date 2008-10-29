@@ -148,6 +148,7 @@ class InterAdminField{
 		}elseif(strpos($campo,"int_")===0||strpos($campo,"float_")===0){
 			$onkeypress=" onkeypress=\"return DFonlyThisChars(true,false,' -.,()')\"";
 			if($campo=="int_key"&&!$valor&&$quantidade>1)$valor=$registros+1+$j;
+			if (strpos($campo,"float_")===0 && $xtra == 'moeda') $valor = number_format($valor, '2', ',', '.');
 			$form="<input type=\"text\" name=\"".$campo."[]\" label=\"".$campo_nome."\" value=\"".$valor."\" maxlength=\"255\"".(($obrigatorio)?" obligatory=\"yes\"":"")." style=\"width:".(($tamanho)?$tamanho."em":"70px")."\"".$readonly.$onkeypress." />";
 		}else{
 			$onkeypress="";
