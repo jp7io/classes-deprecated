@@ -44,7 +44,7 @@ class InterSite extends InterAdmin {
 			$language->lang = $lang->varchar_1;
 			$language->name = $lang->varchar_key;
 			$language->multibyte = $lang->char_1;
-			unset($language->tipo);
+			unset($language->_tipo);
 			unset($language->db_prefix);
 			$this->langs[$language->lang] = $language;
 		}
@@ -82,8 +82,8 @@ class InterSite extends InterAdmin {
 				$server->aliases[] = $aliasObj->varchar_key;
 			}
 			// Cleaning unused data
-			unset($server->db->tipo);
-			unset($server->tipo);
+			unset($server->db->_tipo);
+			unset($server->_tipo);
 		}
 		// Renaming keys
 		foreach ((array)$servers as $server) {
@@ -225,7 +225,7 @@ class InterSite extends InterAdmin {
 	}
 	
 	function __sleep() {
-		unset($this->tipo);
+		unset($this->_tipo);
 		return array_keys(get_object_vars($this));
 	}
 	
@@ -270,6 +270,7 @@ class InterSite extends InterAdmin {
 		$GLOBALS['c_cache_delay'] = $this->cache_delay;
 		$GLOBALS['db_prefix'] = 'interadmin_' . $this->name_id;
 		$GLOBALS['c_path'] = $this->server->path;
+		$GLOBALS['c_cliente_url_path'] = $this->server->path;
 		$GLOBALS['c_analytics'] = $this->google_analytics;
 		if ($this->interadmin_remote == $_SERVER['HTTP_HOST'] || $this->interadmin_remote == 'www.' . $_SERVER['HTTP_HOST']) $GLOBALS['c_remote'] = $this->interadmin_remote;
 		$GLOBALS['googlemaps_key'] = $this->google_maps;
