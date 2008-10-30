@@ -45,6 +45,7 @@ class InterSite extends InterAdmin {
 			$language->name = $lang->varchar_key;
 			$language->multibyte = $lang->char_1;
 			unset($language->_tipo);
+			unset($language->_parent);
 			unset($language->db_prefix);
 			$this->langs[$language->lang] = $language;
 		}
@@ -72,7 +73,7 @@ class InterSite extends InterAdmin {
 				'fields' => array('varchar_key', 'varchar_1', 'varchar_2', 'varchar_3', 'varchar_4', 'password_key', 'select_2'),
 				'fields_alias' => TRUE
 			);
-			$server->db = new InterAdmin($server->db, $options);
+			$server->db = new InterAdmin($server->db->id, $options);
 			$type = new InterAdmin($server->db->type, array('fields' => 'varchar_1'));
 			$server->db->type = $type->varchar_1;
 			// Aliases
@@ -83,7 +84,9 @@ class InterSite extends InterAdmin {
 			}
 			// Cleaning unused data
 			unset($server->db->_tipo);
+			unset($server->db->_parent);
 			unset($server->_tipo);
+			unset($server->_parent);
 		}
 		// Renaming keys
 		foreach ((array)$servers as $server) {
@@ -226,6 +229,7 @@ class InterSite extends InterAdmin {
 	
 	function __sleep() {
 		unset($this->_tipo);
+		unset($this->_parent);
 		return array_keys(get_object_vars($this));
 	}
 	
