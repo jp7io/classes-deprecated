@@ -55,9 +55,9 @@ class Pagination{
 		
 		$this->total = ceil($this->records / $limit); // Total de Paginas
 		$this->page = ($page > $this->total) ? $this->total : $page; // Pagina Atual
-		$this->sql_limit=" LIMIT ".(($page-1)*$limit).",".$limit;
+		$this->init = (($this->page - 1) * $limit); // Item inicial
 		$this->limit = $limit; // Itens por pagina
-		$this->init = (($page - 1) * $limit); // Item inicial
+		$this->sql_limit = " LIMIT " . $this->init . "," . $this->limit;
 		
 		// HTM
 		$this->query_string = preg_replace('([&]?p_page=[0-9]+)', '', $_SERVER['QUERY_STRING']); // Retira a pagina atual da Query String
