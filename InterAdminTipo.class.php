@@ -119,7 +119,7 @@ class InterAdminTipo{
 		$interAdmins = array();
 		//if ($options['fields_alias']) {
 			$campos = $this->getCampos();
-			$table = ($this->getFieldsValues('tabela')) ? '_' . $this->getFieldsValues('tabela') : '';
+			$table = ($this->getModel()->getFieldsValues('tabela')) ? '_' . $this->getModel()->getFieldsValues('tabela') : '';
 		//}
 		if ($options['fields'] == '*') {
 			$options['fields'] = array();
