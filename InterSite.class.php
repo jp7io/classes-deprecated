@@ -17,9 +17,13 @@
  */
 class InterSite extends InterAdmin {
 	/**
-	 * @var Array containning the servers for this site.
+	 * @var Array of servers for this site.
 	 */
 	public $servers;
+	/**
+	 * @var Array of languages for this site.
+	 */
+	public $langs;
 	/**
 	 * Populates and returns the array of servers for this site.
 	 * 
@@ -27,28 +31,11 @@ class InterSite extends InterAdmin {
 	 */
 	public function getServers() {
 		$options = array(
-			'fields' => array('varchar_key', 'select_1', 'varchar_1', 'varchar_2',  'varchar_3', 'varchar_4', 'password_key', 'select_2'),
+			'fields' => array('varchar_key', 'select_1', 'varchar_1', 'varchar_4', 'select_2'),
 			'fields_alias' => TRUE
 		);
 		$servers = $this->getChildren(26, $options);
 		
-		// Languages
-		$options = array(
-			'fields' => array('select_key', 'varchar_1', 'text_1', 'text_2', 'char_1'),
-			'fields_alias' => TRUE
-		);
-		$languages = $this->getChildren(37, $options);
-		$this->langs = NULL;
-		foreach ((array)$languages as $language) {
-			$lang =	new InterAdmin($language->lang, array('fields' => array('varchar_1', 'varchar_key', 'char_1')));
-			$language->lang = $lang->varchar_1;
-			$language->name = $lang->varchar_key;
-			$language->multibyte = $lang->char_1;
-			unset($language->_tipo);
-			unset($language->_parent);
-			unset($language->db_prefix);
-			$this->langs[$language->lang] = $language;
-		}
 		// Variaveis do site
 		$vars = $this->getChildren(39, array( 'fields' => array( 'select_key', 'varchar_1')));
 		
@@ -93,8 +80,26 @@ class InterSite extends InterAdmin {
 			$renamed_servers[$server->host] = $server;
 		}
 		$this->servers = $renamed_servers;
-		// Cleaning unused data
 		return $this->servers;
+	}
+	
+	public function getLangs(){
+		$options = array(
+			'fields' => array('select_key', 'varchar_1', 'text_1', 'text_2', 'char_1'),
+			'fields_alias' => TRUE
+		);
+		$languages = $this->getChildren(37, $options);
+		$this->langs = NULL;
+		foreach ((array)$languages as $language) {
+			$lang =	new InterAdmin($language->lang, array('fields' => array('varchar_1', 'varchar_key', 'char_1')));
+			$language->lang = $lang->varchar_1;
+			$language->name = $lang->varchar_key;
+			$language->multibyte = $lang->char_1;
+			unset($language->_tipo);
+			unset($language->_parent);
+			unset($language->db_prefix);
+			$this->langs[$language->lang] = $language;
+		}
 	}
 	
 	protected function _socketRequest($host, $url, $parameters, $method = 'GET', $referer = '', $debug = false, $cookie = '') {
@@ -128,18 +133,29 @@ class InterSite extends InterAdmin {
 		foreach($this->servers as $server) {
 			$fieldsValues = '';
 			$fieldsValuesDB = '';
-			if ($server->type != 'Desenvolvimento') {
-				if (!$server->ftp) $server->ftp = $server->host;
-				$conn_id = ftp_connect($server->ftp); 
-				$login_result = @ftp_login($conn_id, $server->user, $server->pass);
+			if ($server->type == 'Produção') {
+				$options = array(
+					'fields' => array('varchar_key', 'varchar_1', 'password_key'),
+					'fields_alias' => TRUE				
+				);
+				$ftp = reset($server->getChildren(42, $options));
+	
+				if (!$ftp->ftp) $ftp->ftp = $server->host;
+				$conn_id = ftp_connect($ftp->ftp); 
+				$login_result = @ftp_login($conn_id, $ftp->user, $ftp->pass);
 				if ($login_result) {
 					$fieldsValues = array(
 						'varchar_5' => ftp_systype($conn_id),
 						'date_1' => date('Y-m-d H:i:s'),
 						'char_1' => $login_result
 					);
+					jp7_print_r($fieldsValues);
+					$ftp->setFieldsValues($fieldsValues, TRUE);
 				}
 				@ftp_close($conn_id);
+	
+				$fieldsValues = array();
+				
 				// PHP Info
 				$content = $this->_socketRequest($server->host, '/_admin/phpinfo.php', '', 'GET', 'http://' . $server->host . '/_admin/phpinfo.php');
 				$pos1_str = 'login/index.php?error=3';
@@ -196,7 +212,7 @@ class InterSite extends InterAdmin {
 					}
 				}
 				$fieldsValues['varchar_6'] = $server->phpinfo['PHP'];
-				// Saving FTP and PHP Info data		
+				// Saving PHP Info data		
 				if ($fieldsValues) {
 					jp7_print_r($fieldsValues);
 					$server->setFieldsValues($fieldsValues, TRUE);
@@ -236,6 +252,9 @@ class InterSite extends InterAdmin {
 	function __wakeup() {
 		// This server is a main host
 		$this->server = $this->servers[$_SERVER['HTTP_HOST']];
+		
+		$this->interadmin_remote = jp7_explode(';', $this->interadmin_remote);
+		
 		if (!$this->server) {
 			// This server is not there, it might be an alias
 			foreach ($this->servers as $host=>$server) {
@@ -246,8 +265,8 @@ class InterSite extends InterAdmin {
 						break;
 					}
 				// InterAdmin Remote
-				} elseif ($this->interadmin_remote && $GLOBALS['jp7_app'] && $server->type == 'Produção') {
-					$this->server = $this->servers[$this->interadmin_remote] = $server;
+				} elseif (in_array($_SERVER['HTTP_HOST'], $this->interadmin_remote) && $GLOBALS['jp7_app'] && $server->type == 'Produção') {
+					$this->server = $this->servers[$_SERVER['HTTP_HOST']] = $server;
 					break;
 				}
 				if (in_array($_SERVER['HTTP_HOST'], (array) $server->aliases)) {
@@ -276,7 +295,7 @@ class InterSite extends InterAdmin {
 		$GLOBALS['c_path'] = $this->server->path;
 		$GLOBALS['c_cliente_url_path'] = $this->server->path;
 		$GLOBALS['c_analytics'] = $this->google_analytics;
-		if ($this->interadmin_remote == $_SERVER['HTTP_HOST'] || $this->interadmin_remote == 'www.' . $_SERVER['HTTP_HOST']) $GLOBALS['c_remote'] = $this->interadmin_remote;
+		if (in_array($_SERVER['HTTP_HOST'], $this->interadmin_remote) || in_array('www.' . $_SERVER['HTTP_HOST'], $this->interadmin_remote)) $GLOBALS['c_remote'] = $_SERVER['HTTP_HOST'];
 		$GLOBALS['googlemaps_key'] = $this->google_maps;
 		$GLOBALS['c_w3c'] = TRUE;
 		$GLOBALS['c_doc_root'] = jp7_doc_root();
