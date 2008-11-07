@@ -8,7 +8,7 @@
  * @category JP7
  * @package RssFeed
  */
- 
+
 /**
  * Generates a RSS Feed.
  *
@@ -79,7 +79,7 @@ class RssFeed extends DOMDocument {
 		$this->_channel = $rss->appendChild($this->createElement('channel'));
 	}
 	/**
-	 * Adds data to the RSS feed parsing an array.
+	 * Adds data to the RSS feed parsing an array of objects or arrays, each of them with indexes matching the keysMatch property.
 	 *
 	 * @param array Array with keys matching the itens on $_keysMatch.
  	 * @return string RSS Document.
@@ -142,7 +142,7 @@ class RssFeed extends DOMDocument {
 	 * @return void
 	 **/
 	public function setTitle($title){
-		$this->_channelData['title'] = $title;
+		$this->_channelData['title'] = ($this->actualEncoding == 'ISO-8859-1') ? utf8_encode($title) : $title;
 	}
 	/**
 	 * Gets the title.
@@ -172,7 +172,7 @@ class RssFeed extends DOMDocument {
 	 * @return void
 	 **/
 	public function setDescription($description){
-		$this->_channelData['description'] = $description;
+		$this->_channelData['description'] = ($this->actualEncoding == 'ISO-8859-1') ? utf8_encode($description) : $description;
 	}
 	/**
 	 * Gets the title.
