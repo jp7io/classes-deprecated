@@ -139,7 +139,8 @@ class InterAdminTipo{
 		if ($jp7_app) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		else $rs = interadmin_query($sql);
 		while ($row = $rs->FetchNextObj()) {
-			$interAdmin = new InterAdmin($row->id, array('db_prefix' => $this->db_prefix, 'table' => $this->tabela));
+			$class_name = ($options['class']) ? $options['class'] : 'InterAdmin'; 
+			$interAdmin = new $class_name($row->id, array('db_prefix' => $this->db_prefix, 'table' => $this->tabela));
 			$interAdmin->setTipo($this);
 			foreach((array)$options['fields'] as $field){
 				$alias = ($options['fields_alias']) ? $this->getCamposAlias($field) : $field;
