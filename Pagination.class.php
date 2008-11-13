@@ -40,7 +40,6 @@ class Pagination{
 	 */
 	function __construct($sql = NULL, $limit = 10, $page = 1, $type = '', $numbers_limit = 10, $parameters = '', $separador = '|', $next_char = '&gt;', $back_char = '&lt;', $last_char = '&raquo;', $first_char = '&laquo;', $records = NULL) {
 		global $db, $rs, $seo;
-		if (!intval($page)) $page = 1;
 
 		if ($sql) {
 			if ($GLOBALS["jp7_app"]) $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
@@ -55,6 +54,9 @@ class Pagination{
 		
 		$this->total = ceil($this->records / $limit); // Total de Paginas
 		$this->page = ($page > $this->total) ? $this->total : $page; // Pagina Atual
+
+		if (!intval($this->page)) $page = $this->page = 1;
+		
 		$this->init = (($this->page - 1) * $limit); // Item inicial
 		$this->limit = $limit; // Itens por pagina
 		$this->sql_limit = " LIMIT " . $this->init . "," . $this->limit;
