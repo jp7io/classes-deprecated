@@ -160,8 +160,12 @@ class InterAdmin{
 	/**
 	 * @return object
 	 */
-	function getTipo() {
-		if (!$this->_tipo) $this->_tipo = new InterAdminTipo($this->id_tipo, array('db_prefix' => $this->db_prefix));
+	function getTipo($options = array()) {
+		if (!$this->_tipo) {
+			$class_name = ($options['class']) ? $options['class'] : 'InterAdminTipo';
+			$this->_tipo = new $class_name($this->id_tipo, array('db_prefix' => $this->db_prefix));
+		
+		}
 		if (!$this->id_tipo) $this->_tipo->id_tipo = $this->getFieldsValues('id_tipo');
 		return $this->_tipo;
 	}
@@ -175,11 +179,11 @@ class InterAdmin{
 	/**
 	 * @return InterAdmin
 	 */
-	function getParent() {
+	function getParent($options = array()) {
 		if ($this->_parent) return $this->_parent;
 		$parent_id = $this->getFieldsValues(array('parent_id'))->parent_id;
 		if ($parent_id) {
-			$class_name = get_class($this);
+			$class_name = ($options['class']) ? $options['class'] : get_class($this);
 			$this->_parent = new $class_name($parent_id, array('db_prefix' => $this->db_prefix, 'table' => $this->table));
 			return $this->_parent;
 		}
@@ -196,7 +200,11 @@ class InterAdmin{
 		if (!$tipo) return array();
 		$childrenTipo = new InterAdminTipo($tipo);
 		$options['where'] .= " AND parent_id=" . $this->id;
-		return $childrenTipo->getInterAdmins($options);
+		$children = $childrenTipo->getInterAdmins($options);
+		foreach ($children as $child) {
+			$child->setParent($this);
+		}
+		return $children;
 	}
 	/**
 	 * @return array
