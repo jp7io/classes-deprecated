@@ -65,11 +65,11 @@ class InterAdminTipo{
 	/**
 	 * @return object
 	 */
-	function getParent() {
+	function getParent($options = array()) {
 		if ($this->_parent) return $this->_parent;
 		$parent_id_tipo = $this->getFieldsValues(array('parent_id_tipo'))->parent_id_tipo;
 		if ($parent_id_tipo) {
-			$class_name = get_class($this);
+			$class_name = ($options['class']) ? $options['class'] : get_class($this); 
 			$this->_parent = new $class_name($parent_id_tipo, array('db_prefix' => $this->db_prefix));
 			return $this->_parent;
 		}
@@ -91,7 +91,7 @@ class InterAdminTipo{
 		if ($jp7_app) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
 		else $rs = interadmin_query($sql);
 		while ($row = $rs->FetchNextObj()) {
-			$class_name = get_class($this);
+			$class_name = ($options['class']) ? $options['class'] : get_class($this); 
 			$interAdminTipo = new $class_name($row->id_tipo, array('db_prefix' => $this->db_prefix));
 			$interAdminTipo->setParent($this);
 			foreach((array)$options['fields'] as $field){
