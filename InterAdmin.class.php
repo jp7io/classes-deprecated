@@ -138,12 +138,12 @@ class InterAdmin{
 				$return[] = $row['tipo'];
 			}
 		}
-		$return_str = $this->getFieldsValues($return);
+		$return_str = (array) $this->getFieldsValues($return);
 		foreach ($return_str as $key=>$value) {
 			if (strpos($key, 'select_') === 0 && $value) $value = $value->getStringValue();
 			$return_final[] = $value;
 		}
-		return implode(' - ', $return_final);
+		return implode(' - ', (array) $return_final);
 	}
 	/**
 	 * @return mixed
