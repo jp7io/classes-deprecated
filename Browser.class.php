@@ -53,7 +53,7 @@ class Browser{
 		if (strpos($useragent, 'Safari')) {
 			$this->browser = 'sa';
 			$this->v = 5;
-		} elseif (strpos($useragent, 'Opera')) {
+		} elseif (strpos($useragent, 'Opera') !== FALSE) {
 			$this->browser = 'op';
 			$i = strpos($useragent, 'Opera') + 6;
 		} elseif (strpos($useragent, 'MSIE')) {
