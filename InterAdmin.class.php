@@ -195,6 +195,19 @@ class InterAdmin{
 	 * @param mixed $tipo
 	 * @return array
 	 */
+	function getChildrenTipo($tipo, $options = array()) {
+		$options = array_merge($options,
+			array(
+				'parent_id' => $this->id
+			)
+		);
+		$childrenTipo = new InterAdminTipo($tipo, $options);
+		return $childrenTipo;
+	}
+	/**
+	 * @param mixed $tipo
+	 * @return array
+	 */
 	function getChildren($tipo, $options = array()) {
 		global $db;
 		if (!$tipo) return array();
