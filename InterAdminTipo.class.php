@@ -27,6 +27,7 @@ class InterAdminTipo{
 	function __construct($id_tipo = 0, $options = array()) {
 		$this->id_tipo = $id_tipo;
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
+		$this->parent_id = $options['parent_id'];
 		if ($options['fields']) $this->getFieldsValues($options['fields']);
 	}
 	function __toString() {
@@ -133,6 +134,7 @@ class InterAdminTipo{
 		$sql = "SELECT id" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . 
 		" FROM " . $this->db_prefix . $table . (($this->getFieldsValues('language')) ? $lang->prefix : '') .
 		" WHERE id_tipo=" . $this->id_tipo.
+		(($this->parent_id) ? " AND parent_id=" . $this->parent_id : '') .
 		(($options['where']) ? $options['where'] : '') .
 		" ORDER BY " . (($options['order']) ? $options['order'] . ',' : '') . $this->interadminsOrderby .
 		(($options['limit']) ? " LIMIT " . $options['limit'] : '');
