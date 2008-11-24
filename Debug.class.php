@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * JP7's PHP Functions 
  * 
@@ -224,3 +224,4 @@ class Debug{
 		$this->getTime(TRUE);
 	}
 }
+?>

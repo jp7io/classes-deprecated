@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * JP7's PHP Functions 
  * 
@@ -136,3 +136,4 @@ class Pagination{
 		return '<li' . $className . '><a href="' .  $this->request_uri . '?' . $this->parameters . $this->query_string . (($this->parameters || $this->query_string) ? '&' : '') . 'p_page=' . $pageNumber . '">' . $pageLabel . '</a></li>';
 	}
 }
+?>

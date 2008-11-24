@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * JP7's PHP Functions 
  * 
@@ -54,9 +54,9 @@ class FileCache{
 	 * @global bool
 	 */	
 	public function __construct($storeId = FALSE, $exit = TRUE, $cachePath = 'cache') {
-		global $c_root, $c_path, $c_cache, $c_cache_delay, $c_devIps, $debugger, $s_interadmin_preview, $interadmin_gerar_menu;
+		global $c_root, $c_path, $c_cache, $c_cache_delay, $c_devIps, $debugger, $s_session, $interadmin_gerar_menu;
 		// Cache not desired
-		if (!$c_cache || $debugger->debugFilename || $debugger->debugSql || $s_interadmin_preview || $interadmin_gerar_menu) return;
+		if (!$c_cache || $debugger->debugFilename || $debugger->debugSql || $s_session['preview'] || $interadmin_gerar_menu) return;
 
 		$this->fileRoot = $c_root;
 		$this->cachePath = $this->fileRoot . $cachePath . '/';
@@ -165,3 +165,4 @@ class FileCache{
 		return FALSE;
 	}
 }
+?>

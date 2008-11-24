@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * JP7's PHP Functions 
  * 
@@ -117,3 +117,4 @@ class Browser{
 		}
 	}
 }
+?>

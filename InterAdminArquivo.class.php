@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * JP7's PHP Functions 
  * 
@@ -94,3 +94,4 @@ class InterAdminArquivo{
 		$this->_parent = $parent;
 	}
 }
+?>

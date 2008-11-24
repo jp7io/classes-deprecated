@@ -1,4 +1,4 @@
-<? 
+<?php
 /**
  * JP7's PHP Functions 
  * 

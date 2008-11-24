@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * JP7's PHP Functions 
  * 
@@ -257,3 +257,4 @@ class InterAdmin{
 		return $this->getTipo()->getUrl() . '?id=' . $this->id;
 	}
 }
+?>

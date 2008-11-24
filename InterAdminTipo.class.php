@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * JP7's PHP Functions 
  * 
@@ -303,3 +303,4 @@ class InterAdminTipo{
 		return $url;
 	}
 }
+?>

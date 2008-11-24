@@ -1,4 +1,4 @@
-<?
+<?php
 /**
  * JP7's PHP Functions 
  * 
@@ -37,10 +37,8 @@ class InterAdminField{
 		global $id;
 		global $db;
 		global $db_prefix;
-		global $s_interadmin_user_sa;
-		global $s_interadmin_user_tipo;
-		global $s_interadmin_screenwidth;
-		global $s_interadmin_mode;
+		global $s_user;
+		global $s_session;
 		global $c_cliente_url;
 		global $c_cliente_url_path;
 		global $iframes_i;
@@ -68,7 +66,7 @@ class InterAdminField{
 		$_th="<th title=\"".$campo."\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
 		if($ajuda)$S_ajuda="<input type=\"button\" value=\"?\" tabindex=\"-1\" class=\"bt_ajuda\" onclick=\"alert('".$ajuda."')\" />";
 		if($readonly=="hidden")$readonly_hidden=true;
-		if($readonly||($campo_array[permissoes]&&$campo_array[permissoes]!=$s_interadmin_user_tipo&&!$s_interadmin_user_sa))$readonly=" disabled";
+		if($readonly||($campo_array[permissoes]&&$campo_array[permissoes]!=$s_user['tipo']&&!$s_user['sa']))$readonly=" disabled";
 		
 		if(strpos($campo,"tit_")===0){
 			if($tit_start){
@@ -78,7 +76,7 @@ class InterAdminField{
 			echo "<tr><th colspan=\"4\" class=\"inserir_tit_".(($xtra=="hidden")?"closed":"opened")."\" onclick=\"interadmin_showTitContent(this)\">".$campo_nome."</th></tr><tbody".(($xtra=="hidden")?" style=\"display:none\"":"").">";
 			$tit_start=true;
 		}elseif(strpos($campo,"text_")===0){
-			$form="<textarea".(($xtra)?" textarea_trigger=\"true\"":"")." name=\"".$campo."[]\" id=\"".$campo."_".$j."\" rows=".($tamanho+(($xtra)?((($xtra=="html_light"&&$tamanho<=5)||$quantidade>1)?2:5):0)).(($xtra)?" wrap=\"off\"":"")." xtra=\"".$xtra."\" class=\"inputs_width\" style=\"width:".(($s_interadmin_screenwidth<=800)?"400":"470")."px;".(($xtra)?";color:#000066;font-family:courier new;font-size:11px;visibility:hidden":"")."\"".(((($campo=="text_0"||$campo=="text_1")&&$tamanho<=5)||$quantidade>1)?" smallToolbar=\"true\"":"").$readonly.">".$valor."</textarea>";
+			$form="<textarea".(($xtra)?" textarea_trigger=\"true\"":"")." name=\"".$campo."[]\" id=\"".$campo."_".$j."\" rows=".($tamanho+(($xtra)?((($xtra=="html_light"&&$tamanho<=5)||$quantidade>1)?2:5):0)).(($xtra)?" wrap=\"off\"":"")." xtra=\"".$xtra."\" class=\"inputs_width\" style=\"width:".(($s_session['screenwidth']<=800)?"400":"470")."px;".(($xtra)?";color:#000066;font-family:courier new;font-size:11px;visibility:hidden":"")."\"".(((($campo=="text_0"||$campo=="text_1")&&$tamanho<=5)||$quantidade>1)?" smallToolbar=\"true\"":"").$readonly.">".$valor."</textarea>";
 			if($xtra)$form.="<script type=\"text/javascript\">interadmin_iframes[".$iframes_i."]='".$campo."_".$iframes_i++."'</script>";
 		}elseif(strpos($campo,"char_")===0){
 			if($xtra&&!$id)$GLOBALS[$campo]="S";
@@ -156,7 +154,7 @@ class InterAdminField{
 				switch($xtra){
 					case "id": // ID
 						$onkeypress=" onkeypress=\"return DFonlyThisChars(true,true,'_')\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS["id_tipo"]."&campo=".$campo."&valor_atual=".$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
-						if ($id && !$_SESSION['s_interadmin_user_sa']) $onkeypress .= " disabled=\"disabled\""; // Impede alteração
+						if ($id && !$s_user['sa']) $onkeypress .= " disabled=\"disabled\""; // Impede alteração
 						break;
 					case "id_email": // ID E-Mail
 						$onkeypress=" onkeypress=\"return DFonlyThisChars(true,true,'_@.-')\" onblur=\"ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS["id_tipo"]."&campo=".$campo."&valor_atual=".$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
@@ -239,7 +237,7 @@ class InterAdminField{
 			}else{
 				if(!$readonly_hidden){
 					echo "".
-					"<tr".(($s_interadmin_mode=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
+					"<tr".(($s_session['mode']=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
 						"<th title=\"".$campo."\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>".
 						"<td colspan=\"2\">".$form."</td>".
 						"<td>".$S_ajuda."</td>".
@@ -254,7 +252,7 @@ class InterAdminField{
 				echo "</tbody>";
 				$tit_start=false;
 			}
-			echo "<tr><td height=\"".(($quantidade>1||$s_interadmin_screenwidth<=800)?5:10)."\" colspan=\"4\" style=\"padding:0px\"></td></tr>\n";
+			echo "<tr><td height=\"".(($quantidade>1||$s_session['screenwidth']<=800)?5:10)."\" colspan=\"4\" style=\"padding:0px\"></td></tr>\n";
 		}
 	}
 }
