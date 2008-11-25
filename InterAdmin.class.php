@@ -158,7 +158,7 @@ class InterAdmin{
 		}
 	}
 	/**
-	 * @return object
+	 * @return InterAdminTipo
 	 */
 	function getTipo($options = array()) {
 		if (!$this->_tipo) {
@@ -198,10 +198,11 @@ class InterAdmin{
 	function getChildrenTipo($tipo, $options = array()) {
 		$options = array_merge($options,
 			array(
-				'parent_id' => $this->id
+				'parentInterAdmin' => $this
 			)
 		);
-		$childrenTipo = new InterAdminTipo($tipo, $options);
+		$class_name = ($options['class']) ? $options['class'] : InterAdminTipo;
+		$childrenTipo = new $class_name($tipo, $options);
 		return $childrenTipo;
 	}
 	/**
