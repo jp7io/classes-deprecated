@@ -104,7 +104,7 @@ class Social {
 			Social::removeSocials ($remove);
 		}
 	}
-	public function displayBookmark ($limiter = 5, $url = FALSE, $title = '', $target = '_blank') {
+	public function displayBookmark ($limiter = 5/*, $url = FALSE, $title = '', $target = '_blank'*/) {
 		// Must create a social first
 		if (!$this->displaySocials) {
 			exit('You must creat a social first.');
@@ -114,9 +114,8 @@ class Social {
 		if (!$url) {
 			$url = $_SERVER['HTTP_REFERER'];
 		}
-
-		$html = "\n";
-
+		
+		/*
 		$html .= '<script type="text/javascript">' . "\n";
 		$html .= 'function sets(val) {' . "\n";
 		$html .= 'elt = document.getElementById(\'bookmarkingMys\');' . "\n";
@@ -138,11 +137,14 @@ class Social {
 		$html .= '<input type="hidden" id="bookmarkingWinname" name="winname" value="" />' . "\n";
 		$html .= '<input type="hidden" id="bookmarkingContent" name="content" value="" />' . "\n";
 		$html .= '</form>' . "\n";
+		*/
 
+		$html = '<div id="bookmark">' . "\n";
 		$html .= '<ul>' . "\n";
 		$count = 1;
 		foreach($this->displaySocials as $key=>$value) {
-			$html .= '	<li><a href="javascript:sets(\'' . $key . '\');"><span class="at15t at15t_' . $key . '">' . $value . '</span></a></li>' . "\n";
+			#$html .= '<li><a href="javascript:sets(\'' . $key . '\');"><span class="at15t at15t_' . $key . '">' . $value . '</span></a></li>' . "\n";
+			$html .= '<li><a href="javascript:void(0);" onclick="return addthis_sendto(\'' . $key . '\');"><span class="at15t at15t_' . $key . '">' . $value . '</span></a></li>' . "\n";
 				
 			if($count == $limiter) {
 				$html .= '</ul>' . "\n" . '<ul>' . "\n";
@@ -151,6 +153,7 @@ class Social {
 			$count++;
 		}
 		$html .= '</ul>' . "\n";
+		$html .= '</div>' . "\n";
 
 		return $html;
 	}
@@ -191,7 +194,6 @@ class Social {
 		$html = str_replace('%fail%', $template['fail'], $html);
 		$html = str_replace('%url%', $url, $html);
 		$html = str_replace('%title%', $title, $html);
-		$html = str_replace('%legend%', $messages['legend'], $html);
 		$html = str_replace('%yourName%', $messages['yourName'], $html);
 		$html = str_replace('%yourMail%', $messages['yourMail'], $html);
 		$html = str_replace('%friendMail%', $messages['friendMail'], $html);
