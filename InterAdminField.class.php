@@ -119,6 +119,19 @@ class InterAdminField{
 					$form.="<input type=\"radio\" name=\"" . $campo . "[".$j."]\" id=\"" . $campo . "[".$j."]_".$row->id."\" value=\"".$row->id."\"".(($row->id==$valor)?" checked":"")."> <label for=\"" . $campo . "[".$j."]_".$row->id."\">".toHTML($row->varchar_key)."</label><br />";
 				}
 				$rs->Close();
+			} elseif ($xtra == 'ajax') {
+				$form = "<select name=\"" . $campo . "[]\" label=\"" . $campo_nome_2 . "\" xtype=\"ajax\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . $readonly." class=\"inputs_width\">" .
+				"<option value=\"0\">Selecione ou Procure (Beta)" . (($select_campos_2_nomes) ? $select_campos_2_nomes : "") . "</option>" .
+				"<option value=\"0\">--------------------</option>";
+				//interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", "", "combo", $campo . "[".$j."]", $temp_campo_nome, $obrigatorio);
+				$tipoObj = new InterAdminTipo($campo_nome);
+				$options = array(
+					'where' => (($valor)?" AND id=".$valor:"")
+				);
+				$rows = $tipoObj->getInterAdmins($options);
+				foreach ($rows as $row) {
+					$form.="<option value=\"" . $campo . "[".$j."]_".$row->id."\" value=\"".$row->id."\"".(($row->id==$valor)?" selected":"").">".toHTML($row->getStringValue())."</option>";
+				}
 			} elseif ($xtra) {
 				if ($campo_nome == "all") {
 					ob_start();
