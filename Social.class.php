@@ -208,23 +208,6 @@ class Social {
 		/* Send to a friend */
 
 		/* Embedeed */
-		/*
-		 * http://www.addthis.com/bookmark.php?
-		 * v=15&
-		 * winname=addthis&
-		 * pub=&
-		 * s=google&
-		 * url=&
-		 * title=&
-		 * logo=&
-		 * logobg=&
-		 * logocolor=&
-		 * ate=AT-unknown/-/-/7ef9a70aa725f8/3/491c825d27b8595b&
-		 * adt=undefined&
-		 * content=&
-		 * CXNID=2000001.5215456080540439074NXC
-		 *
-		 */
 		public function displayEmbedded($title = 'Clique aqui', $url = false, $type = 'link', $label = 'Endereço:') {
 			if (!$url) {
 				$url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
