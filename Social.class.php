@@ -163,7 +163,7 @@ class Social {
 		/* Bookmarking */
 
 		/* Send to a friend */
-		public function newSendFriend ($url = FALSE, $title = '', $action = '../indique/enviar.php', $target = '_parent', $template = array (
+		public function newSendFriend ($url = FALSE, $title = '', $action = '../social/sendFriend.php', $target = '_parent', $template = array (
 		'form' => 'global',
 		'mail' => 'global',
 		'success' => 'global',
