@@ -114,7 +114,7 @@ class InterAdminTipo{
 		global $jp7_app;
 		$options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
 		$options['from'] = $this->db_prefix . "_tipos AS main";
-		$options['where'] .= "parent_id_tipo = " . $this->id_tipo . $options['where'];
+		$options['where'] = "parent_id_tipo = " . $this->id_tipo . $options['where'];
 	 	if (!$options['order']) $options['order'] = 'ordem, nome';
 
 		$rs = $this->executeQuery($options);
@@ -300,7 +300,7 @@ class InterAdminTipo{
 						" AS " . $join . " ON "  . $options['fields'][$key] . " = " . $join . ".id_tipo";
 				} else {
 					$options['from'][] = $this->db_prefix .
-						(($joinModel->getFieldsValues('tabela')) ? $joinModel->tabela : '') .
+						(($joinModel->getFieldsValues('tabela')) ? '_' . $joinModel->tabela : '') .
 						(($campos[$key]['nome']->getFieldsValues('language')) ? $lang->prefix : '') .
 						" AS " . $join . " ON "  . $options['fields'][$key] . " = " . $join . ".id";
 				}
@@ -313,11 +313,15 @@ class InterAdminTipo{
 			}
 		}
 		
+		// Order Fix
+		$order_arr = jp7_explode(',', $options['order']);
+		$options['order'] = implode(', main.', $order_arr);	
+		
 		// Sql
 		$sql = "SELECT " . (($options['fields']) ? implode(',', $options['fields']) : '') .
 			" FROM " . implode(' LEFT JOIN ', $options['from']) .
 			" WHERE " . $options['where'] .
-			" ORDER BY " . $options['order'] .
+			" ORDER BY main." . $options['order'] .
 			(($options['limit']) ? " LIMIT " . $options['limit'] : '');
 		
 		if ($jp7_app) $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
