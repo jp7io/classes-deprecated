@@ -315,13 +315,16 @@ class InterAdminTipo{
 		
 		// Order Fix
 		$order_arr = jp7_explode(',', $options['order']);
-		$options['order'] = implode(', main.', $order_arr);	
+		foreach ($order_arr as $key => &$value) {
+			if (strpos($value, '(') === FALSE) $value = 'main.' . $value;
+		}
+		$options['order'] = implode(',', $order_arr);
 		
 		// Sql
 		$sql = "SELECT " . (($options['fields']) ? implode(',', $options['fields']) : '') .
 			" FROM " . implode(' LEFT JOIN ', $options['from']) .
 			" WHERE " . $options['where'] .
-			" ORDER BY main." . $options['order'] .
+			(($options['order']) ? " ORDER BY " . $options['order'] : '') .
 			(($options['limit']) ? " LIMIT " . $options['limit'] : '');
 		
 		if ($jp7_app) $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
