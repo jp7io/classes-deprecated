@@ -238,7 +238,7 @@ class InterAdminTipo{
 		}
 		return $fields;
 	}
-	public function putOrmData(&$object, $row, $options){
+	public function putOrmData(&$object, &$row, $options){
 		$campos = $this->getCampos();
 		$joinCount = 0;
 		foreach((array)$options['fields'] as $join => $field){
@@ -249,7 +249,7 @@ class InterAdminTipo{
 			$alias = ($options['fields_alias']) ? $this->getCamposAlias($field) : $field;
 			$object->$alias = $this->getByForeignKey($row->$field, $field, $campos[$field]['xtra']);
 
-			if (is_object($object->$alias) && $options['fields'][$field]) {
+			if (is_object($object->$alias) && is_array($options['fields'][$field])) {
 				foreach($options['fields'][$field] as $joinField) {
 					$joinAlias = ($options['fields_alias']) ? $campos[$field]['nome']->getCamposAlias($joinField) : $joinField;
 					$joinCampos = $campos[$field]['nome']->getCampos();
@@ -260,7 +260,7 @@ class InterAdminTipo{
 		}
 	}
 	
-	public function getByForeignKey($value, $field, $xtra = ''){
+	public function getByForeignKey(&$value, $field, $xtra = ''){
 		if (strpos($field, 'select_') === 0) {
 			if (strpos($field, 'select_multi') === 0) {
 				$value_arr = explode(',', $value);
