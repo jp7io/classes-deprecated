@@ -17,23 +17,52 @@
 class InterAdminTipo{
 	public $id_tipo;
 	public $db_prefix;
-	protected $_campos;
 	protected $_url;
+	protected $_campos;
 	protected $_parent;
 	/**
+	 * Public Constructor.
+	 * 
 	 * @param int $id_tipo
 	 * @param array $options
 	 */
-	function __construct($id_tipo = 0, $options = array()) {
+	public function __construct($id_tipo = 0, $options = array()) {
 		$this->id_tipo = $id_tipo;
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
-		if ($options['parentInterAdmin']) $this->parentInterAdmin = $options['parentInterAdmin'];
 		if ($options['fields']) $this->getFieldsValues($options['fields']);
 	}
-	function __toString() {
+	/**
+	 * Returns an InterAdminTipo instance. If $options['class'] is passed, 
+	 * it will be returned an object of the given class, otherwise it will search 
+	 * on the database which class to instantiate.
+	 *
+	 * @param int $id_tipo
+	 * @param array $options
+	 * @return InterAdminTipo
+	 */
+	public static function getInstance($id_tipo, $options = array()){
+		if ($options['class']) {
+			$class_name = (class_exists($options['class'])) ? $options['class'] : 'InterAdminTipo';
+		} else {
+			$instance = new InterAdminTipo($id_tipo, array_merge($options, array('fields' => array('model_id_tipo', 'class_tipo'))));
+			if ($instance->class_tipo) $class_name = $instance->class_tipo;
+			else $class_name = jp7_fields_values($instance->db_prefix . '_tipos', 'id_tipo', $instance->model_id_tipo, 'class_tipo');
+			if (!class_exists($class_name)) {
+				if ($options['fields']) $instance->getFieldsValues($options['fields']);
+				return $instance;
+			}
+		}
+		return new $class_name($id_tipo, $options);
+	}
+	/**
+	 * Returns the string value of its $id_tipo.
+	 *
+	 * @return string
+	 */
+	public function __toString() {
 		return (string) $this->id_tipo;
 	}
-	function __get($var) {
+	public function __get($var) {
 		if ($var == 'interadminsOrderby') {
 			$campos = $this->getCampos();
 			if ($campos) {
@@ -50,12 +79,14 @@ class InterAdminTipo{
 				$this->$var = 'date_publish DESC';
 			}
 			return $this->$var;
+		} elseif ($var == 'class') {
+			return ($this->getFieldsValues('class')) ? $this->class : $this->getModel()->getFieldsValues('class');	
 		}
 	}
 	/**
 	 * @return mixed
 	 */
-	function getFieldsValues($fields) {
+	public function getFieldsValues($fields) {
 		$fieldsValues = jp7_fields_values($this->db_prefix.'_tipos', 'id_tipo', $this->id_tipo, $fields, TRUE);
 		foreach ((array) $fieldsValues as $field=>$value) {
 			$this->$field = $value;
@@ -64,40 +95,37 @@ class InterAdminTipo{
 		elseif ($fields) return $fieldsValues->$fields;
 	}
 	/**
-	 * @return object
+	 * @return InterAdmin
 	 */
-	function getParent($options = array()) {
+	public function getParent($options = array()) {
 		if ($this->_parent) return $this->_parent;
-		$parent_id_tipo = $this->getFieldsValues(array('parent_id_tipo'))->parent_id_tipo;
-		if ($parent_id_tipo) {
-			$class_name = ($options['class']) ? $options['class'] : get_class($this); 
-			$this->_parent = new $class_name($parent_id_tipo, array('db_prefix' => $this->db_prefix));
-			return $this->_parent;
+		if ($this->parent_id_tipo || $this->getFieldsValues('parent_id_tipo')) {
+			return $this->_parent = InterAdminTipo::getInstance($this->parent_id_tipo, $options);
 		}
 	}
-	function setParent($parent) {
+	public function setParent($parent) {
 		$this->_parent = $parent;
 	}
 	/**
 	 * @return array
 	 */
-	function getChildren($options = array()){
+	public function getChildren($options = array()){
 		global $db;
 		global $jp7_app;
-		$sql = "SELECT id_tipo" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . " FROM " . $this->db_prefix."_tipos" .
-		" WHERE parent_id_tipo=".$this->id_tipo . 
-		(($options['where']) ? $options['where'] : '') . 
-		" ORDER BY " . (($options['order']) ? $options['order'] : 'ordem, nome') .
-		(($options['limit']) ? " LIMIT " . $options['limit'] : '');
-		if ($jp7_app) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
-		else $rs = interadmin_query($sql);
+		$options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
+		$options['from'] = $this->db_prefix . "_tipos AS main";
+		$options['where'] .= "parent_id_tipo = " . $this->id_tipo . $options['where'];
+	 	if (!$options['order']) $options['order'] = 'ordem, nome';
+
+		$rs = $this->executeQuery($options);
+		
 		while ($row = $rs->FetchNextObj()) {
-			$class_name = ($options['class']) ? $options['class'] : get_class($this); 
-			$interAdminTipo = new $class_name($row->id_tipo, array('db_prefix' => $this->db_prefix));
+			$interAdminTipo = InterAdminTipo::getInstance($row->id_tipo, array(
+				'db_prefix' => $this->db_prefix,
+				'class' => $options['class']
+			));
 			$interAdminTipo->setParent($this);
-			foreach((array)$options['fields'] as $field){
-				$interAdminTipo->$field = $row->$field;
-			}
+			$this->putOrmData($interAdminTipo, $row, $options);
 			$interAdminTipos[] = $interAdminTipo;
 		}
 		$rs->Close();
@@ -106,98 +134,73 @@ class InterAdminTipo{
 	/**
 	 * @return array
 	 */
-	function getChildrenByModel($model_id_tipo, $options = array()) {
-		$options['where'] .= " AND model_id_tipo=" . $model_id_tipo;
+	public function getChildrenByModel($model_id_tipo, $options = array()) {
+		$options['where'] .= " AND main.model_id_tipo = " . $model_id_tipo;
 		return $this->getChildren($options);
 	}
 	/**
 	 * @return array
 	 */
-	function getInterAdmins($options = array()) {
-		global $db;
+	public function getInterAdmins($options = array()) {
 		global $lang;
-		global $jp7_app;
+		$campos = $this->getCampos();
+		$model = $this->getModel();
+		$table = ($model->getFieldsValues('tabela')) ? '_' . $model->tabela : '';
+
+		if ($options['fields'] == '*') $options['fields'] = $this->getAllFieldsNames();
+		$options['fields'] = array_merge(array('id'), (array) $options['fields']);
+		$options['from'] = $this->db_prefix . $table . (($this->getFieldsValues('language')) ? $lang->prefix : '') . " AS main";
+		$options['where'] = "main.id_tipo = " . $this->id_tipo . $options['where'];
+		if ($this->_parent && $this->_parent instanceof InterAdmin) $options['where'] .= " AND main.parent_id = " . $this->_parent->id;	
+		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . $this->interadminsOrderby;
+		
+		$rs = $this->executeQuery($options);
+		
 		$interAdmins = array();
-		//if ($options['fields_alias']) {
-			$campos = $this->getCampos();
-			$table = ($this->getModel()->getFieldsValues('tabela')) ? '_' . $this->getModel()->getFieldsValues('tabela') : '';
-		//}
-		if ($options['fields'] == '*') {
-			$options['fields'] = array();
-			$invalid_fields = array('tit', 'func');
-			$all_fields = array_keys($campos);
-			foreach ($all_fields as $field) {
-				$field_arr = explode('_', $field);
-				if (!in_array($field_arr[0], $invalid_fields)) $options['fields'][] = $field;
-			}
-		}
-		$sql = "SELECT id" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . 
-		" FROM " . $this->db_prefix . $table . (($this->getFieldsValues('language')) ? $lang->prefix : '') .
-		" WHERE id_tipo=" . $this->id_tipo.
-		(($this->parentInterAdmin) ? " AND parent_id=" . $this->parentInterAdmin->id : '') .
-		(($options['where']) ? $options['where'] : '') .
-		" ORDER BY " . (($options['order']) ? $options['order'] . ',' : '') . $this->interadminsOrderby .
-		(($options['limit']) ? " LIMIT " . $options['limit'] : '');
-		if ($jp7_app) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
-		else $rs = interadmin_query($sql);
 		while ($row = $rs->FetchNextObj()) {
-			$class_name = ($options['class']) ? $options['class'] : 'InterAdmin'; 
-			$interAdmin = new $class_name($row->id, array('db_prefix' => $this->db_prefix, 'table' => $this->tabela));
+			$class_name = ($options['class']) ? $options['class'] : $this->class;
+			$interAdmin = InterAdmin::getInstance($row->id, array(
+				'db_prefix' => $this->db_prefix,
+				'table' => $this->tabela,
+				'class' => $class_name
+			));
 			$interAdmin->setTipo($this);
-			if ($this->parentInterAdmin) $interAdmin->setParent($this->parentInterAdmin);
-			foreach((array)$options['fields'] as $field){
-				$alias = ($options['fields_alias']) ? $this->getCamposAlias($field) : $field;
-				if (strpos($field, 'select_') === 0) {
-					if (strpos($field, 'select_multi') === 0) {
-						$value_arr = explode(',', $row->$field);
-						if (!$value_arr[0]) $value_arr = array();
-						foreach ($value_arr as $key2 => $value2) {
-							if ($campos[$field]['xtra'] === 'S') {
-								$value_arr[$key2] = new InterAdminTipo($value2);
-							} else {
-								$value_arr[$key2] = new InterAdmin($value2);
-							}
-						}
-						$row->$field = $value_arr;
-					} elseif($row->$field && is_numeric($row->$field)) {
-						if ($campos[$field]['xtra'] === 'S') {
-							$row->$field = new InterAdminTipo($row->$field);
-						} else {
-							$row->$field = new InterAdmin($row->$field);
-						}
-					}
-				}
-				$interAdmin->$alias = $row->$field;
-			}
+			
+			if ($this->_parent && $this->_parent instanceof InterAdmin) $interAdmin->setParent($this->_parent);
+			
+			$this->putOrmData($interAdmin, $row, $options);
+			
 			$interAdmins[] = $interAdmin;
 		}
 		$rs->Close();
 		return $interAdmins;
 	}
 	/**
-	 * @return array
+	 * @return InterAdmin
 	 */
-	function getFirstInterAdmin($options = array()) {
+	public function getFirstInterAdmin($options = array()) {
 		$options['limit'] = 1;
 		$interAdmin = $this->getInterAdmins($options);
 		return $interAdmin[0];
 	}
 	/**
-	 * @return ?
+	 * Returns the model identified by model_id_tipo, or the object itself if it has no model.
+	 *
+	 * @param array $options
+	 * @return InterAdminTipo
 	 */
-	function getModel() {
-		$model_id_tipo = $this->getFieldsValues('model_id_tipo');
-		if ($model_id_tipo) {
-			$model = new InterAdminTipo($model_id_tipo);
-			return $model->getModel();
+	public function getModel($options = array()) {
+		if ($this->model_id_tipo || $this->getFieldsValues('model_id_tipo')) {
+			$model = new InterAdminTipo($this->model_id_tipo, $options);
+			return $model->getModel($options);
 		} else {
 			return $this;
 		}
 	}
 	/**
-	 * @return ?
+	 * @return array
 	 */
-	function getCampos() {
+	public function getCampos() {
 		if ($this->_campos) return $this->_campos;
 		$model = $this->getModel();
 		$campos = $model->getFieldsValues('campos');
@@ -215,7 +218,7 @@ class InterAdminTipo{
 				}
 				if ($isSelect && $A[$parameters[0]]['nome'] != 'all') {
 					$id_tipo = $A[$parameters[0]]['nome'];
-					$Cadastro_r = new InterAdminTipo($id_tipo);	
+					$Cadastro_r = new InterAdminTipo($id_tipo);
 					$A[$parameters[0]]['nome'] = $Cadastro_r;
 					//jp7_print_r($parameters[0]);
 					//jp7_print_r($A[$parameters[0]]['nome']);
@@ -225,21 +228,118 @@ class InterAdminTipo{
 		return $this->_campos = $A;
 		//return interadmin_tipos_campos($this->getFieldsValues('campos'));
 	}
+	public function getAllFieldsNames(){
+		$fields = array();
+		$invalid_fields = array('tit', 'func');
+		$all_fields = array_keys($this->getCampos());
+		foreach ($all_fields as $field) {
+			$field_arr = explode('_', $field);
+			if (!in_array($field_arr[0], $invalid_fields)) $fields[] = $field;
+		}
+		return $fields;
+	}
+	public function putOrmData(&$object, $row, $options){
+		$campos = $this->getCampos();
+		$joinCount = 0;
+		foreach((array)$options['fields'] as $join => $field){
+			if (is_array($field)) {
+				$field = $join;
+				$joinCount++;
+			}
+			$alias = ($options['fields_alias']) ? $this->getCamposAlias($field) : $field;
+			$object->$alias = $this->getByForeignKey($row->$field, $field, $campos[$field]['xtra']);
+
+			if (is_object($object->$alias) && $options['fields'][$field]) {
+				foreach($options['fields'][$field] as $joinField) {
+					$joinAlias = ($options['fields_alias']) ? $campos[$field]['nome']->getCamposAlias($joinField) : $joinField;
+					$joinCampos = $campos[$field]['nome']->getCampos();
+					$rowField = 'join' . $joinCount . '_' . $joinField;
+					$object->$alias->$joinAlias = $this->getByForeignKey($row->$rowField, $joinField, $joinCampos[$joinField]['xtra']);
+				}
+			}
+		}
+	}
+	
+	public function getByForeignKey($value, $field, $xtra = ''){
+		if (strpos($field, 'select_') === 0) {
+			if (strpos($field, 'select_multi') === 0) {
+				$value_arr = explode(',', $value);
+				if (!$value_arr[0]) $value_arr = array();
+				foreach ($value_arr as $key2 => $value2) {
+					if ($xtra === 'S') {
+						$value_arr[$key2] = InterAdminTipo::getInstance($value2);
+					} else {
+						$value_arr[$key2] = InterAdmin::getInstance($value2);
+					}
+				}
+				$value = $value_arr;
+			} elseif($value && is_numeric($value)) {
+				if ($xtra === 'S') {
+					$value = InterAdminTipo::getInstance($value);
+				} else {
+					$value = InterAdmin::getInstance($value);
+				}
+			}
+		}
+		return $value;
+	}
+	
+	public function executeQuery($options){
+		global $jp7_app, $db, $lang;
+		$campos = $this->getCampos();
+		// Join
+		$joinsCount = 0;
+		if (!is_array($options['from'])) $options['from'] = (array) $options['from'];
+		foreach($options['fields'] as $key => $fields){
+			if (is_array($fields)) {
+				$join = 'join' . ++$joinsCount;
+				$options['fields'][$key] = 'main.' . $key;
+				$joinModel = $campos[$key]['nome']->getModel();
+				if ($campos[$key]['xtra'] == 'S') {
+					$options['from'][] = $this->db_prefix . "_tipos" .
+						" AS " . $join . " ON "  . $options['fields'][$key] . " = " . $join . ".id_tipo";
+				} else {
+					$options['from'][] = $this->db_prefix .
+						(($joinModel->getFieldsValues('tabela')) ? $joinModel->tabela : '') .
+						(($campos[$key]['nome']->getFieldsValues('language')) ? $lang->prefix : '') .
+						" AS " . $join . " ON "  . $options['fields'][$key] . " = " . $join . ".id";
+				}
+				
+				foreach($fields as $joinField) {
+					$options['fields'][] = $join . '.' . $joinField . " AS " . $join . '_' . $joinField;
+				}
+			} else {
+				$options['fields'][$key] = 'main.' . $fields;
+			}
+		}
+		
+		// Sql
+		$sql = "SELECT " . (($options['fields']) ? implode(',', $options['fields']) : '') .
+			" FROM " . implode(' LEFT JOIN ', $options['from']) .
+			" WHERE " . $options['where'] .
+			" ORDER BY " . $options['order'] .
+			(($options['limit']) ? " LIMIT " . $options['limit'] : '');
+		
+		if ($jp7_app) $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+		else $rs = interadmin_query($sql);
+		return $rs;
+	}
+	
 	/**
 	 * @return string
 	 */
-	function getCamposAlias($field) {
+	public function getCamposAlias($field) {
 		$campos = $this->getCampos();
 		if ($campos[$field]['nome_id']) return $campos[$field]['nome_id'];
 		$alias = $campos[$field]['nome'];
-		if (is_object($alias)) $alias = jp7_fields_values($this->db_prefix . '_tipos', 'id_tipo', $alias->id_tipo, 'nome');
+		if (is_object($alias)) $alias = ($alias->nome) ? $alias->nome : $alias->getFieldsValues('nome');
 		$alias = ($alias) ? toId($alias) : $field;
 		return $alias;
 	}
 	/**
 	 * @return string
 	 */
-	function getStringValue($simple = FALSE) {
+	public function getStringValue(/*$simple = FALSE*/) {
 		$campos = $this->getCampos();
 		$return[] = $this->getFieldsValues('nome');
 		//if (!$simple) {
@@ -255,7 +355,7 @@ class InterAdminTipo{
 	/**
 	 * @return string
 	 */
-	function getUrl() {
+	public function getUrl() {
 		if ($this->_url) return $this->_url;
 		global $c_url, $c_cliente_url, $c_cliente_url_path, $implicit_parents_names, $jp7_app, $seo, $lang;
 		$url = '';
@@ -285,7 +385,7 @@ class InterAdminTipo{
 	/**
 	 * @return string
 	 */
-	function getTreePath() {
+	public function getTreePath() {
 		global $c_url, $implicit_parents_names, $seo, $lang;
 		$url = '';
 		$url_arr = '';
