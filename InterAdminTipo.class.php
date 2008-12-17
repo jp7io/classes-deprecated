@@ -316,7 +316,7 @@ class InterAdminTipo{
 		// Order Fix
 		$order_arr = jp7_explode(',', $options['order']);
 		foreach ($order_arr as $key => &$value) {
-			if (strtok($value, '.()') == $str) $value = 'main.' . $value;
+			if (strpos($value, '(') === FALSE && strpos($value, '.') === FALSE) $value = 'main.' . $value;
 		}
 		$options['order'] = implode(',', $order_arr);
 		
