@@ -143,7 +143,6 @@ class InterAdminTipo{
 	 */
 	public function getInterAdmins($options = array()) {
 		global $lang;
-		$campos = $this->getCampos();
 		$model = $this->getModel();
 		$table = ($model->getFieldsValues('tabela')) ? '_' . $model->tabela : '';
 
@@ -175,6 +174,25 @@ class InterAdminTipo{
 		$rs->Close();
 		return $interAdmins;
 	}
+	
+	/**
+	 * Returns the number of InterAdmins using a SQL query with COUNT(id).
+	 *
+	 * @param array $options
+	 * @return int Number of InterAdmins found.
+	 */
+	public function getInterAdminsCount($options = array()) {
+		$model = $this->getModel();
+		$table = ($model->getFieldsValues('tabela')) ? '_' . $model->tabela : '';
+		$options['count'] = "COUNT(main.id) AS count";
+		$options['from'] = $this->db_prefix . $table . (($this->getFieldsValues('language')) ? $lang->prefix : '') . " AS main";
+		$options['where'] = "main.id_tipo = " . $this->id_tipo . $options['where'];
+		if ($this->_parent && $this->_parent instanceof InterAdmin) $options['where'] .= " AND main.parent_id = " . $this->_parent->id;
+		$rs = $this->executeQuery($options);
+		if ($row = $rs->FetchNextObj()) return $row->count;
+		else return 0;
+	}
+	
 	/**
 	 * @return InterAdmin
 	 */
@@ -309,7 +327,7 @@ class InterAdminTipo{
 					$options['fields'][] = $join . '.' . $joinField . " AS " . $join . '_' . $joinField;
 				}
 			} else {
-				$options['fields'][$key] = 'main.' . $fields;
+				if (strpos($fields, '(') === FALSE && strpos($fields, '.') === FALSE) $options['fields'][$key] = 'main.' . $fields;
 			}
 		}
 		
@@ -320,11 +338,13 @@ class InterAdminTipo{
 		}
 		$options['order'] = implode(',', $order_arr);
 		
+		if ($options['count']) $options['fields'] = (array) $options['count'];
 		// Sql
 		$sql = "SELECT " . (($options['fields']) ? implode(',', $options['fields']) : '') .
 			" FROM " . implode(' LEFT JOIN ', $options['from']) .
 			" WHERE " . $options['where'] .
 			(($options['order']) ? " ORDER BY " . $options['order'] : '') .
+			(($options['group']) ? " GROUP BY " . $options['group'] : '') .
 			(($options['limit']) ? " LIMIT " . $options['limit'] : '');
 		
 		if ($jp7_app) $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
