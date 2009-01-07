@@ -31,7 +31,7 @@ class InterSite extends InterAdmin {
 	 */
 	public function getServers() {
 		$options = array(
-			'fields' => array('varchar_key', 'select_1', 'varchar_1', 'varchar_4', 'select_2'),
+			'fields' => array('varchar_key', 'select_1', 'varchar_1', 'varchar_2',  'varchar_3', 'varchar_4', 'password_key', 'select_2'),
 			'fields_alias' => TRUE
 		);
 		$servers = $this->getChildren(26, $options);
@@ -133,29 +133,18 @@ class InterSite extends InterAdmin {
 		foreach($this->servers as $server) {
 			$fieldsValues = '';
 			$fieldsValuesDB = '';
-			if ($server->type == 'Produção') {
-				$options = array(
-					'fields' => array('varchar_key', 'varchar_1', 'password_key'),
-					'fields_alias' => TRUE				
-				);
-				$ftp = reset($server->getChildren(42, $options));
-	
-				if (!$ftp->ftp) $ftp->ftp = $server->host;
-				$conn_id = ftp_connect($ftp->ftp); 
-				$login_result = @ftp_login($conn_id, $ftp->user, $ftp->pass);
+			if ($server->type != 'Desenvolvimento') {
+				if (!$server->ftp) $server->ftp = $server->host;
+				$conn_id = ftp_connect($server->ftp); 
+				$login_result = @ftp_login($conn_id, $server->user, $server->pass);
 				if ($login_result) {
 					$fieldsValues = array(
 						'varchar_5' => ftp_systype($conn_id),
 						'date_1' => date('Y-m-d H:i:s'),
 						'char_1' => $login_result
 					);
-					jp7_print_r($fieldsValues);
-					$ftp->setFieldsValues($fieldsValues, TRUE);
 				}
 				@ftp_close($conn_id);
-	
-				$fieldsValues = array();
-				
 				// PHP Info
 				$content = $this->_socketRequest($server->host, '/_admin/phpinfo.php', '', 'GET', 'http://' . $server->host . '/_admin/phpinfo.php');
 				$pos1_str = 'login/index.php?error=3';
@@ -212,7 +201,7 @@ class InterSite extends InterAdmin {
 					}
 				}
 				$fieldsValues['varchar_6'] = $server->phpinfo['PHP'];
-				// Saving PHP Info data		
+				// Saving FTP and PHP Info data		
 				if ($fieldsValues) {
 					jp7_print_r($fieldsValues);
 					$server->setFieldsValues($fieldsValues, TRUE);
