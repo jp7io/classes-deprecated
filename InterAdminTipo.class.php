@@ -11,20 +11,42 @@
  
 /**
  * Class which represents records on the table interadmin_{client name}_tipos.
- *
+ * 
+ * @property string $interadminsOrderby SQL Order By for the records of this InterAdminTipo.
+ * @property string $class Class to be instantiated for the records of this InterAdminTipo.
  * @package InterAdminTipo
  */
 class InterAdminTipo{
+	/**
+	 * This record's 'id_tipo'.
+	 * @var int
+	 */
 	public $id_tipo;
+	/**
+	 * Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
+	 * @var string
+	 */
 	public $db_prefix;
+	/**
+	 * Caches the url retrieved by getUrl().
+	 * @var string
+	 */
 	protected $_url;
+	/**
+	 * Caches the data retrieved by getCampos().
+	 * @var array
+	 */
 	protected $_campos;
+	/**
+	 * Contains the parent InterAdminTipo object, i.e. the record with an 'id_tipo' equal to this record's 'parent_id_tipo'.
+	 * @var InterAdminTipo
+	 */
 	protected $_parent;
 	/**
-	 * Public Constructor.
+	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
 	 * 
-	 * @param int $id_tipo
-	 * @param array $options
+	 * @param int $id_tipo This record's 'id_tipo'.
+	 * @param array $options Default array of options. Available keys: db_prefix, fields.
 	 */
 	public function __construct($id_tipo = 0, $options = array()) {
 		$this->id_tipo = $id_tipo;
@@ -36,9 +58,9 @@ class InterAdminTipo{
 	 * it will be returned an object of the given class, otherwise it will search 
 	 * on the database which class to instantiate.
 	 *
-	 * @param int $id_tipo
-	 * @param array $options
-	 * @return InterAdminTipo
+	 * @param int $id_tipo This record's 'id_tipo'.
+	 * @param array $options Default array of options. Available keys: db_prefix, fields, class.
+	 * @return InterAdminTipo Returns an InterAdminTipo or a child class in case it's defined on its 'class_tipo' property.
 	 */
 	public static function getInstance($id_tipo, $options = array()){
 		if ($options['class']) {
@@ -55,13 +77,19 @@ class InterAdminTipo{
 		return new $class_name($id_tipo, $options);
 	}
 	/**
-	 * Returns the string value of its $id_tipo.
+	 * String value of this record´s $id_tipo.
 	 *
-	 * @return string
+	 * @return string String value of the $id_tipo property.
 	 */
 	public function __toString() {
 		return (string) $this->id_tipo;
 	}
+	/**
+	 * Retrieves magic properties.
+	 *
+	 * @param string $var Magic property 'interadminsOrderby' or 'class'.
+	 * @return mixed
+	 */
 	public function __get($var) {
 		if ($var == 'interadminsOrderby') {
 			$campos = $this->getCampos();
@@ -84,7 +112,10 @@ class InterAdminTipo{
 		}
 	}
 	/**
-	 * @return mixed
+	 * Gets values from this record on the database.
+	 *
+	 * @param array|string $fields Array (recommended) or string (an unique field) containning the names of the fields to be retrieved.
+	 * @return mixed If $fields is an array an object will be returned, otherwise it will return the value retrieved.
 	 */
 	public function getFieldsValues($fields) {
 		$fieldsValues = jp7_fields_values($this->db_prefix.'_tipos', 'id_tipo', $this->id_tipo, $fields, TRUE);
@@ -95,7 +126,10 @@ class InterAdminTipo{
 		elseif ($fields) return $fieldsValues->$fields;
 	}
 	/**
-	 * @return InterAdmin
+	 * Gets the parent InterAdminTipo object for this record, which is then cached on the $_parent property.
+	 * 
+	 * @param array $options Default array of options. Available keys: db_prefix, fields, class.
+	 * @return InterAdminTipo
 	 */
 	public function getParent($options = array()) {
 		if ($this->_parent) return $this->_parent;
@@ -103,11 +137,20 @@ class InterAdminTipo{
 			return $this->_parent = InterAdminTipo::getInstance($this->parent_id_tipo, $options);
 		}
 	}
+	/**
+	 * Sets the parent InterAdminTipo or InterAdmin object for this record, changing the $_parent property.
+	 *
+	 * @param InterAdminTipo|InterAdmin $parent
+	 * @return void
+	 */
 	public function setParent($parent) {
 		$this->_parent = $parent;
 	}
 	/**
-	 * @return array
+	 * Retrieves the children of this InterAdminTipo.
+	 * 
+	 * @param array $options Default array of options. Available keys: fields, where, order, class.
+	 * @return array Array of InterAdminTipo objects.
 	 */
 	public function getChildren($options = array()){
 		global $db;
@@ -132,14 +175,20 @@ class InterAdminTipo{
 		return $interAdminTipos;
 	}
 	/**
-	 * @return array
+	 * Retrieves the children of this InterAdminTipo which have the given model_id_tipo.
+	 * 
+	 * @param array $options Default array of options. Available keys: fields, where, order, class.
+	 * @return Array of InterAdminTipo objects.
 	 */
 	public function getChildrenByModel($model_id_tipo, $options = array()) {
 		$options['where'] .= " AND main.model_id_tipo = " . $model_id_tipo;
 		return $this->getChildren($options);
 	}
 	/**
-	 * @return array
+	 * Retrieves the records which have this InterAdminTipo's id_tipo.
+	 * 
+	 * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
+	 * @return array Array of InterAdmin objects.
 	 */
 	public function getInterAdmins($options = array()) {
 		global $lang;
@@ -176,10 +225,10 @@ class InterAdminTipo{
 	}
 	
 	/**
-	 * Returns the number of InterAdmins using a SQL query with COUNT(id).
+	 * Returns the number of InterAdmins. It uses a SQL query with COUNT(id).
 	 *
-	 * @param array $options
-	 * @return int Number of InterAdmins found.
+	 * @param array $options Default array of options. Available keys: where.
+	 * @return int Count of InterAdmins found.
 	 */
 	public function getInterAdminsCount($options = array()) {
 		$model = $this->getModel();
@@ -194,7 +243,10 @@ class InterAdminTipo{
 	}
 	
 	/**
-	 * @return InterAdmin
+	 * Retrieves the first records which have this InterAdminTipo's id_tipo.
+	 * 
+	 * @param array $options Default array of options. Available keys: fields, where, order, group, class.
+	 * @return InterAdmin First InterAdmin object found.
 	 */
 	public function getFirstInterAdmin($options = array()) {
 		$options['limit'] = 1;
@@ -204,8 +256,8 @@ class InterAdminTipo{
 	/**
 	 * Returns the model identified by model_id_tipo, or the object itself if it has no model.
 	 *
-	 * @param array $options
-	 * @return InterAdminTipo
+	 * @param array $options Default array of options. Available keys: db_prefix, fields.
+	 * @return InterAdminTipo Model used by this InterAdminTipo.
 	 */
 	public function getModel($options = array()) {
 		if ($this->model_id_tipo || $this->getFieldsValues('model_id_tipo')) {
@@ -216,6 +268,8 @@ class InterAdminTipo{
 		}
 	}
 	/**
+	 * Returns an array with data about the fields on this type, which is then cached on the $_campos property.
+	 * 
 	 * @return array
 	 */
 	public function getCampos() {
@@ -246,6 +300,11 @@ class InterAdminTipo{
 		return $this->_campos = $A;
 		//return interadmin_tipos_campos($this->getFieldsValues('campos'));
 	}
+	/**
+	 * Returns an array with the names of all the fields available.
+	 * 
+	 * @return array
+	 */
 	public function getAllFieldsNames(){
 		$fields = array();
 		$invalid_fields = array('tit', 'func');
@@ -256,6 +315,14 @@ class InterAdminTipo{
 		}
 		return $fields;
 	}
+	/**
+	 * Associates the values on a SQL RecordSet with the fields, and then puts them on an object.
+	 * 
+	 * @param InterAdmin $object
+	 * @param array $row Row of a SQL RecordSet.
+	 * @param array $options Default array of options. Available keys: fields, fields_alias.
+	 * @return void
+	 */
 	public function putOrmData(&$object, &$row, $options){
 		$campos = $this->getCampos();
 		$joinCount = 0;
@@ -277,7 +344,14 @@ class InterAdminTipo{
 			}
 		}
 	}
-	
+	/**
+	 * Gets an object by its key, which may be its 'id' or 'id_tipo', and then returns it.
+	 * 
+	 * @param mixed $value Any value.
+	 * @param string $field The name of the field.
+	 * @param string $xtra Xtra value of the field.
+	 * @return mixed The object created by the key or the value itself.
+	 */
 	public function getByForeignKey(&$value, $field, $xtra = ''){
 		if (strpos($field, 'select_') === 0) {
 			if (strpos($field, 'select_multi') === 0) {
@@ -301,7 +375,12 @@ class InterAdminTipo{
 		}
 		return $value;
 	}
-	
+	/**
+	 * Executes a SQL Query based on the values passed by $options.
+	 * 
+	 * @param array $options  Default array of options. Available keys: count, fields, from, where, order, group, limit.
+	 * @return ADORecordSet The resulting RecordSet.
+	 */
 	public function executeQuery($options){
 		global $jp7_app, $db, $lang;
 		$campos = $this->getCampos();
@@ -353,7 +432,10 @@ class InterAdminTipo{
 	}
 	
 	/**
-	 * @return string
+	 * Gets the alias for a given field name.
+	 * 
+	 * @param string $field Field name.
+	 * @return string Resulting alias.
 	 */
 	public function getCamposAlias($field) {
 		$campos = $this->getCampos();
@@ -364,7 +446,10 @@ class InterAdminTipo{
 		return $alias;
 	}
 	/**
-	 * @return string
+	 * Returns this object´s nome and all the fields marked as 'combo', if the field 
+	 * is an InterAdminTipo such as a select_key, its getStringValue() method is used.
+	 *
+	 * @return string For the tipo 'City' with the field 'state' marked as 'combo' it would return: 'City - State'.
 	 */
 	public function getStringValue(/*$simple = FALSE*/) {
 		$campos = $this->getCampos();
@@ -380,6 +465,8 @@ class InterAdminTipo{
 		return implode(' - ', $return);
 	}
 	/**
+	 * Returns the full url for this InterAdminTipo.
+	 * 
 	 * @return string
 	 */
 	public function getUrl() {
@@ -410,6 +497,8 @@ class InterAdminTipo{
 		return $this->_url = $url;
 	}
 	/**
+	 * Returns the names of the parents separated by '/', e.g. 'countries/south-america/brazil'.
+	 * 
 	 * @return string
 	 */
 	public function getTreePath() {
