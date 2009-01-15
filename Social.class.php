@@ -205,10 +205,12 @@ class Social {
 		if (!$url) {
 			$url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 		}
-		if ($template['form'] == 'global' or $template == false or $template['form'] == false) {
-			$template['form'] = jp7_path_find('../../_default/site/_templates/sendFriend/form.htm');
-		} else {
-			$template['form'] = jp7_path_find('../site/_templates/' . $template['form']);
+		switch ($template['form']) {
+			case 'global':
+				$template['form'] = jp7_path_find('../../_default/site/_templates/social_sendfriend/form.htm');
+				break;
+			default:
+				$template['form'] = jp7_path_find($template['form']);
 		}
 
 		$html = file_get_contents($template['form']);
