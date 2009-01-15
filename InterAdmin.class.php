@@ -90,7 +90,7 @@ class InterAdmin{
 	/**
 	 * Gets values from this record on the database.
 	 *
-	 * @param array|string $fields Array (recommended) or string (an unique field) containning the names of the fields to be retrieved.
+	 * @param array|string $fields Array of fields or name of the field to be retrieved, '*' to get all the fields.
 	 * @param bool $forceAsString Gets the string value for fields referencing to another InterAdmin ID (fields started by "select_").
 	 * @param bool $fields_alias If <tt>TRUE</tt> the names of the fields are replaced by the Alias that were inserted on the InterAdmin.
 	 * @return mixed If $fields is an array an object will be returned, otherwise it will return the value retrieved.
