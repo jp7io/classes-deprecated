@@ -292,5 +292,40 @@ class InterAdmin{
 	public function getUrl(){
 		return $this->getTipo()->getUrl() . '?id=' . $this->id;
 	}
+	/**
+	 * Returns the tags.
+	 * 
+	 * @return string
+	 */
+	public function getTags(){
+		if (!$this->tags) {
+			$this->getFieldsValues('tags');
+		} 
+		if ($this->tags) {
+			$tags_arr = explode(',', $this->tags);
+		} else {
+			$tags_arr = array();
+		}
+		$tags_return = array();
+		foreach ($tags_arr as $tag) {
+			if (strpos($tag, ';') !== false) {
+				$tag_arr = explode(';', $tag);
+				$tag_tipo = new InterAdminTipo($tag_arr[0]);
+				$options = array(
+					'fields' => array('varchar_key'),
+					'where' => ' AND id=' . $tag_arr[1]
+				);
+				$tag_registro = $tag_tipo->getFirstInterAdmin($options);
+				$tag_registro->interadmin = $this;
+				$tags_return[] = $tag_registro;
+			} else {
+				$tag_tipo = new InterAdminTipo($tag);
+				$tag_tipo->getFieldsValues('nome');
+				$tag_tipo->interadmin = $this;
+				$tags_return[] = $tag_tipo;
+			}
+		}
+		return $tags_return;
+	}
 }
 ?>
