@@ -290,14 +290,21 @@ class InterAdmin{
 	 * @return string
 	 */
 	public function getUrl(){
-		return $this->getTipo()->getUrl() . '?id=' . $this->id;
+		global $seo;
+		$link = $this->getTipo()->getUrl();
+		if ($seo) {
+			$link .= '.' . toSeo($this->getFieldsValues('varchar_key'));
+		} else {
+			$link .= '?id=' . $this->id;
+		}
+		return $link;
 	}
 	/**
 	 * Returns the tags.
 	 * 
 	 * @return string
 	 */
-	public function getTags(){
+	public function getTags($class_tipo = 'InterAdminTipo', $class = 'InterAdmin'){
 		if (!$this->tags) {
 			$this->getFieldsValues('tags');
 		} 
@@ -310,16 +317,18 @@ class InterAdmin{
 		foreach ($tags_arr as $tag) {
 			if (strpos($tag, ';') !== false) {
 				$tag_arr = explode(';', $tag);
-				$tag_tipo = new InterAdminTipo($tag_arr[0]);
+				$tag_tipo = new $class_tipo($tag_arr[0]);
+				$tag_tipo->getFieldsValues('nome');
 				$options = array(
 					'fields' => array('varchar_key'),
-					'where' => ' AND id=' . $tag_arr[1]
+					'where' => ' AND id=' . $tag_arr[1],
+					'class' => $class
 				);
 				$tag_registro = $tag_tipo->getFirstInterAdmin($options);
 				$tag_registro->interadmin = $this;
 				$tags_return[] = $tag_registro;
 			} else {
-				$tag_tipo = new InterAdminTipo($tag);
+				$tag_tipo = new $class_tipo($tag);
 				$tag_tipo->getFieldsValues('nome');
 				$tag_tipo->interadmin = $this;
 				$tags_return[] = $tag_tipo;
