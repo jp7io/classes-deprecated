@@ -46,6 +46,11 @@ class InterAdmin{
 	 */
 	protected $_parent;
 	/**
+	 * Contains an array of objects (InterAdmin and InterAdminTipo).
+	 * @var array
+	 */
+	protected $_tags;
+	/**
 	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
 	 * @param int $id This record's 'id'.
 	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias.
@@ -305,36 +310,31 @@ class InterAdmin{
 	 * @return string
 	 */
 	public function getTags($class_tipo = 'InterAdminTipo', $class = 'InterAdmin'){
-		if (!$this->tags) {
-			$this->getFieldsValues('tags');
-		} 
-		if ($this->tags) {
-			$tags_arr = explode(',', $this->tags);
-		} else {
-			$tags_arr = array();
-		}
-		$tags_return = array();
-		foreach ($tags_arr as $tag) {
-			if (strpos($tag, ';') !== false) {
-				$tag_arr = explode(';', $tag);
-				$tag_tipo = new $class_tipo($tag_arr[0]);
-				$tag_tipo->getFieldsValues('nome');
-				$options = array(
-					'fields' => array('varchar_key'),
-					'where' => ' AND id=' . $tag_arr[1],
-					'class' => $class
-				);
-				$tag_registro = $tag_tipo->getFirstInterAdmin($options);
-				$tag_registro->interadmin = $this;
-				$tags_return[] = $tag_registro;
-			} else {
-				$tag_tipo = new $class_tipo($tag);
-				$tag_tipo->getFieldsValues('nome');
-				$tag_tipo->interadmin = $this;
-				$tags_return[] = $tag_tipo;
+		if (!$this->_tags) {
+			global $db;
+			$sql = "SELECT * FROM " . $this->db_prefix . "_tags WHERE parent_id = " . $this->id;
+			$rs = $db->Execute($sql);
+			$this->tags = array();
+			while ($row = $rs->FetchNextObj()) {
+				$tag_tipo = new InterAdminTipo($row->id_tipo);
+				$tag_text = $tag_tipo->getFieldsValues('nome');
+				if ($row->id) {
+					$options = array(
+						'fields' => array('varchar_key'),
+						'where' => ' AND id=' . $row->id
+					);
+					$tag_registro = $tag_tipo->getFirstInterAdmin($options);
+					$tag_text = $tag_registro->varchar_key . ' (' . $tag_tipo->nome . ')';
+					$tag_registro->interadmin = $this;
+					$this->_tags[] = $tag_registro;
+				} else {
+					$tag_tipo->interadmin = $this;
+					$this->_tags[] = $tag_tipo;
+				}
 			}
+			$rs->Close();
 		}
-		return $tags_return;
+		return (array) $this->_tags;
 	}
 }
 ?>

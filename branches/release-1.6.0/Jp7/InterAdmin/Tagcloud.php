@@ -7,14 +7,13 @@ class Jp7_InterAdmin_Tagcloud
 	public function getTags($class = 'InterAdmin') {
 		global $db_prefix, $lang;
 		$tags_arr = array();
-		$sql = "SELECT id, tags, hits FROM " . $db_prefix . $lang->prefix .
-		" WHERE tags <> '' AND hits > 0" .
+		$sql = "SELECT id, hits FROM " . $db_prefix . $lang->prefix .
+		" WHERE hits > 0" .
 		" ORDER BY date_hit DESC" .
 		" LIMIT " . $this->limit;
 		$rs = interadmin_query($sql);
 		while ($row = $rs->FetchNextObj()) {
 			$interadminCloud = new $class($row->id);
-			$interadminCloud->tags = $row->tags;
 			$interadminCloud->hits = $row->hits;
 			$tags_arr = array_merge($tags_arr, $interadminCloud->getTags());
 		}
@@ -42,10 +41,13 @@ class Jp7_InterAdmin_Tagcloud
 		foreach ($tags_arr_unique as $key => $tag) {
 			$obj = $tag['obj'];
 			if ($max > $min) {
-				// Linear
-				//$weight = ($tag['hits']-$min)/$diff;
-				// Logarítmo
-				$weight = (log($tag['hits'])-log($min))/(log($max)-log($min));
+				if ($this->type == 'linear') {
+					// Linear
+					$weight = ($tag['hits'] - $min) / $diff;
+				} else {
+					// Logarítmo
+					$weight = (log($tag['hits']) - log($min)) / (log($max) - log($min));
+				}
 				// Final
 				$tags_arr_unique[$key]['fontSize'] = $this->minFontSize + round($fontSizeDiff * $weight);
 			} else {
