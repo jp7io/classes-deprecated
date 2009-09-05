@@ -51,6 +51,11 @@ class InterAdmin{
 	 */
 	protected $_tags;
 	/**
+	 * Used by getFieldsValues() to know if it needs to reload the values.
+	 * @var bool
+	 */
+	protected $_updated = false;
+	/**
 	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
 	 * @param int $id This record's 'id'.
 	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias.
@@ -93,6 +98,17 @@ class InterAdmin{
 	}
 
 	/**
+	 * Gets fields values by their alias.
+	 *  
+	 * @param array|string $fields
+	 * @see InterAdmin::getFieldsValues()
+	 * @return 
+	 */
+	public function getByAlias($fields){
+		return $this->getFieldsValues($fields, false, true);
+	}
+
+	/** 
 	 * Gets values from this record on the database.
 	 *
 	 * @param array|string $fields Array of fields or name of the field to be retrieved, '*' to get all the fields.
@@ -101,47 +117,91 @@ class InterAdmin{
 	 * @return mixed If $fields is an array an object will be returned, otherwise it will return the value retrieved.
 	 * @todo (FIXME - Multiple languages) When there is no id_tipo yet, the function is unable to decide which language table it should use.
 	 */
-	public function getFieldsValues($fields, $forceAsString = FALSE, $fields_alias = FALSE) {   
+	public function getFieldsValues($fields, $forceAsString = false, $fields_alias = false, $reloadValues = false) {   
 		global $lang;
 		if (!$this->_tipo) $this->getTipo();
 		if ($lang->prefix) $tipoLanguage = $this->_tipo->getFieldsValues('language');
 		if ($fields == '*') $fields = $this->_tipo->getAllFieldsNames(); 
 		
-		$rs = $this->_tipo->executeQuery(array(
-			'fields' => (array) $fields,
-			'from' => $this->db_prefix . $this->table . (($tipoLanguage) ? $lang->prefix : '') . " AS main",
-			'where' => "main.id = " . (($this->id) ? $this->id : 0)
-		));
-		
-		$fieldsValues = $rs->FetchNextObj();
-		
-		// Force As String - Kept for backwards compatibility
-		if ($forceAsString) {
-			foreach((array)$fieldsValues as $key=>$value) {
-				if (strpos($key, 'select_') === 0) {
-					$value_arr = explode(',', $value);
-					$str_arr = array();
-					foreach($value_arr as $value_id) {
-						$str_arr[] = jp7_fields_values($this->db_prefix . (($tipoLanguage) ? $lang->prefix : ''), 'id', $value_id, 'varchar_key');
-					}
-					$value = implode(', ', $str_arr);
-				}
-				if ($fields_alias) {
-					$alias = $this->_tipo->getCamposAlias($key);
-					unset($fieldsValues->$key);
-				} else {
-					$alias = $key;
-				}
-				$this->$alias = $fieldsValues->$alias = $value;
-			}
-		} else {
-			$this->_tipo->putOrmData($this, $fieldsValues, array(
-				'fields' => $fields,
-				'fields_alias' => $fields_alias
-			));
+		if ($this->_updated) {
+			$reloadValues = true;
 		}
-		if (is_array($fields)) return $fieldsValues;
-		else return $fieldsValues->$fields;
+		
+		$fieldsToLoad = array();
+		if ($reloadValues || $forceAsString) {
+			$fieldsToLoad = $fields;
+		} else {
+			foreach ((array) $fields as $key => $field) {
+				if (is_array($field) || !isset($this->$field)) {
+					$fieldsToLoad[$key] = $field;		
+				}
+			}
+		}
+		
+		foreach($this->_tipo->getCampos() as $key => $campo) {
+			if (is_array($fieldsToLoad)) {
+				if ($fieldsToLoad[$campo['nome_id']]) {
+					$fieldsToLoad[$key] = $fieldsToLoad[$campo['nome_id']];
+					unset($fields[$campo['nome_id']]);
+				} else {
+					$fields_key = array_search($campo['nome_id'], $fieldsToLoad);
+					if ($fields_key !== false) {
+						$fieldsToLoad[$fields_key] = $key;
+					}
+				}
+			}
+		}
+		
+		if ($fieldsToLoad) {
+			$rs = $this->_tipo->executeQuery(array(
+				'fields' => (array) $fieldsToLoad,
+				'from' => $this->db_prefix . $this->table . (($tipoLanguage) ? $lang->prefix : '') . " AS main",
+				'where' => "main.id = " . (($this->id) ? $this->id : 0)
+			));
+			$fieldsValues = $rs->FetchNextObj();
+			
+			// Force As String - Kept for backwards compatibility
+			if ($forceAsString) {
+				foreach((array)$fieldsValues as $key=>$value) {
+					if (strpos($key, 'select_') === 0) {
+						$value_arr = explode(',', $value);
+						$str_arr = array();
+						foreach($value_arr as $value_id) {
+							$str_arr[] = jp7_fields_values($this->db_prefix . (($tipoLanguage) ? $lang->prefix : ''), 'id', $value_id, 'varchar_key');
+						}
+						$value = implode(', ', $str_arr);
+					}
+					if ($fields_alias) {
+						$alias = $this->_tipo->getCamposAlias($key);
+						unset($fieldsValues->$key);
+					} else {
+						$alias = $key;
+					}
+					$this->$alias = $fieldsValues->$alias = $value;
+				}
+				
+				if (is_array($fields)) {
+					return $fieldsValues;
+				} else {
+					return $fieldsValues->$fields;
+				}
+			} else {
+				$this->_tipo->putOrmData($this, $fieldsValues, array(
+					'fields' => $fieldsToLoad,
+					'fields_alias' => $fields_alias
+				));
+			}
+		}
+		
+		if (is_array($fields)) {
+			$returnValues = new stdClass();
+			foreach ($fields as $field) {
+				$returnValues->$field = $this->$field;
+			}
+			return $returnValues;
+		} else {
+			return $this->$fields;
+		}
 	}
 	/**
 	 * Returns this object´s varchar_key and all the fields marked as 'combo', if the field 
@@ -179,6 +239,7 @@ class InterAdmin{
 		} else {
 			$this->id = jp7_db_insert($this->db_prefix . $this->table . (($tipoLanguage) ? $lang->prefix : ''), 'id', 0, $fields_values, TRUE, $force_magic_quotes_gpc);
 		}
+		$this->_updated = true;
 	}
 	/**
 	 * Gets the InterAdminTipo object for this record, which is then cached on the $_tipo property.
@@ -321,7 +382,7 @@ class InterAdmin{
 				if ($row->id) {
 					$options = array(
 						'fields' => array('varchar_key'),
-						'where' => ' AND id=' . $row->id
+						'where' => array('id=' . $row->id)
 					);
 					$tag_registro = $tag_tipo->getFirstInterAdmin($options);
 					$tag_text = $tag_registro->varchar_key . ' (' . $tag_tipo->nome . ')';

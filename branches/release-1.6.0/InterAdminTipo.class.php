@@ -202,11 +202,39 @@ class InterAdminTipo{
 	public function getInterAdmins($options = array()) {
 		global $lang;
 		$table = ($this->tabela) ? '_' . $this->tabela : '';
+		if ($options['fields'] == '*') {
+			$options['fields'] = $this->getAllFieldsNames();
+		}
+		if (!is_array($options['where'])) {
+			if ($options['where']) {
+				$options['where'] = explode(' AND ', $options['where']);
+				$options['where'] = array_filter($options['where']); // Para remover itens vazios
+			} else {
+				$options['where'] = array();
+			}
+		}
 		
-		if ($options['fields'] == '*') $options['fields'] = $this->getAllFieldsNames();
+		foreach($this->getCampos() as $key => $campo) {
+			if (is_array($options['fields'])) {
+				if ($options['fields'][$campo['nome_id']]) {
+					$options['fields'][$key] = $options['fields'][$campo['nome_id']];
+					unset($options['fields'][$campo['nome_id']]);
+				} else {
+					$fields_key = array_search($campo['nome_id'], $options['fields']);
+					if ($fields_key !== false) {
+						$options['fields'][$fields_key] = $key;
+					}
+				}
+			}
+			foreach ($options['where'] as $where_key => $where) {
+				$options['where'][$where_key] = str_replace($campo['nome_id'], $key, $where);
+			}
+			$options['order'] = str_replace($campo['nome_id'], $key, $options['order']);
+			$options['group'] = str_replace($campo['nome_id'], $key, $options['group']);
+		}
 		$options['fields'] = array_merge(array('id'), (array) $options['fields']);
 		$options['from'] = $this->db_prefix . $table . (($this->getFieldsValues('language')) ? $lang->prefix : '') . " AS main";
-		$options['where'] = "main.id_tipo = " . $this->id_tipo . $options['where'];
+		$options['where'] = "main.id_tipo = " . $this->id_tipo . (($options['where']) ? ' AND ' . implode(' AND ', $options['where']) : '');
 		if ($this->_parent && $this->_parent instanceof InterAdmin) $options['where'] .= " AND main.parent_id = " . $this->_parent->id;	
 		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . $this->interadminsOrderby;
 		
@@ -260,6 +288,17 @@ class InterAdminTipo{
 		$options['limit'] = 1;
 		$interAdmin = $this->getInterAdmins($options);
 		return $interAdmin[0];
+	}
+	/*
+	 * Retrieves the first record which have this id_string
+	 * 
+	 * @param string $id_string Search value.
+	 * @return InterAdmin First InterAdmin object found.
+	 */
+	public function getInterAdminById($id_string) {
+		return $this->getFirstInterAdmin(array(
+			'where' => array("id_string = '" . $id_string . "'")
+		));
 	}
 	/**
 	 * Returns the model identified by model_id_tipo, or the object itself if it has no model.
