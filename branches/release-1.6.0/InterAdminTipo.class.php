@@ -208,7 +208,7 @@ class InterAdminTipo{
 		if (!is_array($options['where'])) {
 			if ($options['where']) {
 				$options['where'] = explode(' AND ', $options['where']);
-				$options['where'] = array_filter($options['where']); // Para remover itens vazios
+				$options['where'] = array_filter($options['where'], 'array_trim'); // Para remover itens vazios
 			} else {
 				$options['where'] = array();
 			}
@@ -242,13 +242,18 @@ class InterAdminTipo{
 		
 		$interAdmins = array();
 		while ($row = $rs->FetchNextObj()) {
-			$class_name = ($options['class']) ? $options['class'] : $this->class;
+			if ($class_name_cached) {
+				$class_name = $class_name_cached;
+			} else {
+				$class_name = ($options['class']) ? $options['class'] : $this->class;
+			}
 			$interAdmin = InterAdmin::getInstance($row->id, array(
 				'db_prefix' => $this->db_prefix,
 				'table' => $this->tabela,
 				'class' => $class_name
 			));
 			$interAdmin->setTipo($this);
+			$class_name_cached = get_class($interAdmin);
 			
 			if ($this->_parent && $this->_parent instanceof InterAdmin) $interAdmin->setParent($this->_parent);
 			
