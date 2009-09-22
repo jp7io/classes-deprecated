@@ -357,7 +357,11 @@ class InterAdmin{
 	 */
 	public function getUrl(){
 		global $seo;
-		$link = $this->getTipo()->getUrl();
+		if ($this->getParent()->id) {
+			$link = $this->_parent->getUrl() . '/' . toSeo($this->getTipo()->getFieldsValues('nome'));
+		} else {
+			$link = $this->getTipo()->getUrl();
+		}
 		if ($seo) {
 			$link .= '.' . toSeo($this->getFieldsValues('varchar_key'));
 		} else {
@@ -396,6 +400,18 @@ class InterAdmin{
 			$rs->Close();
 		}
 		return (array) $this->_tags;
+	}
+	
+	public function isPublished() {
+		global $c_publish, $s_session;
+		$this->getFieldsValues(array('date_publish', 'date_expire', 'char_key', 'publish', 'deleted'));
+		return (
+			strtotime($this->date_publish) <= time() &&
+			(strtotime($this->date_expire) >= time() || $this->date_expire == '0000-00-00 00:00:00') &&
+			$this->char_key &&
+			($this->publish || $s_session['preview'] || !$c_publish) &&
+			!$this->deleted
+		);
 	}
 }
 ?>
