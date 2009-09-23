@@ -408,29 +408,19 @@ class InterAdminTipo{
 	public function getByForeignKey(&$value, $field, $campos = ''){
 		$options = array();
 		if (strpos($field, 'select_') === 0) {
-			$isObject = true;
-			if (strpos($field, 'select_multi') === 0) {
-				$isMulti = true;
-				$isTipo = in_array($campos['xtra'], array('S', 'ajax_tipos', 'radio_tipos'));
-			} elseif($value && is_numeric($value)) {
-				$isTipo = in_array($campos['xtra'], array('S', 'ajax_tipos', 'radio_tipos'));
-			}
+			$isMulti = (strpos($field, 'select_multi') === 0);
+			$isTipo = in_array($campos['xtra'], array('S', 'ajax_tipos', 'radio_tipos'));
 			if (!$isTipo) {
 				$options = array(
 					'table' => $campos['nome']->tabela
 				);
 			}
 		} elseif (strpos($field, 'special_') === 0 && $campos['xtra']) {
-			$isObject = true;
-			if (in_array($campos['xtra'], array('registros_multi', 'tipos_multi'))) {
-				$isMulti = true;
-				$isTipo = ($campos['xtra'] == 'multi_tipos');
-			} elseif($value && is_numeric($value)) {
-				$isTipo = ($campos['xtra'] == 'tipos');
-			}
+			$isMulti = in_array($campos['xtra'], array('registros_multi', 'tipos_multi'));
+			$isTipo = ($campos['xtra'] == 'multi_tipos' || $campos['xtra'] == 'tipos');
 		}
 		
-		if ($isObject) {
+		if (isset($isMulti)) {
 			if ($isMulti) {
 				$value_arr = explode(',', $value);
 				if (!$value_arr[0]) $value_arr = array();
@@ -442,7 +432,7 @@ class InterAdminTipo{
 					}
 				}
 				$value = $value_arr;
-			} else {
+			} elseif ($value && is_numeric($value)) {
 				if ($isTipo) {
 					$value = InterAdminTipo::getInstance($value);
 				} else {

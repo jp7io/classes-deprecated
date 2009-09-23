@@ -109,6 +109,9 @@ class InterAdmin{
 	 * @return 
 	 */
 	public function getByAlias($fields){
+		if (func_num_args() > 1) {
+			throw new Exception('$fields should be array.');
+		}
 		return $this->getFieldsValues($fields, false, true);
 	}
 
