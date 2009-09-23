@@ -78,15 +78,19 @@ class InterAdmin{
 	public static function getInstance($id, $options = array()) {
 		if ($options['class']) {
 			$class_name = (class_exists($options['class'])) ? $options['class'] : 'InterAdmin';
+			$finalInstance = new $class_name($id, $options);
 		} else {
 			$instance = new InterAdmin($id, array_merge($options, array('fields' => array())));
 			$class_name = $instance->getTipo()->class;
-			if (!class_exists($class_name)) {
+			if (class_exists($class_name)) {
+				$finalInstance = new $class_name($id, $options);
+				$finalInstance->setTipo($instance->getTipo()); // Performance
+			} else {
 				if ($options['fields']) $instance->getFieldsValues($options['fields'], FALSE, $options['fields_alias']);
-				return $instance;
+				$finalInstance = $instance;
 			}
 		}
-		return new $class_name($id, $options);
+		return $finalInstance;
 	}
 	/**
 	 * String value of this record´s $id.

@@ -406,28 +406,46 @@ class InterAdminTipo{
 	 * @return mixed The object created by the key or the value itself.
 	 */
 	public function getByForeignKey(&$value, $field, $campos = ''){
+		$options = array();
 		if (strpos($field, 'select_') === 0) {
+			$isObject = true;
 			if (strpos($field, 'select_multi') === 0) {
+				$isMulti = true;
+				$isTipo = in_array($campos['xtra'], array('S', 'ajax_tipos', 'radio_tipos'));
+			} elseif($value && is_numeric($value)) {
+				$isTipo = in_array($campos['xtra'], array('S', 'ajax_tipos', 'radio_tipos'));
+			}
+			if (!$isTipo) {
+				$options = array(
+					'table' => $campos['nome']->tabela
+				);
+			}
+		} elseif (strpos($field, 'special_') === 0 && $campos['xtra']) {
+			$isObject = true;
+			if (in_array($campos['xtra'], array('registros_multi', 'tipos_multi'))) {
+				$isMulti = true;
+				$isTipo = ($campos['xtra'] == 'multi_tipos');
+			} elseif($value && is_numeric($value)) {
+				$isTipo = ($campos['xtra'] == 'tipos');
+			}
+		}
+		
+		if ($isObject) {
+			if ($isMulti) {
 				$value_arr = explode(',', $value);
 				if (!$value_arr[0]) $value_arr = array();
 				foreach ($value_arr as $key2 => $value2) {
-					if (in_array($campos['xtra'], array('S', 'ajax_tipos', 'radio_tipos'))) {
+					if ($isTipo) {
 						$value_arr[$key2] = InterAdminTipo::getInstance($value2);
 					} else {
-						$options = array(
-							'table' => $campos['nome']->tabela
-						);
 						$value_arr[$key2] = InterAdmin::getInstance($value2, $options);
 					}
 				}
 				$value = $value_arr;
-			} elseif($value && is_numeric($value)) {
-				if (in_array($campos['xtra'], array('S', 'ajax_tipos', 'radio_tipos'))) {
+			} else {
+				if ($isTipo) {
 					$value = InterAdminTipo::getInstance($value);
 				} else {
-					$options = array(
-						'table' => $campos['nome']->tabela
-					);
 					$value = InterAdmin::getInstance($value, $options);
 				}
 			}
