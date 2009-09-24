@@ -145,11 +145,12 @@ class InterAdmin{
 			}
 		}
 		
+		// Replace dos Alias
 		foreach($this->_tipo->getCampos() as $key => $campo) {
 			if (is_array($fieldsToLoad)) {
 				if ($fieldsToLoad[$campo['nome_id']]) {
 					$fieldsToLoad[$key] = $fieldsToLoad[$campo['nome_id']];
-					unset($fields[$campo['nome_id']]);
+					unset($fieldsToLoad[$campo['nome_id']]);
 				} else {
 					$fields_key = array_search($campo['nome_id'], $fieldsToLoad);
 					if ($fields_key !== false) {
@@ -256,7 +257,9 @@ class InterAdmin{
 	 */
 	public function getTipo($options = array()) {
 		if (!$this->_tipo) {
-			if (!$this->id_tipo) $this->id_tipo = jp7_fields_values($this->db_prefix . $this->table, 'id', $this->id, 'id_tipo');
+			if (!$this->id_tipo) {
+				$this->id_tipo = jp7_fields_values($this->db_prefix . $this->table, 'id', $this->id, 'id_tipo');
+			}
 			$this->_tipo = InterAdminTipo::getInstance($this->id_tipo, array('db_prefix' => $this->db_prefix, 'class' => $options['class']));
 		}
 		return $this->_tipo;
