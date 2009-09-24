@@ -5,16 +5,16 @@
  * Contains the main custom functions and classes.
  * @author JP7
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @category JP7
- * @package Debug
+ * @category Jp7
+ * @package Jp7_Debugger
  */
  
 /**
  * Debug class, used to display filenames, processing time and display formatted SQL queries.
  *
- * @package Debug
+ * @package Jp7_Debugger
  */
-class Debug{
+class Jp7_Debugger{
 	/**
 	 * Flag, it is <tt>TRUE</tt> if its displaying filenames or SQL queries.
 	 * @var bool
