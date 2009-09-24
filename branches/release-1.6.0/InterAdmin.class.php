@@ -370,7 +370,13 @@ class InterAdmin{
 			$link = $this->getTipo()->getUrl();
 		}
 		if ($seo) {
-			$link .= '.' . toSeo($this->getFieldsValues('varchar_key'));
+			$alias = $this->getTipo()->getCamposAlias('varchar_key');
+			if (isset($this->$alias)) {
+				$nome = $this->$alias;
+			} else {
+				$nome = $this->getFieldsValues('varchar_key');
+			}
+			$link .= '.' . toSeo($nome);
 		} else {
 			$link .= '?id=' . $this->id;
 		}
