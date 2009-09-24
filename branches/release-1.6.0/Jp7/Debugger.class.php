@@ -136,15 +136,28 @@ class Jp7_Debugger{
  	 * @return string Formatted HTML backtrace.
 	 */	
 	public function getBacktrace($msgErro = NULL, $sql = NULL, $backtrace = NULL) {
+		global $c_doc_root;
 		if (!$backtrace) $backtrace = debug_backtrace();
 		krsort($backtrace);
-		$erroDetalhesArray = reset($backtrace);
+		
 		$S = '';
 		if ($msgErro) {
 			$S .= $this->_getBacktraceLabel('ERRO') . wordwrap($msgErro, 85, "\n") . "\n";
 		}
-		$S .= $this->_getBacktraceLabel('ARQUIVO') . $erroDetalhesArray['file'] . "\n";
-		$S .= $this->_getBacktraceLabel('LINHA') . $erroDetalhesArray['line'] . "\n";
+		$S .= '<hr />';
+		$S .= $this->_getBacktraceLabel('CALL STACK') . '<br />';
+		$S .= '<table id="jp7_debugger_table"><tr><th>#</th><th>Function</th><th>Location</th></tr>';
+		foreach ($backtrace as $key => $row) {
+			$S .= '<tr><td>' . (count($backtrace) - $key) . '</td>';
+			$S .= '<td>' . (($row['class']) ? $row['class'] . (($row['objeto']) ? ':' : '->') : '' ) . $row['function'] . '()</td>';
+			$S .= '<td>' . str_replace(str_replace('/', '\\', $c_doc_root), '', $row['file']) . ':' . $row['line'] . '</td></tr>';
+		}
+		$S .= '</table>';
+		
+		$S .= '<hr />';
+		if ($sql) {
+			$S .= $this->_getBacktraceLabel('SQL') . preg_replace(array('/( FROM )/','/( WHERE )/','/( ORDER BY )/'), "\n" . '            \1', $sql)  . "\n";
+		}
 		$S .= $this->_getBacktraceLabel('URL') . (($_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . "\n";
 		if ($_SERVER['HTTP_REFERER']) {
 			$S .= $this->_getBacktraceLabel('REFERER') . $_SERVER['HTTP_REFERER'] . "\n";
@@ -152,10 +165,8 @@ class Jp7_Debugger{
 		$S .= $this->_getBacktraceLabel('IP CLIENTE') . $_SERVER['REMOTE_ADDR'] . "\n";
 		$S .= $this->_getBacktraceLabel('IP SERVIDOR') . $_SERVER['SERVER_ADDR'] . "\n";
 		$S .= $this->_getBacktraceLabel('USER_AGENT') . $_SERVER['HTTP_USER_AGENT'] . "\n";
-		if ($sql) { 
-			$S .= $this->_getBacktraceLabel('SQL') . preg_replace(array('/( FROM )/','/( WHERE )/','/( ORDER BY )/'), "\n" . '            \1', $sql)  . "\n";
-		}
-		$S .= $this->_getBacktraceLabel('BACKTRACE') . preg_replace(array('/( FROM )/','/( WHERE )/','/( ORDER BY )/'), "\n" . '                          \1', print_r($backtrace, true));
+		$S .= '<hr />';
+		$S .= $this->_getBacktraceLabel('BACKTRACE') . print_r($backtrace, true);
 		if (count($_POST)) {
 			$S .= $this->_getBacktraceLabel('POST') . print_r($_POST, true);	
 		}

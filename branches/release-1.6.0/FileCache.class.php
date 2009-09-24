@@ -49,7 +49,7 @@ class FileCache{
  	 * @global bool
   	 * @global int
 	 * @global array
-	 * @global Debug
+	 * @global Jp7_Debugger
   	 * @global bool
 	 * @global bool
 	 */	
