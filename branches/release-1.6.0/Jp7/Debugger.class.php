@@ -149,7 +149,7 @@ class Jp7_Debugger{
 		$S .= '<table id="jp7_debugger_table"><tr><th>#</th><th>Function</th><th>Location</th></tr>';
 		foreach ($backtrace as $key => $row) {
 			$S .= '<tr><td>' . (count($backtrace) - $key) . '</td>';
-			$S .= '<td>' . (($row['class']) ? $row['class'] . (($row['objeto']) ? ':' : '->') : '' ) . $row['function'] . '()</td>';
+			$S .= '<td>' . $row['class'] . $row['type'] . $row['function'] . '()</td>';
 			$S .= '<td>' . str_replace(str_replace('/', '\\', $c_doc_root), '', $row['file']) . ':' . $row['line'] . '</td></tr>';
 		}
 		$S .= '</table>';
