@@ -18,7 +18,7 @@
  * @category Jp7
  * @package InterAdminTipo
  */
-class InterAdminTipo{
+class InterAdminTipo {
 	/**
 	 * This record's 'id_tipo'.
 	 * @var int

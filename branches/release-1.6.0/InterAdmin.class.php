@@ -108,9 +108,9 @@ class InterAdmin{
 	 * @see InterAdmin::getFieldsValues()
 	 * @return 
 	 */
-	public function getByAlias($fields){
+	public function getByAlias($fields) {
 		if (func_num_args() > 1) {
-			throw new Exception('$fields should be array.');
+			throw new Exception('Only 1 argument is expected and it should be an array.');
 		}
 		return $this->getFieldsValues($fields, false, true);
 	}
