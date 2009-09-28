@@ -163,11 +163,22 @@ class InterAdminTipo {
 	public function getChildren($options = array()){
 		global $db;
 		global $jp7_app;
+		
+		if (!is_array($options['where'])) {
+			if ($options['where']) {
+				$options['where'] = jp7_explode(' AND ', $options['where']);
+			} else {
+				$options['where'] = array();
+			}
+		}
+		
 		$options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
 		$options['from'] = $this->db_prefix . "_tipos AS main";
-		$options['where'] = "parent_id_tipo = " . $this->id_tipo . $options['where'];
-	 	if (!$options['order']) $options['order'] = 'ordem, nome';
-
+		$options['where'][] = "parent_id_tipo = " . $this->id_tipo;
+	 	if (!$options['order']) {
+	 		$options['order'] = 'ordem, nome';
+		}
+		
 		$rs = $this->executeQuery($options);
 		
 		$interAdminTipos = array();
@@ -234,8 +245,8 @@ class InterAdminTipo {
 		}
 		$options['fields'] = array_merge(array('id'), (array) $options['fields']);
 		$options['from'] = $this->db_prefix . $table . (($this->getFieldsValues('language')) ? $lang->prefix : '') . " AS main";
-		$options['where'] = "main.id_tipo = " . $this->id_tipo . (($options['where']) ? ' AND ' . implode(' AND ', $options['where']) : '');
-		if ($this->_parent && $this->_parent instanceof InterAdmin) $options['where'] .= " AND main.parent_id = " . $this->_parent->id;	
+		$options['where'][] = "main.id_tipo = " . $this->id_tipo;
+		if ($this->_parent && $this->_parent instanceof InterAdmin) $options['where'][] =  "main.parent_id = " . $this->_parent->id;	
 		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . $this->interadminsOrderby;
 		
 		$rs = $this->executeQuery($options);
@@ -276,8 +287,19 @@ class InterAdminTipo {
 		$table = ($model->getFieldsValues('tabela')) ? '_' . $model->tabela : '';
 		$options['count'] = "COUNT(main.id) AS count";
 		$options['from'] = $this->db_prefix . $table . (($this->getFieldsValues('language')) ? $lang->prefix : '') . " AS main";
-		$options['where'] = "main.id_tipo = " . $this->id_tipo . $options['where'];
-		if ($this->_parent && $this->_parent instanceof InterAdmin) $options['where'] .= " AND main.parent_id = " . $this->_parent->id;
+		
+		if (!is_array($options['where'])) {
+			if ($options['where']) {
+				$options['where'] = jp7_explode(' AND ', $options['where']);
+			} else {
+				$options['where'] = array();
+			}
+		}
+		
+		$options['where'][] = "main.id_tipo = " . $this->id_tipo;
+		if ($this->_parent && $this->_parent instanceof InterAdmin) {
+			$options['where'][] = "main.parent_id = " . $this->_parent->id;
+		}
 		$rs = $this->executeQuery($options);
 		if ($row = $rs->FetchNextObj()) return $row->count;
 		else return 0;
@@ -492,20 +514,25 @@ class InterAdminTipo {
 			if (strpos($value, '(') === false && strpos($value, '.') === false) $value = 'main.' . $value;
 		}
 		$options['order'] = implode(',', $order_arr);
-		$where_arr = jp7_explode(' AND ', $options['where']);
-		foreach ($where_arr as $key => &$value) {
+		// Where Fix
+		if (!$options['where']) {
+			$options['where'] = array();
+		}
+		
+		foreach ($options['where'] as $key => &$value) {
 			if (strpos($value, '(') === false && strpos($value, '.') === false) $value = 'main.' . $value;
 		}
-		$options['where'] = implode(' AND ', $where_arr);
-		
-		if ($options['count']) $options['fields'] = (array) $options['count'];
-		
-		if (!$options['fields']) $options['fields'] = array('0');
+		if ($options['count']) {
+			$options['fields'] = (array) $options['count'];
+		} 
+		if (!$options['fields']) {
+			$options['fields'] = array('0');
+		}
 		
 		// Sql
 		$sql = "SELECT " . (($options['fields']) ? implode(',', $options['fields']) : '') .
 			" FROM " . implode(' LEFT JOIN ', $options['from']) .
-			" WHERE " . $options['where'] .
+			" WHERE " . implode(' AND ',  $options['where']) .
 			(($options['group']) ? " GROUP BY " . $options['group'] : '') .
 			(($options['order']) ? " ORDER BY " . $options['order'] : '') .
 			(($options['limit']) ? " LIMIT " . $options['limit'] : '');

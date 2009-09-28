@@ -164,7 +164,7 @@ class InterAdmin{
 			$rs = $this->_tipo->executeQuery(array(
 				'fields' => (array) $fieldsToLoad,
 				'from' => $this->db_prefix . $this->table . (($tipoLanguage) ? $lang->prefix : '') . " AS main",
-				'where' => "main.id = " . (($this->id) ? $this->id : 0)
+				'where' => array("main.id = " . (($this->id) ? $this->id : 0))
 			));
 			$fieldsValues = $rs->FetchNextObj();
 			
