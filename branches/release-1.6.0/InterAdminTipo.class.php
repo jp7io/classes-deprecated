@@ -481,7 +481,7 @@ class InterAdminTipo {
                         $options['fields'][] = $join . '.' . $joinField . " AS " . $join . '_' . $joinField;
                     }
                 } else {
-                    if (strpos($field, '(') === FALSE && strpos($field, '.') === FALSE) $options['fields'][$key] = 'main.' . $field;
+                    if (strpos($field, '(') === false && strpos($field, '.') === false) $options['fields'][$key] = 'main.' . $field;
                 }
             }
 		}
@@ -489,9 +489,14 @@ class InterAdminTipo {
 		// Order Fix
 		$order_arr = jp7_explode(',', $options['order']);
 		foreach ($order_arr as $key => &$value) {
-			if (strpos($value, '(') === FALSE && strpos($value, '.') === FALSE) $value = 'main.' . $value;
+			if (strpos($value, '(') === false && strpos($value, '.') === false) $value = 'main.' . $value;
 		}
 		$options['order'] = implode(',', $order_arr);
+		$where_arr = jp7_explode(' AND ', $options['where']);
+		foreach ($where_arr as $key => &$value) {
+			if (strpos($value, '(') === false && strpos($value, '.') === false) $value = 'main.' . $value;
+		}
+		$options['where'] = implode(' AND ', $where_arr);
 		
 		if ($options['count']) $options['fields'] = (array) $options['count'];
 		
