@@ -14,7 +14,7 @@
  *
  * @package InterAdmin
  */
-class InterAdmin{
+class InterAdmin {
 	/**
 	 * This record's 'id'.
 	 * @var int
@@ -55,6 +55,11 @@ class InterAdmin{
 	 * @var bool
 	 */
 	protected $_updated = false;
+	/**
+	 * Array of all the attributes with their names as keys and the values of the attributes as values.
+	 * @var array 
+	 */
+	public $attributes = array();
 	/**
 	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
 	 * @param int $id This record's 'id'.
@@ -100,7 +105,48 @@ class InterAdmin{
 	public function __toString(){
 		return (string) $this->id;
 	}
-
+	
+	/**
+	 * Magic get acessor.
+	 * 
+	 * @param string $attributeName
+	 * @return mixed
+	 */
+	public function __get($attributeName) {
+		return $this->attributes[$attributeName];
+	}
+	
+	/**
+	 * Magic set acessor.
+	 * 
+	 * @param string $attributeName
+	 * @param string $attributeValue
+	 * @return void
+	 */
+	public function __set($attributeName, $attributeValue) {
+		$this->attributes[$attributeName] = $attributeValue;
+	}
+	
+	/**
+	 * Magic unset acessor.
+	 * 
+	 * @param string $attributeName
+	 * @return void
+	 */
+	public function __unset($attributeName) {
+		unset($this->attributes[$attributeName]);
+	}
+	
+	/**
+	 * Magic isset acessor.
+	 * 
+	 * @param string $attributeName
+	 * @return bool
+	 */
+	public function __isset($attributeName) {
+		return isset($this->attributes[$attributeName]);
+	}
+	
 	/**
 	 * Gets fields values by their alias.
 	 *  

@@ -786,10 +786,10 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 	private static function _dump(&$data, $name='...') {
 
 		// object ?
-		//
+		//	
 		if (is_object($data)) {
 			return Krumo::_object($data, $name);
-			}
+		}
 
 		// array ?
 		//
@@ -803,10 +803,10 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 				//
 				if (!isset($GLOBALS[Krumo::_marker()])) {
 					$GLOBALS[Krumo::_marker()] = array();
-					}
+				}
 				if (!is_array($GLOBALS[Krumo::_marker()])) {
 					$GLOBALS[Krumo::_marker()] = (array) $GLOBALS[Krumo::_marker()];
-					}
+				}
 				
 				// extract ?
 				//
@@ -945,7 +945,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 	* @access private
 	* @static
 	*/
-	private static function _vars(&$data) {
+	private static function _vars(&$data, $ignoreRecursion = false) {
 
 		$_is_object = is_object($data);
 		
@@ -953,16 +953,15 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 		// prevent endless recursion loops
 		//
 		$_recursion_marker = Krumo::_marker();
-		$_r = ($_is_object)
-			? @$data->$_recursion_marker
-			: @$data[$_recursion_marker] ;
+		$_r = ($_is_object)	? @$data->$_recursion_marker : @$data[$_recursion_marker];
 		$_r = (integer) $_r;
-
+		
+		
 		// recursion detected
 		//
-		if ($_r > 0) {
-			return Krumo::_recursion();
-			}
+		if ($_r > 0 && !$ignoreRecursion) {
+			return Krumo::_recursion($data);
+		}
 
 		// stain it
 		//
@@ -1023,7 +1022,12 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 	* @access private
 	* @static
 	*/
-	private static function _recursion() {
+	private static function _recursion($data = null) {
+		if (is_object($data)) {
+			$texto = get_class($data) . (isset($data->id) ? ' - ' . $data->id : '');
+		} else {
+			$texto = gettype($data);
+		}
 ?>
 <div class="krumo-nest" style="display:none;">
 	<ul class="krumo-node">
@@ -1032,7 +1036,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 				onMouseOver="krumo.over(this);"
 				onMouseOut="krumo.out(this);">
 					<a class="krumo-name"><big>&#8734;</big></a>
-					(<em class="krumo-type">Recursion</em>)
+					<em class="krumo-type">Recursion</em> (<?php echo $texto ?>)
 			</div>
 		
 		</li>
@@ -1086,7 +1090,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 	</div>
 
 	<?php if (count($data)) {
-		Krumo::_vars($data);
+		Krumo::_vars($data, $name == 'attributes');
 		} ?>
 </li>
 <?php
@@ -1113,7 +1117,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 
 			<a class="krumo-name"><?php echo $name;?></a>
 			(<em class="krumo-type">Object</em>) 
-			<strong class="krumo-class"><?php echo get_class($data);?></strong>
+			<strong class="krumo-class"><?php echo get_class($data) . ((isset($data->id)) ? ' - ' . $data->id : '');?></strong>
 	</div>
 
 	<?php if (count($data)) {
