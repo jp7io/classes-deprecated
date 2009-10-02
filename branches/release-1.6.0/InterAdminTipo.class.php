@@ -44,6 +44,9 @@ class InterAdminTipo {
 	 * @var InterAdminTipo
 	 */
 	protected $_parent;
+	
+	const DEFAULT_CLASS = 'InterAdmin';
+	
 	/**
 	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
 	 * 
@@ -65,10 +68,13 @@ class InterAdminTipo {
 	 * @return InterAdminTipo Returns an InterAdminTipo or a child class in case it's defined on its 'class_tipo' property.
 	 */
 	public static function getInstance($id_tipo, $options = array()){
+		if (!$options['default_class']) {
+			$options['default_class'] = 'InterAdminTipo';
+		}
 		if ($options['class']) {
-			$class_name = (class_exists($options['class'])) ? $options['class'] : 'InterAdminTipo';
+			$class_name = (class_exists($options['class'])) ? $options['class'] : $options['default_class'];
 		} else {
-			$instance = new InterAdminTipo($id_tipo, array_merge($options, array('fields' => array('model_id_tipo', 'class_tipo'))));
+			$instance = new $options['default_class']($id_tipo, array_merge($options, array('fields' => array('model_id_tipo', 'class_tipo'))));
 			if ($instance->class_tipo) $class_name = $instance->class_tipo;
 			else $class_name = jp7_fields_values($instance->db_prefix . '_tipos', 'id_tipo', $instance->model_id_tipo, 'class_tipo');
 			if (!class_exists($class_name)) {
@@ -142,6 +148,7 @@ class InterAdminTipo {
 	public function getParent($options = array()) {
 		if ($this->_parent) return $this->_parent;
 		if ($this->parent_id_tipo || $this->getFieldsValues('parent_id_tipo')) {
+			$options['default_class'] = get_class($this);
 			return $this->_parent = InterAdminTipo::getInstance($this->parent_id_tipo, $options);
 		}
 	}
@@ -185,7 +192,8 @@ class InterAdminTipo {
 		while ($row = $rs->FetchNextObj()) {
 			$interAdminTipo = InterAdminTipo::getInstance($row->id_tipo, array(
 				'db_prefix' => $this->db_prefix,
-				'class' => $options['class']
+				'class' => $options['class'],
+				'default_class' => get_class($this)
 			));
 			$interAdminTipo->setParent($this);
 			$this->putOrmData($interAdminTipo, $row, $options);
@@ -261,7 +269,8 @@ class InterAdminTipo {
 			$interAdmin = InterAdmin::getInstance($row->id, array(
 				'db_prefix' => $this->db_prefix,
 				'table' => $this->tabela,
-				'class' => $class_name
+				'class' => $class_name,
+				'default_class' => constant(get_class($this) . '::DEFAULT_CLASS')
 			));
 			$interAdmin->setTipo($this);
 			$class_name_cached = get_class($interAdmin);
@@ -322,10 +331,9 @@ class InterAdminTipo {
 	 * @param string $id_string Search value.
 	 * @return InterAdmin First InterAdmin object found.
 	 */
-	public function getInterAdminById($id_string) {
-		return $this->getFirstInterAdmin(array(
-			'where' => array("id_string = '" . $id_string . "'")
-		));
+	public function getInterAdminById($id_string, $options = array()) {
+		$options['where'] = array("id_string = '" . $id_string . "'");
+		return $this->getFirstInterAdmin($options);
 	}
 	/**
 	 * Returns the model identified by model_id_tipo, or the object itself if it has no model.
@@ -434,6 +442,10 @@ class InterAdminTipo {
 	 * @return mixed The object created by the key or the value itself.
 	 */
 	public function getByForeignKey(&$value, $field, $campos = ''){
+		
+		$interAdminClass = constant(get_class($this) . '::DEFAULT_CLASS');
+		$interAdminTipoClass = $interAdminClass . 'Tipo';
+		
 		$options = array();
 		if (strpos($field, 'select_') === 0) {
 			$isMulti = (strpos($field, 'select_multi') === 0);
@@ -454,17 +466,17 @@ class InterAdminTipo {
 				if (!$value_arr[0]) $value_arr = array();
 				foreach ($value_arr as $key2 => $value2) {
 					if ($isTipo) {
-						$value_arr[$key2] = InterAdminTipo::getInstance($value2);
+						$value_arr[$key2] = call_user_func(array($interAdminTipoClass, 'getInstance'), $value2);
 					} else {
-						$value_arr[$key2] = InterAdmin::getInstance($value2, $options);
+						$value_arr[$key2] = call_user_func(array($interAdminClass, 'getInstance'), $value2, $options);
 					}
 				}
 				$value = $value_arr;
 			} elseif ($value && is_numeric($value)) {
 				if ($isTipo) {
-					$value = InterAdminTipo::getInstance($value);
+					$value = call_user_func(array($interAdminTipoClass, 'getInstance'), $value);
 				} else {
-					$value = InterAdmin::getInstance($value, $options);
+					$value = call_user_func(array($interAdminClass, 'getInstance'), $value, $options);
 				}
 			}
 		}

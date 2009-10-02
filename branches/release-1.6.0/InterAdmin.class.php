@@ -81,11 +81,14 @@ class InterAdmin {
 	 * @return InterAdmin Returns an InterAdmin or a child class in case it's defined on the 'class' property of its InterAdminTipo.
 	 */
 	public static function getInstance($id, $options = array()) {
+		if (!$options['default_class']) {
+			$options['default_class'] = 'InterAdmin';
+		}
 		if ($options['class']) {
-			$class_name = (class_exists($options['class'])) ? $options['class'] : 'InterAdmin';
+			$class_name = (class_exists($options['class'])) ? $options['class'] : $options['default_class'];
 			$finalInstance = new $class_name($id, $options);
 		} else {
-			$instance = new InterAdmin($id, array_merge($options, array('fields' => array())));
+			$instance = new $options['default_class']($id, array_merge($options, array('fields' => array())));
 			$class_name = $instance->getTipo()->class;
 			if (class_exists($class_name)) {
 				$finalInstance = new $class_name($id, $options);
@@ -284,6 +287,7 @@ class InterAdmin {
 	 * @param array $fields_values Array with the values, the keys are the fields names.
 	 * @param bool $force_magic_quotes_gpc If TRUE the string will be quoted even if 'magic_quotes_gpc' is not active. 
 	 * @return void
+	 * @todo É preciso verificar os casos com tabela customizada
 	 */
 	public function setFieldsValues($fields_values, $force_magic_quotes_gpc = FALSE){
 		global $lang;
