@@ -583,6 +583,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 		?>
 <div class="krumo-root">
 	<ul class="krumo-node krumo-first">
+		<div style="float:right;background:white;line-height:24px;color:black;padding:0px 4px;cursor:pointer" title="Expandir" onclick="$('.krumo-expand', $(this).parent()).each(function(){krumo.toggle(this);})">[]</div>
 		<?php echo Krumo::_dump($data);?>
 		<li class="krumo-footnote">
 			<div class="krumo-version" style="white-space:nowrap;">
@@ -1056,6 +1057,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 	* @static
 	*/
 	private static function _array(&$data, $name) {
+		$count = ($name == 'attributes') ? count($data) - 1 : count($data); 
 ?>
 <li class="krumo-child">
 	
@@ -1066,9 +1068,9 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 		
 			<a class="krumo-name"><?php echo $name;?></a>
 			(<em class="krumo-type">Array, <strong class="krumo-array-length"><?php echo 
-				(count($data)==1)
+				($count == 1)
 					?("1 element")
-					:(count($data)." elements");
+					:($count . " elements");
 				?></strong></em>) 
 			
 				
