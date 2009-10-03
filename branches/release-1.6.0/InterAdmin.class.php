@@ -376,12 +376,16 @@ class InterAdmin {
 		global $lang;
 		global $jp7_app;
 		$arquivos = array();
-
+		
 		if (class_exists($options['class'])) $className = $options['class'];
 		else $className = 'InterAdminArquivo';
-
+		
 		if ($options['fields'] == '*') $options['fields'] = call_user_method('getAllFieldsNames', $className);
-
+		
+		if (is_array($options['where'])) {
+			$options['where'] = ' AND ' . implode(' AND ', $options['where']);
+		}
+		
 		$sql = "SELECT id_arquivo" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . 
 			" FROM " . $this->db_prefix .(($this->getTipo()->getFieldsValues('language')) ? $lang->prefix : '') . '_arquivos' .
 			" WHERE id_tipo = " . intval($this->id_tipo) . " AND id=" . $this->id .
