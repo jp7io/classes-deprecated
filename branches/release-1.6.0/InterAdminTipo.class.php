@@ -237,6 +237,9 @@ class InterAdminTipo {
 				}
 			// Sem join
 			} elseif ($aliases[$campo]) {
+				if (strpos($aliases[$campo], 'file_') === 0) {
+					$fields[] = $aliases[$campo] . '_text';
+				}			
 				$fields[$alias] = $aliases[$campo];
 			}
 		}
@@ -266,7 +269,7 @@ class InterAdminTipo {
 		if (is_array($options['fields'])) {
 			$this->resolveAliases($options['fields']);
 		}
-			
+		
 		foreach($this->getCampos() as $key => $campo) {
 			foreach ($options['where'] as $where_key => $where) {
 				$options['where'][$where_key] = str_replace($campo['nome_id'], $key, $where);
@@ -277,7 +280,9 @@ class InterAdminTipo {
 		$options['fields'] = array_merge(array('id'), (array) $options['fields']);
 		$options['from'] = $this->db_prefix . $table . (($this->getFieldsValues('language')) ? $lang->prefix : '') . " AS main";
 		$options['where'][] = "main.id_tipo = " . $this->id_tipo;
-		if ($this->_parent && $this->_parent instanceof InterAdmin) $options['where'][] =  "main.parent_id = " . $this->_parent->id;	
+		if ($this->_parent && $this->_parent instanceof InterAdmin) {
+			$options['where'][] =  "main.parent_id = " . $this->_parent->id;
+		}
 		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . $this->interadminsOrderby;
 		
 		$rs = $this->executeQuery($options);
@@ -440,21 +445,21 @@ class InterAdminTipo {
 	 * @param array $options Default array of options. Available keys: fields, fields_alias.
 	 * @return void
 	 */
-	public function putOrmData(&$object, &$row, $options){
+	public function putOrmData(&$object, &$row, $options) {
 		$campos = $this->getCampos();
 		$joinCount = 0;
-		foreach((array)$options['fields'] as $join => $field){
+		foreach ((array)$options['fields'] as $join => $field) {
 			if (is_array($field)) {
 				$field = $join;
 				$joinCount++;
 			}
 			$alias = ($options['fields_alias']) ? $this->getCamposAlias($field) : $field;
-			
 			if (!isset($object->$alias)) {
 				$object->$alias = $row->$alias = $this->getByForeignKey($row->$field, $field, $campos[$field]);
 			}
-
-			if ($options['fields_alias']) unset($row->$field);
+			if ($options['fields_alias']) {
+				unset($row->$field);
+			}
 			
 			if (is_object($object->$alias) && is_array($options['fields'][$field])) {
 				foreach($options['fields'][$field] as $joinField) {
@@ -528,7 +533,9 @@ class InterAdminTipo {
 		$campos = $this->getCampos();
 		// Join
 		$joinsCount = 0;
-		if (!is_array($options['from'])) $options['from'] = (array) $options['from'];
+		if (!is_array($options['from'])) {
+			$options['from'] = (array) $options['from'];
+		} 
 		if (is_array($options['fields'])) {
             foreach($options['fields'] as $key => $field){
                 $joinTipo = $campos[$key]['nome'];
@@ -607,10 +614,17 @@ class InterAdminTipo {
 				$aliases[$field] = $campos[$field]['nome_id'];
 			} else {
 				$alias = $campos[$field]['nome'];
+				if (!$alias) {
+					// Alias magico para imagem_1 trazer file_1 e file_1_text.
+					$imagemField = preg_replace('/_text$/', '', $field);
+					if ($campos[$imagemField]) {
+						$alias = $this->getCamposAlias($imagemField) . '_text';
+					}
+				}
 				if (is_object($alias)) {
 					$alias = ($alias->nome) ? $alias->nome : $alias->getFieldsValues('nome');
 				}
-				$alias = ($alias) ? toId($alias) : $field;
+				$alias = ($alias) ? toId($alias, false, '_') : $field;
 				$aliases[$field] = $alias;
 				self::$_campos[$this->id_tipo][$field]['nome_id'] = $alias; // Cache
 			}
