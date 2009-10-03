@@ -77,7 +77,7 @@ class InterAdmin {
 	 * on the database which class to instantiate.
 	 *
 	 * @param int $id This record's 'id'.
-	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias, class.
+	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias, class, default_class.
 	 * @return InterAdmin Returns an InterAdmin or a child class in case it's defined on the 'class' property of its InterAdminTipo.
 	 */
 	public static function getInstance($id, $options = array()) {
@@ -193,23 +193,9 @@ class InterAdmin {
 				}
 			}
 		}
-		
-		// Replace dos Alias
-		foreach($this->_tipo->getCampos() as $key => $campo) {
-			if (is_array($fieldsToLoad)) {
-				if ($fieldsToLoad[$campo['nome_id']]) {
-					$fieldsToLoad[$key] = $fieldsToLoad[$campo['nome_id']];
-					unset($fieldsToLoad[$campo['nome_id']]);
-				} else {
-					$fields_key = array_search($campo['nome_id'], $fieldsToLoad);
-					if ($fields_key !== false) {
-						$fieldsToLoad[$fields_key] = $key;
-					}
-				}
-			}
-		}
-		
+				
 		if ($fieldsToLoad) {
+			$this->_tipo->resolveAliases($fieldsToLoad);
 			$rs = $this->_tipo->executeQuery(array(
 				'fields' => (array) $fieldsToLoad,
 				'from' => $this->db_prefix . $this->table . (($tipoLanguage) ? $lang->prefix : '') . " AS main",
@@ -333,6 +319,7 @@ class InterAdmin {
 	public function getParent($options = array()) {
 		if (!$this->parent_id) $this->getFieldsValues('parent_id');
 		if (!$this->_parent) {
+			$options['default_class'] = constant(get_class($this->_tipo) . '::DEFAULT_CLASS');
 			$this->_parent = InterAdmin::getInstance($this->parent_id, $options);
 			if ($this->_parent->id) $this->getTipo()->setParent($this->_parent);
 		}
@@ -355,7 +342,10 @@ class InterAdmin {
 	 * @return InterAdminTipo
 	 */
 	public function getChildrenTipo($id_tipo, $options = array()) {
-		if (!$options['db_prefix']) $options['db_prefix'] = $this->db_prefix;
+		if (!$options['db_prefix']) {
+			$options['db_prefix'] = $this->db_prefix;
+		}
+		$options['default_class'] = constant(get_class($this->_tipo) . '::DEFAULT_CLASS') . 'Tipo';
 		$childrenTipo = InterAdminTipo::getInstance($id_tipo, $options);
 		$childrenTipo->setParent($this);
 		return $childrenTipo;
@@ -370,7 +360,9 @@ class InterAdmin {
 	public function getChildren($id_tipo, $options = array()) {
 		global $db;
 		$children = array();
-		if ($id_tipo) $children = $this->getChildrenTipo($id_tipo)->getInterAdmins($options); 
+		if ($id_tipo) {
+			$children = $this->getChildrenTipo($id_tipo)->getInterAdmins($options);
+		}
 		return $children;
 	}
 	/**

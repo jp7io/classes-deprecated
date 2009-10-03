@@ -38,7 +38,7 @@ class InterAdminTipo {
 	 * Caches the data retrieved by getCampos().
 	 * @var array
 	 */
-	protected $_campos;
+	protected static $_campos;
 	/**
 	 * Contains the parent InterAdminTipo object, i.e. the record with an 'id_tipo' equal to this record's 'parent_id_tipo'.
 	 * @var InterAdminTipo
@@ -64,7 +64,7 @@ class InterAdminTipo {
 	 * on the database which class to instantiate.
 	 *
 	 * @param int $id_tipo This record's 'id_tipo'.
-	 * @param array $options Default array of options. Available keys: db_prefix, fields, class.
+	 * @param array $options Default array of options. Available keys: db_prefix, fields, class, default_class.
 	 * @return InterAdminTipo Returns an InterAdminTipo or a child class in case it's defined on its 'class_tipo' property.
 	 */
 	public static function getInstance($id_tipo, $options = array()){
@@ -148,7 +148,7 @@ class InterAdminTipo {
 	public function getParent($options = array()) {
 		if ($this->_parent) return $this->_parent;
 		if ($this->parent_id_tipo || $this->getFieldsValues('parent_id_tipo')) {
-			$options['default_class'] = get_class($this);
+			$options['default_class'] = constant(get_class($this) . '::DEFAULT_CLASS') . 'Tipo';
 			return $this->_parent = InterAdminTipo::getInstance($this->parent_id_tipo, $options);
 		}
 	}
@@ -193,7 +193,7 @@ class InterAdminTipo {
 			$interAdminTipo = InterAdminTipo::getInstance($row->id_tipo, array(
 				'db_prefix' => $this->db_prefix,
 				'class' => $options['class'],
-				'default_class' => get_class($this)
+				'default_class' => constant(get_class($this) . '::DEFAULT_CLASS') . 'Tipo'
 			));
 			$interAdminTipo->setParent($this);
 			$this->putOrmData($interAdminTipo, $row, $options);
@@ -209,9 +209,39 @@ class InterAdminTipo {
 	 * @return Array of InterAdminTipo objects.
 	 */
 	public function getChildrenByModel($model_id_tipo, $options = array()) {
-		$options['where'] .= " AND main.model_id_tipo = " . $model_id_tipo;
+		$options['where'][] = "main.model_id_tipo = " . $model_id_tipo;
 		return $this->getChildren($options);
 	}
+	
+	/**
+	 * Resolves Aliases on $options fields.
+	 * 
+	 * @param object $tipo Tipo where the campos and alias are
+	 * @param object $fields Same syntax as $options['fields']
+	 * @return array Revolved $fields.
+	 */
+	public function resolveAliases(&$fields = array(), $tipo = null) {
+		if (is_null($tipo)) {
+			$tipo = $this;
+		}
+		$aliases = array_flip($tipo->getCamposAlias());
+		foreach ($fields as $alias => $campo) {
+			// Com join
+			if (is_array($campo)) {
+				$nome = $aliases[$alias];
+				if ($nome) {
+					$fields[$nome] = $campo;
+					unset($fields[$alias]);
+					$campos = $tipo->getCampos();
+					$this->resolveAliases($fields[$nome], $campos[$nome]['nome']);
+				}
+			// Sem join
+			} elseif ($aliases[$campo]) {
+				$fields[$alias] = $aliases[$campo];
+			}
+		}
+	}
+	
 	/**
 	 * Retrieves the records which have this InterAdminTipo's id_tipo.
 	 * 
@@ -233,18 +263,11 @@ class InterAdminTipo {
 			}
 		}
 		
+		if (is_array($options['fields'])) {
+			$this->resolveAliases($options['fields']);
+		}
+			
 		foreach($this->getCampos() as $key => $campo) {
-			if (is_array($options['fields'])) {
-				if ($options['fields'][$campo['nome_id']]) {
-					$options['fields'][$key] = $options['fields'][$campo['nome_id']];
-					unset($options['fields'][$campo['nome_id']]);
-				} else {
-					$fields_key = array_search($campo['nome_id'], $options['fields']);
-					if ($fields_key !== false) {
-						$options['fields'][$fields_key] = $key;
-					}
-				}
-			}
 			foreach ($options['where'] as $where_key => $where) {
 				$options['where'][$where_key] = str_replace($campo['nome_id'], $key, $where);
 			}
@@ -355,7 +378,9 @@ class InterAdminTipo {
 	 * @return array
 	 */
 	public function getCampos() {
-		if ($this->_campos) return $this->_campos;
+		if (self::$_campos[$this->id_tipo]) {
+			return self::$_campos[$this->id_tipo];
+		} 
 		$model = $this->getModel();
 		$campos = $model->getFieldsValues('campos');
 		unset($model->campos);
@@ -379,7 +404,7 @@ class InterAdminTipo {
 				}
 			}
 		}
-		return $this->_campos = $A;
+		return self::$_campos[$this->id_tipo] = $A;
 		//return interadmin_tipos_campos($this->getFieldsValues('campos'));
 	}
 	/**
@@ -442,9 +467,7 @@ class InterAdminTipo {
 	 * @return mixed The object created by the key or the value itself.
 	 */
 	public function getByForeignKey(&$value, $field, $campos = ''){
-		
 		$interAdminClass = constant(get_class($this) . '::DEFAULT_CLASS');
-		$interAdminTipoClass = $interAdminClass . 'Tipo';
 		
 		$options = array();
 		if (strpos($field, 'select_') === 0) {
@@ -460,23 +483,25 @@ class InterAdminTipo {
 			$isTipo = ($campos['xtra'] == 'multi_tipos' || $campos['xtra'] == 'tipos');
 		}
 		
+		$options['default_class'] =  $interAdminClass . (($isTipo) ? 'Tipo' : '');
+		
 		if (isset($isMulti)) {
 			if ($isMulti) {
 				$value_arr = explode(',', $value);
 				if (!$value_arr[0]) $value_arr = array();
 				foreach ($value_arr as $key2 => $value2) {
 					if ($isTipo) {
-						$value_arr[$key2] = call_user_func(array($interAdminTipoClass, 'getInstance'), $value2);
+						$value_arr[$key2] = InterAdminTipo::getInstance($value2, $options);
 					} else {
-						$value_arr[$key2] = call_user_func(array($interAdminClass, 'getInstance'), $value2, $options);
+						$value_arr[$key2] = InterAdmin::getInstance($value2, $options);
 					}
 				}
 				$value = $value_arr;
 			} elseif ($value && is_numeric($value)) {
 				if ($isTipo) {
-					$value = call_user_func(array($interAdminTipoClass, 'getInstance'), $value);
+					$value = InterAdminTipo::getInstance($value, $options);
 				} else {
-					$value = call_user_func(array($interAdminClass, 'getInstance'), $value, $options);
+					$value = InterAdmin::getInstance($value, $options);
 				}
 			}
 		}
@@ -558,16 +583,33 @@ class InterAdminTipo {
 	/**
 	 * Gets the alias for a given field name.
 	 * 
-	 * @param string $field Field name.
-	 * @return string Resulting alias.
+	 * @param array|string $fields Fields names, defaults to all fields.
+	 * @return array|string Resulting alias(es).
 	 */
-	public function getCamposAlias($field) {
+	public function getCamposAlias($fields = null) {
 		$campos = $this->getCampos();
-		if ($campos[$field]['nome_id']) return $campos[$field]['nome_id'];
-		$alias = $campos[$field]['nome'];
-		if (is_object($alias)) $alias = ($alias->nome) ? $alias->nome : $alias->getFieldsValues('nome');
-		$alias = ($alias) ? toId($alias) : $field;
-		return $alias;
+		if (is_null($fields)) {
+			$fields = array_keys($campos);
+		}
+		$aliases = array();
+		foreach ((array) $fields as $field) {
+			if ($campos[$field]['nome_id']) {
+				$aliases[$field] = $campos[$field]['nome_id'];
+			} else {
+				$alias = $campos[$field]['nome'];
+				if (is_object($alias)) {
+					$alias = ($alias->nome) ? $alias->nome : $alias->getFieldsValues('nome');
+				}
+				$alias = ($alias) ? toId($alias) : $field;
+				$aliases[$field] = $alias;
+				self::$_campos[$this->id_tipo][$field]['nome_id'] = $alias; // Cache
+			}
+		}
+		if (is_array($fields)) {
+			return $aliases;
+		} else {
+			return reset($aliases);
+		}
 	}
 	/**
 	 * Returns this object´s nome and all the fields marked as 'combo', if the field 
