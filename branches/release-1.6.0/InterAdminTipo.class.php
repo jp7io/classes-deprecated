@@ -348,13 +348,23 @@ class InterAdminTipo {
 		$interAdmin = $this->getInterAdmins($options);
 		return $interAdmin[0];
 	}
-	/*
+	/**
+	 * Retrieves the unique record which have this id
+	 * 
+	 * @param int $id Search value.
+	 * @return InterAdmin First InterAdmin object found.
+	 */
+	public function getInterAdminById($id, $options = array()) {
+		$options['where'] = array("id = " . intval($id));
+		return $this->getFirstInterAdmin($options);
+	}
+	/**
 	 * Retrieves the first record which have this id_string
 	 * 
 	 * @param string $id_string Search value.
 	 * @return InterAdmin First InterAdmin object found.
 	 */
-	public function getInterAdminById($id_string, $options = array()) {
+	public function getInterAdminByIdString($id_string, $options = array()) {
 		$options['where'] = array("id_string = '" . $id_string . "'");
 		return $this->getFirstInterAdmin($options);
 	}
