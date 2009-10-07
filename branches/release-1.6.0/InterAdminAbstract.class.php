@@ -265,7 +265,8 @@ abstract class InterAdminAbstract {
 				}
 			// Com função
 			} elseif (strpos($campo, '(') !== false) {
-				$fields[$join] = preg_replace('/([\(,][ ]*)/', '\1' . $table . '.', $campo);
+				$fields[$join] = preg_replace('/([\(,][ ]*)/', '\1' . $table . '.', $campo) .
+				 	' AS `' . $table . '.' . trim(strtolower(preg_replace('/[\(\),]/', '_', $campo)), '_') . '`';
 			// Sem join
 			} else {
 				$nome = ($aliases[$campo]) ? $aliases[$campo] : $campo;
@@ -319,7 +320,7 @@ abstract class InterAdminAbstract {
 				$value = $this->_getByForeignKey($value, $field, $campos[$field]);
 				$attributes[$alias] = $value;
 			} else {
-				$join = ($fields[$table]) ? $fields[$table] : $join;
+				$join = ($fields[$table]) ? $fields[$table] : $table;
 				$joinTipo = $campos[$join]['nome'];
 				$joinCampos = $joinTipo->getCampos();
 				$alias = ($aliases && $joinTipo->getCamposAlias($field)) ? $joinTipo->getCamposAlias($field) : $field;
