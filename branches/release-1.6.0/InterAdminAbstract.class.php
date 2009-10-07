@@ -84,7 +84,7 @@ abstract class InterAdminAbstract {
 		}
 		// @todo return only the fields requested on $fields
 		if (is_array($fields)) {
-			return $this->attributes;
+			return (object) $this->attributes;
 		} else {
 			return $this->attributes[$fields];
 		}
@@ -263,6 +263,9 @@ abstract class InterAdminAbstract {
 					$fields = array_merge($fields, $joinOptions['fields']);
 					unset($fields[$join]);
 				}
+			// Com função
+			} elseif (strpos($campo, '(') !== false) {
+				$fields[$join] = preg_replace('/([\(,][ ]*)/', '\1' . $table . '.', $campo);
 			// Sem join
 			} else {
 				$nome = ($aliases[$campo]) ? $aliases[$campo] : $campo;
