@@ -314,9 +314,6 @@ abstract class InterAdminAbstract {
 			list($table, $field) = explode('.', $key);
 			if ($table == 'main') {
 				$alias = ($aliases[$field]) ? $aliases[$field] : $field;
-				if ($aliases && $field == 'select_2') {
-					$GLOBALS['bla'] = true;	
-				}
 				$value = $this->_getByForeignKey($value, $field, $campos[$field]);
 				$attributes[$alias] = $value;
 			} else {
@@ -325,7 +322,9 @@ abstract class InterAdminAbstract {
 				$joinCampos = $joinTipo->getCampos();
 				$alias = ($aliases && $joinTipo->getCamposAlias($field)) ? $joinTipo->getCamposAlias($field) : $field;
 				$value = $this->_getByForeignKey($value, $field, $joinCampos[$field]);
-				$attributes[$table]->$alias = $value;
+				if (is_object($attributes[$table])) {
+					$attributes[$table]->$alias = $value;	
+				}
 			}
 		}
 		return $attributes;
