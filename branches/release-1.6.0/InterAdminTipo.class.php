@@ -73,8 +73,12 @@ class InterAdminTipo extends InterAdminAbstract {
 			$class_name = (class_exists($options['class'])) ? $options['class'] : $options['default_class'];
 		} else {
 			$instance = new $options['default_class']($id_tipo, array_merge($options, array('fields' => array('model_id_tipo', 'class_tipo'))));
-			if ($instance->class_tipo) $class_name = $instance->class_tipo;
-			else $class_name = jp7_fields_values($instance->db_prefix . '_tipos', 'id_tipo', $instance->model_id_tipo, 'class_tipo');
+			if ($instance->class_tipo) {
+				 $class_name = $instance->class_tipo;
+			} else {
+				// @todo Store class_tipo on metadatas do save queries
+				$class_name = jp7_fields_values($instance->db_prefix . '_tipos', 'id_tipo', $instance->model_id_tipo, 'class_tipo');
+			}
 			if (!class_exists($class_name)) {
 				if ($options['fields']) $instance->getFieldsValues($options['fields']);
 				return $instance;
@@ -82,6 +86,16 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		return new $class_name($id_tipo, $options);
 	}
+	
+	
+	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false, $reloadValues = false) {
+		if (!isset($this->attributes['model_id_tipo'])) {
+			$eagerload = array('nome', 'campos', 'model_id_tipo', 'tabela', 'class', 'class_tipo', 'template');
+			$fields = array_unique(array_merge((array) $fields, $eagerload));
+		}
+		return parent::getFieldsValues($fields, $forceAsString, $fieldsAlias, $reloadValues); 
+	}
+	
 	/**
 	 * String value of this record´s $id_tipo.
 	 *

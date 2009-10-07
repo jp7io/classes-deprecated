@@ -61,11 +61,7 @@ abstract class InterAdminAbstract {
 		if ($reloadValues || $forceAsString) {
 			$fieldsToLoad = $fields;
 		} else {
-			foreach ((array) $fields as $key => $field) {
-				if (is_array($field) || !isset($this->$field)) {
-					$fieldsToLoad[$key] = $field;		
-				}
-			}
+			$fieldsToLoad = array_diff((array) $fields, array_keys($this->attributes));
 		}
 		// Retrieving data
 		if ($fieldsToLoad) {
