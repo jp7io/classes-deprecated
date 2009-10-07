@@ -383,18 +383,21 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function getStringValue() {
 		$campos = $this->getTipo()->getCampos();
-		//jp7_print_r($campos);
-		foreach ($campos as $key => $row) {
-			if (($row['combo'] || $key == 'varchar_key' || $key == 'select_key') && $key !== 'char_key') {
-				$return[] = $row['tipo'];
+		$camposCombo = array();
+		foreach ($campos as $key => $campo) {
+			if (($campo['combo'] || $key == 'varchar_key' || $key == 'select_key') && $key !== 'char_key') {
+				$camposCombo[] = $campo['tipo'];
 			}
 		}
-		$return_str = (array) $this->getFieldsValues($return);
-		foreach ($return_str as $key=>$value) {
-			if (strpos($key, 'select_') === 0 && $value) $value = $value->getStringValue();
-			$return_final[] = $value;
+		$valoresCombo = $this->getFieldsValues($camposCombo);
+		$stringValue = array();
+		foreach ($valoresCombo as $key => $value) {
+			if (is_object($value)) {
+				 $value = $value->getStringValue();
+			}
+			$stringValue[] = $value;
 		}
-		return implode(' - ', (array) $return_final);
+		return implode(' - ', $stringValue);
 	}
 	public function getAttributesNames() {
 		return array_keys($this->getAttributesCampos());

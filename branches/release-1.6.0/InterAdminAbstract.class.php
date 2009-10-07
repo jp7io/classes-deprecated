@@ -78,9 +78,9 @@ abstract class InterAdminAbstract {
 				$this->attributes = array_merge($this->attributes, $attributes[0]); 
 			}
 		}
-		// @todo return only the fields requested on $fields
 		if (is_array($fields)) {
-			return (object) $this->attributes;
+			// returns only the fields requested on $fields
+			return (object) array_intersect_key($this->attributes, array_flip($fields));
 		} else {
 			return $this->attributes[$fields];
 		}
