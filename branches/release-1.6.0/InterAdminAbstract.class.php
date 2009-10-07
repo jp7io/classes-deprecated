@@ -202,10 +202,9 @@ abstract class InterAdminAbstract {
 		
 		$reserved = array('WHERE', 'AND', 'ORDER', 'BY', 'GROUP', 'OR', 'IS', 'NULL', 'BETWEEN', 'NOT', 'LIKE', 'DESC', 'ASC');
 		$quoted = '(\'((?<=\\\\)\'|[^\'])*\')';
-		$keyword = '\b[a-zA-Z0-9_.]+\b(?!\()';
+		$keyword = '\b[a-zA-Z0-9_.]+\b(?![ ]?\()'; // won't match CONCAT() or IN (1,2)
 		
 		$offset = 0;
-		
 		while($retorno = preg_match('/(' . $quoted . '|' . $keyword . ')/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
 			list($termo, $pos) = $matches[1];
 			if (!is_numeric($termo) && !in_array($termo, $reserved) && $termo[0] != "'") {
@@ -246,7 +245,7 @@ abstract class InterAdminAbstract {
 		foreach ($fields as $join => $campo) {
 			// Com join
 			if (is_array($campo)) {
-				$nome = $aliases[$join];
+				$nome = ($aliases[$join]) ? $aliases[$join] : $join;
 				if ($nome) {
 					$fields[] = $table . '.' . $nome . ' AS `' . $table . '.' . $nome . '`';
 					// Join e Recursividade
