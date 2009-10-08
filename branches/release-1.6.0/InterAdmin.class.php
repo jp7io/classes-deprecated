@@ -381,8 +381,17 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		return implode(' - ', $stringValue);
 	}
+	/**
+	 * Saves this record and updates date_modify.
+	 * 
+	 * @return void
+	 */
+	public function save() {
+		$this->date_modify = date('c');
+		return parent::save();
+	}
 	public function getAttributesNames() {
-		return array_keys($this->getAttributesCampos());
+		return $this->getTipo()->getCamposNames();
 	}
 	public function getAttributesCampos() {
 		return $this->getTipo()->getCampos();

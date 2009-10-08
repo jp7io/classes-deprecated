@@ -544,6 +544,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$mostrar = $this->getCamposAlias('char_key');
 		$record->$mostrar = 'S';
 		$record->date_publish = date('c');
+		$record->date_insert = date('c');
 		return $record;
 	}
 	

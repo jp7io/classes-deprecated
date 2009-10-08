@@ -118,17 +118,24 @@ abstract class InterAdminAbstract {
 	 * Saves this record.
 	 * 
 	 * @return void
+	 * @todo ver como fazer o log
 	 */
 	public function save() {
 		$pk = $this->_primary_key;
-		
-		krumo($simulacaoPais);
-		die();
-		
+		$valuesToSave = array();
+		$aliases = array_flip($this->getAttributesAliases());
+		foreach ($this->attributes as $key => $value) {
+			$key = ($aliases[$key]) ? $aliases[$key] : $key;
+			if (is_object($value)) {
+				$valuesToSave[$key] = (string) $value;
+			} else {
+				$valuesToSave[$key] = $value;
+			}
+		}
 		if ($this->$pk) {
-			jp7_db_insert($this->getTableName(), $this->_primary_key, $this->$pk, $fields_values, true, $force_magic_quotes_gpc);
+			jp7_db_insert($this->getTableName(), $this->_primary_key, $this->$pk, $valuesToSave);
 		} else {
-			$this->$pk = jp7_db_insert($this->getTableName(), $this->_primary_key, 0, $fields_values, true, $force_magic_quotes_gpc);
+			$this->$pk = jp7_db_insert($this->getTableName(), $this->_primary_key, 0, $valuesToSave);
 		}
 	}
 	/**
