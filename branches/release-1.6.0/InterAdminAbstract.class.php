@@ -13,6 +13,7 @@ abstract class InterAdminAbstract {
 	 * @var bool
 	 */
 	protected $_updated = false;
+	protected $_deleted = false;
 	/**
 	 * Magic get acessor.
 	 * 
@@ -59,7 +60,10 @@ abstract class InterAdminAbstract {
 	 * @return mixed If $fields is an array an object will be returned, otherwise it will return the value retrieved.
 	 * @todo (FIXME - Multiple languages) When there is no id_tipo yet, the function is unable to decide which language table it should use.
 	 */
-	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {   
+	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
+		if ($this->_deleted) {
+			throw new Exception('This record has been deleted.');
+		}
 		if ($fields == '*' || $fields == array('*')) {
 			$fields = $this->getAttributesNames();
 		}
@@ -416,5 +420,21 @@ abstract class InterAdminAbstract {
 		$newobject = new $className();
 		$newobject->attributes = $this->attributes;
 		return $newobject;
+	}
+	
+	/**
+	 * Deletes this row from the table.
+	 * 
+	 * @return 
+	 */
+	public function delete() {
+		global $db;
+		$pk = $this->_primary_key;
+		if ($this->$pk) {
+			$sql = "DELETE FROM " . $this->getTableName() . 
+				" WHERE " . $this->_primary_key . " = " . $this->$pk;
+		}
+		$this->attributes = array();
+		$this->_deleted = true;
 	}
 }

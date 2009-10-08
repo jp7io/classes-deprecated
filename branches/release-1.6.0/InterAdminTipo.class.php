@@ -534,7 +534,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		return self::$_metadata[$this->id_tipo][$varname];
 	}
 	/**
-	 * Creates a record with id_tipo, char_key and date_publish filled.
+	 * Creates a record with id_tipo, char_key, date_insert and date_publish filled.
 	 * 
 	 * @return InterAdmin
 	 */
