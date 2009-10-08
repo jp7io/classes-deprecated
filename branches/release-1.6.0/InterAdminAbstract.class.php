@@ -7,6 +7,13 @@ abstract class InterAdminAbstract {
 	 */
 	public $attributes = array();
 	/**
+	 * Used to know if the values were updated through setFieldsValues(). 
+	 * Hack for compatibility with legacy sites.
+	 * 
+	 * @var bool
+	 */
+	protected $_updated = false;
+	/**
 	 * Magic get acessor.
 	 * 
 	 * @param string $attributeName
@@ -52,13 +59,13 @@ abstract class InterAdminAbstract {
 	 * @return mixed If $fields is an array an object will be returned, otherwise it will return the value retrieved.
 	 * @todo (FIXME - Multiple languages) When there is no id_tipo yet, the function is unable to decide which language table it should use.
 	 */
-	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false, $reloadValues = false) {   
+	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {   
 		if ($fields == '*' || $fields == array('*')) {
 			$fields = $this->getAttributesNames();
 		}
 		// cache
 		$fieldsToLoad = array();
-		if ($reloadValues || $forceAsString) {
+		if ($forceAsString || $this->_updated) {
 			$fieldsToLoad = $fields;
 		} else {
 			$fieldsToLoad = array_diff((array) $fields, array_keys($this->attributes));
@@ -80,9 +87,48 @@ abstract class InterAdminAbstract {
 		}
 		if (is_array($fields)) {
 			// returns only the fields requested on $fields
+			foreach ($fields as $key => $value) {
+				if (is_array($value)) {
+					$fields[$key] = $key;
+				}
+			}
 			return (object) array_intersect_key($this->attributes, array_flip($fields));
 		} else {
 			return $this->attributes[$fields];
+		}
+	}
+	/**
+	 * Updates the values into the database table. If this object has no 'id', the data is inserted.
+	 * 
+	 * @param array $fields_values Array with the values, the keys are the fields names.
+	 * @param bool $force_magic_quotes_gpc If TRUE the string will be quoted even if 'magic_quotes_gpc' is not active.
+	 * @return void
+	 * @todo Verificar necessidade de $force_magic_quotes_gpc no jp7_db_insert
+	 */
+	public function setFieldsValues($fields_values, $force_magic_quotes_gpc = false) {
+		$pk = $this->_primary_key;
+		if ($this->$pk) {
+			jp7_db_insert($this->getTableName(), $this->_primary_key, $this->$pk, $fields_values, true, $force_magic_quotes_gpc);
+		} else {
+			$this->$pk = jp7_db_insert($this->getTableName(), $this->_primary_key, 0, $fields_values, true, $force_magic_quotes_gpc);
+		}
+		$this->_updated = true; // FIXME Hack temporário
+	}
+	/**
+	 * Saves this record.
+	 * 
+	 * @return void
+	 */
+	public function save() {
+		$pk = $this->_primary_key;
+		
+		krumo($simulacaoPais);
+		die();
+		
+		if ($this->$pk) {
+			jp7_db_insert($this->getTableName(), $this->_primary_key, $this->$pk, $fields_values, true, $force_magic_quotes_gpc);
+		} else {
+			$this->$pk = jp7_db_insert($this->getTableName(), $this->_primary_key, 0, $fields_values, true, $force_magic_quotes_gpc);
 		}
 	}
 	/**
@@ -134,7 +180,7 @@ abstract class InterAdminAbstract {
 	/**
 	 * Executes a SQL Query based on the values passed by $options.
 	 * 
-	 * @param array $options Default array of options. Available keys: count, fields, fields_alias, from, where, order, group, limit.
+	 * @param array $options Default array of options. Available keys: fields, fields_alias, from, where, order, group, limit.
 	 * @return array Array of attributes.
 	 */
 	protected function _executeQuery($options, $campos = array(), $aliases = array()) {
@@ -163,11 +209,7 @@ abstract class InterAdminAbstract {
 		$this->_resolveFieldsAlias($options, $campos, $aliases);
 		// Resolve Alias and Joins for 'where', 'group' and 'order';
 		$clauses = $this->_resolveSqlClausesAlias($options, $campos, $aliases);
-		// Count @todo Ver se funciona
-		if ($options['count']) {
-		    $options['fields'] = (array) $options['count'];
-		}
-		
+				
 		// Sql
 		$sql = "SELECT " . implode(',', $options['fields']) .
 			" FROM " . implode(' LEFT JOIN ', $options['from']) .
@@ -196,7 +238,10 @@ abstract class InterAdminAbstract {
 			(($options['group']) ? " GROUP BY " . $options['group'] : '') .
 			(($options['order']) ? " ORDER BY " . $options['order'] : '');
 		
-		$reserved = array('WHERE', 'AND', 'ORDER', 'BY', 'GROUP', 'OR', 'IS', 'NULL', 'BETWEEN', 'NOT', 'LIKE', 'DESC', 'ASC');
+		$reserved = array(
+			'WHERE', 'AND', 'ORDER', 'REGEXP', 'BY', 'GROUP', 'OR', 
+			'IS', 'NULL', 'BETWEEN', 'NOT', 'LIKE', 'DESC', 'ASC'
+		);
 		$quoted = '(\'((?<=\\\\)\'|[^\'])*\')';
 		$keyword = '\b[a-zA-Z0-9_.]+\b(?![ ]?\()'; // won't match CONCAT() or IN (1,2)
 		
@@ -332,8 +377,37 @@ abstract class InterAdminAbstract {
 		}
 		return constant(get_class($obj) . '::DEFAULT_CLASS');
 	}
+	
 	abstract function getAttributesCampos();
 	abstract function getAttributesNames();
 	abstract function getAttributesAliases();
 	abstract function getTableName();
+	
+	/**
+	 * Reloads all the attributes.
+	 * 
+	 * @todo Not implemented yet. Won't work with recursive objects and alias.
+	 * @return void
+	 */
+	public function reload($fields = null) {
+		if (is_null($fields)) {
+			$fields = array();
+			foreach ($this->attributes as $key => $attribute) {
+				$fields[] = $key;
+			}
+		}
+		$this->attributes = array();
+		$this->getFieldsValues($fields);
+	}
+	/**
+	 * Creates a object of the given Class name with the same attributes.
+	 * 
+	 * @param object $className
+	 * @return InterAdminAbstract An instance of the given Class name.
+	 */
+	public function becomes($className) {
+		$newobject = new $className();
+		$newobject->attributes = $this->attributes;
+		return $newobject;
+	}
 }

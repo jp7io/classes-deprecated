@@ -242,30 +242,15 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $records;
 	}
 	/**
-	 * Returns the number of InterAdmins. It uses a SQL query with COUNT(id).
+	 * Returns the number of InterAdmins using COUNT(id).
 	 *
 	 * @param array $options Default array of options. Available keys: where.
 	 * @return int Count of InterAdmins found.
 	 */
 	public function getInterAdminsCount($options = array()) {
-		$options['count'] = "COUNT(id) AS count";
-		$options['from'] = $this->getInterAdminsTableName() . " AS main";
-		
-		if (!is_array($options['where'])) {
-			if ($options['where']) {
-				$options['where'] = jp7_explode(' AND ', $options['where']);
-			} else {
-				$options['where'] = array();
-			}
-		}
-		
-		$options['where'][] = "id_tipo = " . $this->id_tipo;
-		if ($this->_parent && $this->_parent instanceof InterAdmin) {
-			$options['where'][] = "parent_id = " . $this->_parent->id;
-		}
-		$rs = $this->executeQuery($options);
-		if ($row = $rs->FetchNextObj()) return $row->count;
-		else return 0;
+		$options['fields'] = array('COUNT(id)');
+		$retorno = $this->getFirstInterAdmin($options);
+		return intval($retorno->count_id);
 	}
 	/**
 	 * Retrieves the first records which have this InterAdminTipo's id_tipo.
@@ -548,4 +533,18 @@ class InterAdminTipo extends InterAdminAbstract {
 	protected function _getMetadata($varname) {
 		return self::$_metadata[$this->id_tipo][$varname];
 	}
+	/**
+	 * Creates a record with id_tipo, char_key and date_publish filled.
+	 * 
+	 * @return InterAdmin
+	 */
+	public function createInterAdmin() {
+		$options = array('default_class' => $this->_getDefaultClass());
+		$record = InterAdmin::getInstance(0, $options, $this);
+		$mostrar = $this->getCamposAlias('char_key');
+		$record->$mostrar = 'S';
+		$record->date_publish = date('c');
+		return $record;
+	}
+	
 }

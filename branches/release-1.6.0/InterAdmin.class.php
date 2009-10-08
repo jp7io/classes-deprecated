@@ -120,24 +120,6 @@ class InterAdmin extends InterAdminAbstract {
 		return $this->getFieldsValues($fields, false, true);
 	}
 	/**
-	 * Updates the values into the database table. If this object has no 'id', the data is inserted.
-	 * 
-	 * @param array $fields_values Array with the values, the keys are the fields names.
-	 * @param bool $force_magic_quotes_gpc If TRUE the string will be quoted even if 'magic_quotes_gpc' is not active. 
-	 * @return void
-	 * @todo É preciso verificar os casos com tabela customizada
-	 */
-	public function setFieldsValues($fields_values, $force_magic_quotes_gpc = FALSE){
-		global $lang;
-		$tipoLanguage = $this->getTipo()->getFieldsValues('language');
-		if ($this->id) {
-			jp7_db_insert($this->db_prefix . $this->table . (($tipoLanguage) ? $lang->prefix : ''), 'id', $this->id, $fields_values, TRUE, $force_magic_quotes_gpc);
-		} else {
-			$this->id = jp7_db_insert($this->db_prefix . $this->table . (($tipoLanguage) ? $lang->prefix : ''), 'id', 0, $fields_values, TRUE, $force_magic_quotes_gpc);
-		}
-		$this->_updated = true;
-	}
-	/**
 	 * Gets the InterAdminTipo object for this record, which is then cached on the $_tipo property.
 	 * 
 	 * @param array $options Default array of options. Available keys: class.
