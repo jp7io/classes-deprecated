@@ -231,18 +231,22 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		
 		$sql = "SELECT id_arquivo" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . 
-			" FROM " . $this->db_prefix .(($this->getTipo()->getFieldsValues('language')) ? $lang->prefix : '') . '_arquivos' .
+			" FROM " . $this->getTipo()->getArquivosTableName() . '_arquivos' .
 			" WHERE id_tipo = " . intval($this->id_tipo) . " AND id=" . $this->id .
 			(($options['where']) ? $options['where'] : '') .
 			" ORDER BY " . (($options['order']) ? $options['order'] . ',' : '') . ' ordem' .
 			(($options['limit']) ? " LIMIT " . $options['limit'] : '');
-		if ($jp7_app) $rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
-		else $rs = interadmin_query($sql);
+			
+		if ($jp7_app) {
+			$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
+		} else {
+			$rs = interadmin_query($sql);
+		}
 		while ($row = $rs->FetchNextObj()) {
-			$arquivo = new $className($row->id_arquivo, array('db_prefix' => $this->db_prefix));
+			$arquivo = new $className($row->id_arquivo, array('db_prefix' => $this->getTipo()->db_prefix));
 			$arquivo->setTipo($this->getTipo());
 			$arquivo->setParent($this);
-			foreach((array) $options['fields'] as $field) {
+			foreach ((array) $options['fields'] as $field) {
 				$arquivo->$field = $row->$field;
 			}
 			$arquivos[] = $arquivo;

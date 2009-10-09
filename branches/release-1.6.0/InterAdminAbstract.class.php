@@ -250,8 +250,8 @@ abstract class InterAdminAbstract {
 			(($options['order']) ? " ORDER BY " . $options['order'] : '');
 		
 		$reserved = array(
-			'WHERE', 'AND', 'ORDER', 'REGEXP', 'BY', 'GROUP', 'OR', 
-			'IS', 'NULL', 'BETWEEN', 'NOT', 'LIKE', 'DESC', 'ASC'
+			'WHERE', 'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
+			'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP'
 		);
 		$quoted = '(\'((?<=\\\\)\'|[^\'])*\')';
 		$keyword = '\b[a-zA-Z0-9_.]+\b(?![ ]?\()'; // won't match CONCAT() or IN (1,2)

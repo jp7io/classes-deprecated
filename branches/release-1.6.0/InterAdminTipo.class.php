@@ -42,7 +42,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @var InterAdminTipo
 	 */
 	protected $_parent;
-				
+	
 	/**
 	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
 	 * 
@@ -65,7 +65,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $options Default array of options. Available keys: db_prefix, fields, class, default_class.
 	 * @return InterAdminTipo Returns an InterAdminTipo or a child class in case it's defined on its 'class_tipo' property.
 	 */
-	public static function getInstance($id_tipo, $options = array()){
+	public static function getInstance($id_tipo, $options = array()) {
 		if (!$options['default_class']) {
 			$options['default_class'] = 'InterAdminTipo';
 		}
@@ -77,31 +77,32 @@ class InterAdminTipo extends InterAdminAbstract {
 				 $class_name = $instance->class_tipo;
 			} else {
 				// @todo Store class_tipo on metadatas do save queries
-				$class_name = jp7_fields_values($instance->db_prefix . '_tipos', 'id_tipo', $instance->model_id_tipo, 'class_tipo');
+				if ($instance->model_id_tipo) {
+					$class_name = jp7_fields_values($instance->db_prefix . '_tipos', 'id_tipo', $instance->model_id_tipo, 'class_tipo');
+				}
 			}
 			if (!class_exists($class_name)) {
-				if ($options['fields']) $instance->getFieldsValues($options['fields']);
+				if ($options['fields']) {
+					$instance->getFieldsValues($options['fields']);
+				}
 				return $instance;
 			}
 		}
 		return new $class_name($id_tipo, $options);
 	}
-	
-	
-	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false, $reloadValues = false) {
+	public function getFieldsValues($fields) {
 		if (!isset($this->attributes['model_id_tipo'])) {
 			$eagerload = array('nome', 'campos', 'model_id_tipo', 'tabela', 'class', 'class_tipo', 'template');
 			$neededFields = array_unique(array_merge((array) $fields, $eagerload));
-			$values = parent::getFieldsValues($neededFields, $forceAsString, $fieldsAlias, $reloadValues);
+			$values = parent::getFieldsValues($neededFields);
 			if (is_array($fields)) {
 				return $values;
 			} else {
 				return $values->$fields;
 			}
 		}
-		return parent::getFieldsValues($fields, $forceAsString, $fieldsAlias, $reloadValues);
+		return parent::getFieldsValues($fields);
 	}
-	
 	/**
 	 * String value of this record´s $id_tipo.
 	 *
@@ -324,7 +325,9 @@ class InterAdminTipo extends InterAdminAbstract {
 					}
 					if ($isSelect && $A[$parameters[0]]['nome'] != 'all') {
 						$id_tipo = $A[$parameters[0]]['nome'];
-						$A[$parameters[0]]['nome'] = new InterAdminTipo($id_tipo);
+						$A[$parameters[0]]['nome'] = InterAdminTipo::getInstance($id_tipo, array(
+							'default_class' =>	$this->_getDefaultClass() . 'Tipo'
+						));
 					}
 				}
 			}
@@ -439,7 +442,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		if ($seo) {
 			$url = $c_url . join("/", $url_arr);
 		} else {
-			$url = (($jp7_app) ? $c_cliente_url . $c_cliente_url_path : $c_url) . $lang->path_url . join("_", $url_arr);
+			$url = (($jp7_app) ? $c_cliente_url . $c_cliente_url_path : $c_url) . $lang->path_url . implode("_", $url_arr);
 			$pos = strpos($url, '_');
 			if ($pos) $url = substr_replace($url, '/', $pos, 1);
 			$url .= (count($url_arr) > 1) ? '.php' : '/';
@@ -512,13 +515,29 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $interadminsOrderBy;
 	}
 	/**
-	 * Returns the table name for this tipo.
+	 * Returns the table name for the InterAdmins.
 	 * 
 	 * @return string
 	 */
 	public function getInterAdminsTableName() {
 		global $lang;
 		$table = $this->db_prefix .	(($this->tabela) ? '_' . $this->tabela : '');
+		if (!isset($this->language)) {
+			$this->getFieldsValues('language');
+		}
+		if ($this->language) {
+			$table .= $lang->prefix;
+		}
+		return $table;
+	}
+	/**
+	 * Returns the table name for the files.
+	 * 
+	 * @return string
+	 */
+	public function getArquivosTableName() {
+		global $lang;
+		$table = $this->db_prefix;
 		if (!isset($this->language)) {
 			$this->getFieldsValues('language');
 		}
@@ -547,5 +566,4 @@ class InterAdminTipo extends InterAdminAbstract {
 		$record->date_insert = date('c');
 		return $record;
 	}
-	
 }
