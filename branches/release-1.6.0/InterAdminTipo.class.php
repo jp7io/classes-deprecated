@@ -172,17 +172,17 @@ class InterAdminTipo extends InterAdminAbstract {
 	 		$options['order'] = 'ordem, nome';
 		}
 		
-		$attributesArray = $this->_executeQuery($options, $this->getAttributesCampos(), $this->getAttributesAliases());
+		$rs = $this->_executeQuery($options);
 		
 		$tipos = array();
-		foreach ($attributesArray as $attributes) {
-			$tipo = InterAdminTipo::getInstance($attributes['id_tipo'], array(
+		while ($row = $rs->FetchNextObj()) {
+			$tipo = InterAdminTipo::getInstance($row->{'main.id_tipo'}, array(
 				'db_prefix' => $this->db_prefix,
 				'class' => $options['class'],
 				'default_class' => $this->_getDefaultClass() . 'Tipo'
 			));
 			$tipo->setParent($this);
-			$tipo->attributes = array_merge($tipo->attributes, $attributes);
+			$this->_getAttributesFromRow($row, $tipo);
 			$tipos[] = $tipo;
 		}
 		return $tipos;
@@ -225,11 +225,14 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . $this->getInterAdminsOrder();
 		
-		$attributesArray = $this->_executeQuery($options, $this->getCampos(), $this->getCamposAlias());
+		$campos = $this->getCampos();
+		$aliases = $this->getCamposAlias();
+		
+		$rs = $this->_executeQuery($options, $campos, $aliases);
 		
 		$records = array();
-		foreach ($attributesArray as $attributes) {
-			$record = InterAdmin::getInstance($attributes['id'], array(
+		while ($row = $rs->FetchNextObj()) {
+			$record = InterAdmin::getInstance($row->{'main.id'}, array(
 				'class' => $options['class'],
 				'default_class' => $this->_getDefaultClass()
 			), $this);
@@ -237,7 +240,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			if ($this->_parent instanceof InterAdmin) {
 				$record->setParent($this->_parent);
 			}
-			$record->attributes = array_merge($record->attributes, $attributes);
+			$this->_getAttributesFromRow($row, $record, $campos, $aliases);
 			$records[] = $record;
 		}
 		return $records;

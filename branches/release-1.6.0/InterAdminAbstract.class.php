@@ -82,11 +82,11 @@ abstract class InterAdminAbstract {
 				'from' => $this->getTableName() . " AS main",
 				'where' => array($this->_primary_key . " = " . intval($this->{$this->_primary_key}))			
 			);
-			$attributes = $this->_executeQuery($options, $this->getAttributesCampos(), $this->getAttributesAliases());
+			$rs = $this->_executeQuery($options);
 			if ($forceAsString) {
 				//@todo return $this->_getFieldsValuesAsString($sqlRow, $tipoLanguage);
-			} elseif ($attributes[0]) {
-				$this->attributes = array_merge($this->attributes, $attributes[0]); 
+			} elseif ($row = $rs->FetchNextObj()) {
+				$this->_getAttributesFromRow($row, $this); 
 			}
 		}
 		if (is_array($fields)) {
@@ -148,9 +148,10 @@ abstract class InterAdminAbstract {
 	 * @param mixed $value Any value.
 	 * @param string $field The name of the field.
 	 * @param string $campos Value from getCampos().
+	 * @param InterAdminAbstract Object which will receive the attribute.
 	 * @return mixed The object created by the key or the value itself.
 	 */
-	protected function _getByForeignKey(&$value, $field, $campo = ''){
+	protected function _getByForeignKey(&$value, $field, $campo = '', $object) {
 		$interAdminClass = $this->_getDefaultClass();
 		
 		$options = array();
@@ -161,6 +162,14 @@ abstract class InterAdminAbstract {
 		} elseif (strpos($field, 'special_') === 0 && $campo['xtra']) {
 			$isMulti = in_array($campo['xtra'], array('registros_multi', 'tipos_multi'));
 			$isTipo = ($campo['xtra'] == 'multi_tipos' || $campo['xtra'] == 'tipos');
+		} elseif (strpos($field, 'file_') === 0 && strpos($field, '_text') === false && $value) {
+			$class_name = $interAdminClass . 'FieldFile';
+			if (!class_exists($class_name)) {
+				$class_name = 'InterAdminFieldFile';
+			}
+			$file = new $class_name($value);
+			$file->setParent($object);
+			return $file;
 		}
 		
 		$options['default_class'] =  $interAdminClass . (($isTipo) ? 'Tipo' : '');
@@ -192,15 +201,17 @@ abstract class InterAdminAbstract {
 	 * Executes a SQL Query based on the values passed by $options.
 	 * 
 	 * @param array $options Default array of options. Available keys: fields, fields_alias, from, where, order, group, limit.
-	 * @return array Array of attributes.
+	 * @return ADORecordSet
 	 */
-	protected function _executeQuery($options, $campos = array(), $aliases = array()) {
-		$attributes = array();
-		if (!$options['fields']) {
-		    return $attributes;
-		}
+	protected function _executeQuery($options, $campos = null, $aliases = null) {
 		global $jp7_app, $db;
 		// Type casting 
+		if (is_null($campos)) {
+			$campos = $this->getAttributesCampos();
+		}
+		if (is_null($aliases)) {
+			$aliases = $this->getAttributesAliases();
+		}
 		if (!is_array($options['from'])) {
     		$options['from'] = (array) $options['from'];
 		}
@@ -220,7 +231,7 @@ abstract class InterAdminAbstract {
 		$this->_resolveFieldsAlias($options, $campos, $aliases);
 		// Resolve Alias and Joins for 'where', 'group' and 'order';
 		$clauses = $this->_resolveSqlClausesAlias($options, $campos, $aliases);
-				
+		
 		// Sql
 		$sql = "SELECT " . implode(',', $options['fields']) .
 			" FROM " . implode(' LEFT JOIN ', $options['from']) .
@@ -232,11 +243,7 @@ abstract class InterAdminAbstract {
 		} else {
 			$rs = interadmin_query($sql);
 		}
-		while ($row = $rs->FetchNextObj()) {
-			$attributes[] = $this->_getAttributesFromRow($row, $campos, $aliases);
-		}
-		
-		return $attributes;
+		return $rs;
 	}
 	/**
 	 * Resolves the aliases on clause using regex
@@ -288,7 +295,7 @@ abstract class InterAdminAbstract {
 	 * 
 	 * @param array $options Same syntax as $options
 	 * @param array $campos 
-	 * @param array $aliases
+	 * @param array $aliases     'alias' => 'field'
 	 * @param string $table Table alias for the fields.
 	 * @return array Revolved $fields.
 	 */
@@ -322,7 +329,7 @@ abstract class InterAdminAbstract {
 			} else {
 				$nome = ($aliases[$campo]) ? $aliases[$campo] : $campo;
 				if (strpos($nome, 'file_') === 0 && strpos($nome, '_text') === false) {
-					$fields[] = $table . '.' . $nome . '_text  AS `' . $table . '.' . $nome . '_text`';
+					$fields[] = $table . '.' . $nome . '_text  AS `' . $campo . '.text`';
 				}			
 				$fields[$join] = $table . '.' . $nome . ' AS `' . $table . '.' . $nome . '`';
 			}
@@ -354,31 +361,41 @@ abstract class InterAdminAbstract {
 	 * @param array $row Row of a SQL RecordSet.
 	 * @param bool $fieldsAlias
 	 * @param array $attributes If not provided it will populate an empty array.
-	 * @return $attributes
+	 * @return void
 	 */
-	protected function _getAttributesFromRow($row, $campos, $aliases) {
-		if ($aliases) {
-			$fields = $aliases;
-			$aliases = array_flip($aliases);
+	protected function _getAttributesFromRow($row, $object, $campos = null, $aliases = null) {
+		if (is_null($campos)) {
+			$campos = $this->getAttributesCampos();
 		}
+		if (is_null($aliases)) {
+			$aliases = $this->getAttributesAliases();
+		}
+		if ($aliases) {
+			$fields = array_flip($aliases);
+		}
+		
+		$attributes = &$object->attributes;
 		foreach ($row as $key => $value) {
 			list($table, $field) = explode('.', $key);
 			if ($table == 'main') {
 				$alias = ($aliases[$field]) ? $aliases[$field] : $field;
-				$value = $this->_getByForeignKey($value, $field, $campos[$field]);
+				$value = $this->_getByForeignKey($value, $field, $campos[$field], $object);
 				$attributes[$alias] = $value;
 			} else {
+				$joinAlias = '';
 				$join = ($fields[$table]) ? $fields[$table] : $table;
 				$joinTipo = $campos[$join]['nome'];
-				$joinCampos = $joinTipo->getCampos();
-				$alias = ($aliases && $joinTipo->getCamposAlias($field)) ? $joinTipo->getCamposAlias($field) : $field;
-				$value = $this->_getByForeignKey($value, $field, $joinCampos[$field]);
+				if (is_object($joinTipo)) {
+					$joinCampos = $joinTipo->getCampos();
+					$joinAlias = $joinTipo->getCamposAlias($field);
+				}
+				$alias = ($aliases && $joinAlias) ? $joinAlias : $field;
+				$value = $this->_getByForeignKey($value, $field, $joinCampos[$field], $object);
 				if (is_object($attributes[$table])) {
-					$attributes[$table]->$alias = $value;	
+					$attributes[$table]->$alias = $value;
 				}
 			}
 		}
-		return $attributes;
 	}
 	
 	protected function _getDefaultClass() {
