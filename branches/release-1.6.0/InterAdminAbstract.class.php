@@ -80,13 +80,16 @@ abstract class InterAdminAbstract {
 				'fields' => (array) $fieldsToLoad,
 				'fields_alias' => $fieldsAlias,
 				'from' => $this->getTableName() . " AS main",
-				'where' => array($this->_primary_key . " = " . intval($this->{$this->_primary_key}))			
+				'where' => array($this->_primary_key . " = " . intval($this->{$this->_primary_key})),
+				// Internal use
+				'aliases' => $this->getAttributesAliases(),
+				'campos' => $this->getAttributesCampos()		
 			);
 			$rs = $this->_executeQuery($options);
 			if ($forceAsString) {
 				//@todo return $this->_getFieldsValuesAsString($sqlRow, $tipoLanguage);
 			} elseif ($row = $rs->FetchNextObj()) {
-				$this->_getAttributesFromRow($row, $this); 
+				$this->_getAttributesFromRow($row, $this, $options); 
 			}
 		}
 		if (is_array($fields)) {
@@ -200,18 +203,12 @@ abstract class InterAdminAbstract {
 	/**
 	 * Executes a SQL Query based on the values passed by $options.
 	 * 
-	 * @param array $options Default array of options. Available keys: fields, fields_alias, from, where, order, group, limit.
+	 * @param array $options Default array of options. Available keys: fields, fields_alias, from, where, order, group, limit, campos and aliases.
 	 * @return ADORecordSet
 	 */
-	protected function _executeQuery($options, $campos = null, $aliases = null) {
+	protected function _executeQuery($options) {
 		global $jp7_app, $db;
 		// Type casting 
-		if (is_null($campos)) {
-			$campos = $this->getAttributesCampos();
-		}
-		if (is_null($aliases)) {
-			$aliases = $this->getAttributesAliases();
-		}
 		if (!is_array($options['from'])) {
     		$options['from'] = (array) $options['from'];
 		}
@@ -223,14 +220,14 @@ abstract class InterAdminAbstract {
 			$options['fields'] = (array) $options['fields'];
 		}
 		if ($options['fields_alias']) {
-			$aliases = array_flip($aliases);	
+			$options['aliases'] = array_flip($options['aliases']);	
 		} else {
-			$aliases = array();
+			$options['aliases'] = array();
 		}
 		// Resolve Alias and Joins for 'fields' and 'from'
-		$this->_resolveFieldsAlias($options, $campos, $aliases);
+		$this->_resolveFieldsAlias($options);
 		// Resolve Alias and Joins for 'where', 'group' and 'order';
-		$clauses = $this->_resolveSqlClausesAlias($options, $campos, $aliases);
+		$clauses = $this->_resolveSqlClausesAlias($options);
 		
 		// Sql
 		$sql = "SELECT " . implode(',', $options['fields']) .
@@ -251,7 +248,9 @@ abstract class InterAdminAbstract {
 	 * @param string $clause
 	 * @return 
 	 */
-	protected function _resolveSqlClausesAlias(&$options = array(), $campos, $aliases) {
+	protected function _resolveSqlClausesAlias(&$options = array()) {
+		$campos = &$options['campos'];
+		$aliases = &$options['aliases'];
 		$clause = " WHERE " . $options['where'] .
 			(($options['group']) ? " GROUP BY " . $options['group'] : '') .
 			(($options['order']) ? " ORDER BY " . $options['order'] : '');
@@ -299,7 +298,9 @@ abstract class InterAdminAbstract {
 	 * @param string $table Table alias for the fields.
 	 * @return array Revolved $fields.
 	 */
-	protected function _resolveFieldsAlias(&$options = array(), $campos, $aliases, $table = 'main') {
+	protected function _resolveFieldsAlias(&$options = array(), $table = 'main') {
+		$campos = &$options['campos'];
+		$aliases = &$options['aliases'];
 		$fields = $options['fields'];
 		foreach ($fields as $join => $campo) {
 			// Com join
@@ -315,9 +316,11 @@ abstract class InterAdminAbstract {
 					}
 					$joinOptions = array(
 						'fields' => $fields[$join],
-						'fields_alias' => $options['fields_alias']
+						'fields_alias' => $options['fields_alias'],
+						'campos' => $joinTipo->getCampos(),
+						'aliases' => array_flip($joinTipo->getCamposAlias())
 					);
-					$this->_resolveFieldsAlias($joinOptions, $joinTipo->getCampos(), array_flip($joinTipo->getCamposAlias()), $join);
+					$this->_resolveFieldsAlias($joinOptions, $join);
 					$fields = array_merge($fields, $joinOptions['fields']);
 					unset($fields[$join]);
 				}
@@ -363,23 +366,24 @@ abstract class InterAdminAbstract {
 	 * @param array $attributes If not provided it will populate an empty array.
 	 * @return void
 	 */
-	protected function _getAttributesFromRow($row, $object, $campos = null, $aliases = null) {
-		if (is_null($campos)) {
-			$campos = $this->getAttributesCampos();
-		}
-		if (is_null($aliases)) {
-			$aliases = $this->getAttributesAliases();
+	protected function _getAttributesFromRow($row, $object, $options) {
+		$campos = &$options['campos'];
+		$aliases = &$options['aliases'];
+		if (!$options['fields_alias']) {
+			$aliases = array();
 		}
 		if ($aliases) {
 			$fields = array_flip($aliases);
 		}
-		
 		$attributes = &$object->attributes;
 		foreach ($row as $key => $value) {
 			list($table, $field) = explode('.', $key);
 			if ($table == 'main') {
 				$alias = ($aliases[$field]) ? $aliases[$field] : $field;
 				$value = $this->_getByForeignKey($value, $field, $campos[$field], $object);
+				if (is_object($attributes[$alias])) {
+					continue;
+				} 
 				$attributes[$alias] = $value;
 			} else {
 				$joinAlias = '';
@@ -392,6 +396,9 @@ abstract class InterAdminAbstract {
 				$alias = ($aliases && $joinAlias) ? $joinAlias : $field;
 				$value = $this->_getByForeignKey($value, $field, $joinCampos[$field], $object);
 				if (is_object($attributes[$table])) {
+					if (is_object($attributes[$table]->$alias)) {
+						continue;
+					}
 					$attributes[$table]->$alias = $value;
 				}
 			}

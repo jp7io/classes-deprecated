@@ -92,7 +92,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 	public function getFieldsValues($fields) {
 		if (!isset($this->attributes['model_id_tipo'])) {
-			$eagerload = array('nome', 'campos', 'model_id_tipo', 'tabela', 'class', 'class_tipo', 'template');
+			$eagerload = array('nome', 'campos', 'model_id_tipo', 'tabela', 'class', 'class_tipo', 'template', 'children');
 			$neededFields = array_unique(array_merge((array) $fields, $eagerload));
 			$values = parent::getFieldsValues($neededFields);
 			if (is_array($fields)) {
@@ -171,6 +171,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	 	if (!$options['order']) {
 	 		$options['order'] = 'ordem, nome';
 		}
+		// Internal use
+		$options['aliases'] = $this->getAttributesAliases();
+		$options['campos'] = $this->getAttributesCampos();
 		
 		$rs = $this->_executeQuery($options);
 		
@@ -182,7 +185,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				'default_class' => $this->_getDefaultClass() . 'Tipo'
 			));
 			$tipo->setParent($this);
-			$this->_getAttributesFromRow($row, $tipo);
+			$this->_getAttributesFromRow($row, $tipo, $options);
 			$tipos[] = $tipo;
 		}
 		return $tipos;
@@ -224,11 +227,11 @@ class InterAdminTipo extends InterAdminAbstract {
 			$options['where'][] =  "parent_id = " . $this->_parent->id;
 		}
 		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . $this->getInterAdminsOrder();
+		// Internal use
+		$options['aliases'] = $this->getCamposAlias();
+		$options['campos'] = $this->getCampos();
 		
-		$campos = $this->getCampos();
-		$aliases = $this->getCamposAlias();
-		
-		$rs = $this->_executeQuery($options, $campos, $aliases);
+		$rs = $this->_executeQuery($options);
 		
 		$records = array();
 		while ($row = $rs->FetchNextObj()) {
@@ -240,7 +243,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			if ($this->_parent instanceof InterAdmin) {
 				$record->setParent($this->_parent);
 			}
-			$this->_getAttributesFromRow($row, $record, $campos, $aliases);
+			$this->_getAttributesFromRow($row, $record, $options);
 			$records[] = $record;
 		}
 		return $records;
