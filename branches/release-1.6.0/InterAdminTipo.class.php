@@ -374,15 +374,12 @@ class InterAdminTipo extends InterAdminAbstract {
 				$aliases[$field] = $campos[$field]['nome_id'];
 			} else {
 				$alias = $campos[$field]['nome'];
-				if (!$alias) {
-					// Alias magico para imagem_1 trazer file_1 e file_1_text.
-					$imagemField = preg_replace('/_text$/', '', $field);
-					if ($campos[$imagemField]) {
-						$alias = $this->getCamposAlias($imagemField) . '_text';
-					}
-				}
 				if (is_object($alias)) {
-					$alias = ($alias->nome) ? $alias->nome : $alias->getFieldsValues('nome');
+					if ($campos[$field]['label']) {
+					 	$alias = $campos[$field]['label'];
+					} else { 
+						$alias = $alias->getFieldsValues('nome');	
+					}
 				}
 				$alias = ($alias) ? toId($alias, false, '_') : $field;
 				$aliases[$field] = $alias;
