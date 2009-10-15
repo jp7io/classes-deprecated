@@ -99,6 +99,38 @@ class InterAdmin extends InterAdminAbstract {
 		return $finalInstance;
 	}
 	/**
+	 * Magic method calls
+	 * 
+	 * Available magic methods:
+	 * - get{name}(array $options)
+	 * - getFirst{name}(array $options)
+	 * 
+	 * @param string $methodName
+	 * @return mixed
+	 */
+	public function __call($methodName, $args) {
+		if (strpos($methodName, 'get') === 0) {
+			$offset = 3;
+			$options = (array) $args[0];
+			if (strpos($methodName, 'getFirst') === 0) {
+				$offset = 8;
+				$options['limit'] = 1;
+				// @todo pluralize function
+				if ($methodName[strlen($methodName) - 1] != 's') {
+					$methodName .= 's'; 
+				}
+			}
+			$children = $this->getTipo()->getInterAdminsChildren();
+			// @todo tableize function
+			$nome_id = strtolower(preg_replace('/([a-z])([A-Z])/', '\1_\2', substr($methodName, $offset))); 
+			if ($child = $children[$nome_id]) {
+				return $this->getChildren($child['id_tipo'], $options);
+			}
+		}
+		// Default error when method doesn´t exist
+		trigger_error('Call to undefined method ' . get_class($this) . '->' . $methodName . '()', E_USER_ERROR);
+	}
+	/**
 	 * String value of this record´s $id.
 	 * 
 	 * @return string String value of the $id property.

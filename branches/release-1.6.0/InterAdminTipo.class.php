@@ -559,6 +559,23 @@ class InterAdminTipo extends InterAdminAbstract {
 		return self::$_metadata[$this->id_tipo][$varname];
 	}
 	/**
+	 * @return array
+	 */
+	public function getInterAdminsChildren() {
+		if (!$children = $this->_getMetadata('children')) {
+			$children = array();
+			$childrenArr = split("{;}", $this->getFieldsValues('children'));
+			for ($i = 0; $i < count($childrenArr) - 1; $i++) {
+				$child = array_combine(array('id_tipo', 'nome', 'ajuda', 'netos'), split('{,}', $childrenArr[$i]));
+				$nome_id = toId($child['nome'], false, '_');
+				$children[$nome_id] = $child;
+			}
+			$this->_setMetadata('children', $children);
+		}
+		return $children;
+	}
+	
+	/**
 	 * Creates a record with id_tipo, char_key, date_insert and date_publish filled.
 	 * 
 	 * @return InterAdmin

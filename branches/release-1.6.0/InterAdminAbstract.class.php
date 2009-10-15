@@ -251,19 +251,31 @@ abstract class InterAdminAbstract {
 	protected function _resolveSqlClausesAlias(&$options = array()) {
 		$campos = &$options['campos'];
 		$aliases = &$options['aliases'];
-		$clause = " WHERE " . $options['where'] .
-			(($options['group']) ? " GROUP BY " . $options['group'] : '') .
-			(($options['order']) ? " ORDER BY " . $options['order'] : '');
 		
+		$quoted = '(\'((?<=\\\\)\'|[^\'])*\')';
+		$keyword = '\b[a-zA-Z0-9_.]+\b(?![ ]?\()'; // won't match CONCAT() or IN (1,2)
 		$reserved = array(
 			'WHERE', 'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
 			'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP'
 		);
-		$quoted = '(\'((?<=\\\\)\'|[^\'])*\')';
-		$keyword = '\b[a-zA-Z0-9_.]+\b(?![ ]?\()'; // won't match CONCAT() or IN (1,2)
+		
+		// Group by para wheres com children
+		if (strpos($options['where'], 'children_') !== false) { // Performance
+			preg_match_all('/(' . $quoted . '|children_[a-zA-Z0-9_.]+)/', $options['where'], $matches);
+			foreach ($matches[1] as $match) {
+				if ($match[0] != "'") { // Filter
+					$options['group'] .= (($options['group']) ? ',' : '') . 'main.id';
+					break;
+				}
+			}
+		}
+		
+		$clause = " WHERE " . $options['where'] .
+			(($options['group']) ? " GROUP BY " . $options['group'] : '') .
+			(($options['order']) ? " ORDER BY " . $options['order'] : '');
 		
 		$offset = 0;
-		while($retorno = preg_match('/(' . $quoted . '|' . $keyword . ')/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
+		while(preg_match('/(' . $quoted . '|' . $keyword . ')/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
 			list($termo, $pos) = $matches[1];
 			if (!is_numeric($termo) && !in_array($termo, $reserved) && $termo[0] != "'") {
 				$len = strlen($termo);
@@ -272,12 +284,29 @@ abstract class InterAdminAbstract {
 					list($table, $termo) = explode('.', $termo);
 				}
 				if ($table != 'main') {
-					$joinNome = ($aliases[$table]) ? $aliases[$table] : $table;
-					// Permite utilizar relacionamentos no where sem ter usado o campo no fields
-					if (!in_array($table, (array) $options['from_alias'])) {
-						$this->_addJoinAlias($options, $table, $joinNome, $campos);
+					// Joins com children
+					if (strpos($table, 'children_') === 0) {
+						$joinNome = substr($table, 9);
+						$childrenArr = $this->getInterAdminsChildren();
+						if (!$childrenArr[$joinNome]) {
+							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.');
+						}
+						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo']);
+						if (!in_array($table, (array) $options['from_alias'])) {
+							$options['from_alias'][] = $table;
+							$options['from'][] = $joinTipo->getInterAdminsTableName() .
+                				' AS ' . $table . ' ON ' . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo;
+						}
+						$joinAliases = array_flip($joinTipo->getCamposAlias());
+					// Joins normais
+					} else {
+						$joinNome = ($aliases[$table]) ? $aliases[$table] : $table;
+						// Permite utilizar relacionamentos no where sem ter usado o campo no fields
+						if (!in_array($table, (array) $options['from_alias'])) {
+							$this->_addJoinAlias($options, $table, $joinNome, $campos);
+						}
+						$joinAliases = array_flip($campos[$joinNome]['nome']->getCamposAlias());
 					}
-					$joinAliases = array_flip($campos[$joinNome]['nome']->getCamposAlias());
 					$campo = ($joinAliases[$termo]) ? $joinAliases[$termo] : $termo;
 				} else {
 					$campo = ($aliases[$termo]) ? $aliases[$termo] : $termo;
@@ -351,7 +380,7 @@ abstract class InterAdminAbstract {
 		}
 		$options['from_alias'][] = $alias; // Used as cache when resolving Where
 		if ($campos[$nome]['xtra'] == 'S') { // @todo testar
-            $options['from'][] = $this->db_prefix . '_tipos' .
+            $options['from'][] = $joinTipo->getTableName() . 
                 ' AS ' . $alias . ' ON '  . $table . '.' . $nome . ' = ' . $alias . '.id_tipo';
         } else {
             $options['from'][] = $joinTipo->getInterAdminsTableName() .
