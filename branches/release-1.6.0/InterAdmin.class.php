@@ -131,14 +131,6 @@ class InterAdmin extends InterAdminAbstract {
 		trigger_error('Call to undefined method ' . get_class($this) . '->' . $methodName . '()', E_USER_ERROR);
 	}
 	/**
-	 * String value of this record´s $id.
-	 * 
-	 * @return string String value of the $id property.
-	 */
-	public function __toString(){
-		return (string) $this->id;
-	}
-	/**
 	 * Gets fields values by their alias.
 	 *  
 	 * @param array|string $fields

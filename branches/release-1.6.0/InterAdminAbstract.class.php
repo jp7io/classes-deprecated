@@ -51,6 +51,15 @@ abstract class InterAdminAbstract {
 	public function __isset($attributeName) {
 		return isset($this->attributes[$attributeName]);
 	}
+	/**
+	 * String value of this record´s primary_key.
+	 * 
+	 * @return string String value of the primary_key property.
+	 */
+	public function __toString() {
+		$pk = $this->_primary_key;
+		return (string) $this->$pk;
+	}
 	/** 
 	 * Gets values from this record on the database.
 	 *

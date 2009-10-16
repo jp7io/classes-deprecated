@@ -19,8 +19,7 @@
  * @package InterAdminTipo
  */
 class InterAdminTipo extends InterAdminAbstract {
-	const DEFAULT_CLASS = 'InterAdmin';	
-	
+	const DEFAULT_CLASS = 'InterAdmin';
  	/**
 	 * Stores metadata to be shared by instances with the same $id_tipo.
 	 * @var array 
@@ -42,7 +41,6 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @var InterAdminTipo
 	 */
 	protected $_parent;
-	
 	/**
 	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
 	 * 
@@ -102,14 +100,6 @@ class InterAdminTipo extends InterAdminAbstract {
 			}
 		}
 		return parent::getFieldsValues($fields);
-	}
-	/**
-	 * String value of this record´s $id_tipo.
-	 *
-	 * @return string String value of the $id_tipo property.
-	 */
-	public function __toString() {
-		return (string) $this->id_tipo;
 	}
 	/**
 	 * Retrieves magic properties.
@@ -571,7 +561,6 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		return $children;
 	}
-	
 	/**
 	 * Creates a record with id_tipo, char_key, date_insert and date_publish filled.
 	 * 
