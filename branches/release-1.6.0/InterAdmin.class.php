@@ -168,8 +168,6 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return void
 	 */
 	public function setTipo($tipo) {
-		unset($this->db_prefix);
-		unset($this->table);
 		$this->id_tipo = $tipo->id_tipo;
 		$this->_tipo = $tipo;
 	}
@@ -285,7 +283,7 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function getUrl(){
 		global $seo;
-		if ($this->getParent()->id) {
+		if ($seo && $this->getParent()->id) {
 			$link = $this->_parent->getUrl() . '/' . toSeo($this->getTipo()->getFieldsValues('nome'));
 		} else {
 			$link = $this->getTipo()->getUrl();
