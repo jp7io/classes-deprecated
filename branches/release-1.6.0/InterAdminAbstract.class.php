@@ -457,6 +457,7 @@ abstract class InterAdminAbstract {
 	abstract function getAttributesNames();
 	abstract function getAttributesAliases();
 	abstract function getTableName();
+	abstract function delete();
 	
 	/**
 	 * Reloads all the attributes.
@@ -491,7 +492,7 @@ abstract class InterAdminAbstract {
 	 * 
 	 * @return 
 	 */
-	public function delete() {
+	public function deleteForever() {
 		global $db;
 		$pk = $this->_primary_key;
 		if ($this->$pk) {

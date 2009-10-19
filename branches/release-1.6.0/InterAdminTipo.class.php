@@ -224,7 +224,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$options['fields'] = array_merge(array('id'), (array) $options['fields']);
 		$options['from'] = $this->getInterAdminsTableName() . " AS main";
 		$options['where'][] = "id_tipo = " . $this->id_tipo;
-		if ($this->_parent && $this->_parent instanceof InterAdmin) {
+		if ($this->_parent instanceof InterAdmin) {
 			$options['where'][] =  "parent_id = " . $this->_parent->id;
 		}
 		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . $this->getInterAdminsOrder();
@@ -474,6 +474,15 @@ class InterAdminTipo extends InterAdminAbstract {
 			$url = $c_url . join("/", $url_arr);
 		return $url;
 	}
+	/**
+	 * Sets this row as deleted as saves it.
+	 * 
+	 * @return
+	 */
+	public function delete() {
+		$this->deleted_tipo = 'S';
+		$this->save();
+	}
 	public function getAttributesNames() {
 		return array('id_tipo', 'model_id_tipo', 'parent_id_tipo', 'redirect_id_tipo',
 			'nome', 'nome_en', 'texto', 'class', 'class_tipo', 'template', 'editpage', 
@@ -571,17 +580,26 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $children;
 	}
 	/**
-	 * Creates a record with id_tipo, char_key, date_insert and date_publish filled.
+	 * Creates a record with id_tipo, mostrar, date_insert and date_publish filled.
 	 * 
+	 * @param array $attributes Attributes to be merged into the new record.
 	 * @return InterAdmin
 	 */
-	public function createInterAdmin() {
+	public function createInterAdmin(array $attributes = array()) {
 		$options = array('default_class' => $this->_getDefaultClass());
 		$record = InterAdmin::getInstance(0, $options, $this);
 		$mostrar = $this->getCamposAlias('char_key');
 		$record->$mostrar = 'S';
 		$record->date_publish = date('c');
 		$record->date_insert = date('c');
+		if ($this->_parent instanceof InterAdmin) {
+			$record->parent_id = $this->_parent->id;
+			// Childs are published by default on InterAdmin.
+			$record->publish = 'S';
+		}
+		if ($attributes) {
+			$record->attributes = array_merge($record->attributes,  $attributes);
+		}
 		return $record;
 	}
 }

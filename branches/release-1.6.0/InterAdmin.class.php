@@ -43,6 +43,11 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	protected $_tags;
 	/**
+	 * Username to be inserted in the log when saving this record.
+	 * @var string
+	 */
+	protected static $log_user = 'site';
+	/**
 	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
 	 * @param int $id This record's 'id'.
 	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias.
@@ -102,31 +107,35 @@ class InterAdmin extends InterAdminAbstract {
 	 * Magic method calls
 	 * 
 	 * Available magic methods:
-	 * - get{name}(array $options)
-	 * - getFirst{name}(array $options)
+	 * - add{$childName}(array $attributes = array())
+	 * - get{$childName}(array $options = array())
+	 * - getFirst{$childName}(array $options = array())
 	 * 
 	 * @param string $methodName
 	 * @return mixed
 	 */
 	public function __call($methodName, $args) {
+		$offset = strlen('get');
+		$children = $this->getTipo()->getInterAdminsChildren();
 		if (strpos($methodName, 'get') === 0) {
-			$offset = 3;
 			$options = (array) $args[0];
 			if (strpos($methodName, 'getFirst') === 0) {
-				$offset = 8;
+				$offset = strlen('getFirst');
 				$options['limit'] = 1;
-				// @todo pluralize function
-				if ($methodName[strlen($methodName) - 1] != 's') {
-					$methodName .= 's'; 
-				}
+				$methodName = Jp7_Inflector::plural($methodName);
 			}
-			$children = $this->getTipo()->getInterAdminsChildren();
-			// @todo tableize function
-			$nome_id = strtolower(preg_replace('/([a-z])([A-Z])/', '\1_\2', substr($methodName, $offset))); 
+			$nome_id = Jp7_Inflector::underscore(substr($methodName, $offset)); 
 			if ($child = $children[$nome_id]) {
 				return $this->getChildren($child['id_tipo'], $options);
 			}
-		}
+		} elseif (strpos($methodName, 'add') === 0) {
+			$attributes = (array) $args[0];
+			$methodName = Jp7_Inflector::plural($methodName);
+			$nome_id = Jp7_Inflector::underscore(substr($methodName, $offset)); 
+			if ($child = $children[$nome_id]) {
+				return $this->addChild($child['id_tipo'], $attributes);
+			}
+		} 
 		// Default error when method doesn´t exist
 		trigger_error('Call to undefined method ' . get_class($this) . '->' . $methodName . '()', E_USER_ERROR);
 	}
@@ -198,6 +207,19 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function setParent($parent) {
 		$this->_parent = $parent;
+	}
+	/**
+	 * Adds a child record (the record is created and saved). 
+	 * 
+	 * @param int $id_tipo
+	 * @param array $attributes Attributes to be merged into the new record.
+	 * @return 
+	 */
+	public function addChild($id_tipo, array $attributes = array()) {
+		$childrenTipo = $this->getChildrenTipo($id_tipo);
+		$child = $childrenTipo->createInterAdmin($attributes);
+		$child->save();
+		return $child;
 	}
 	/**
 	 * Instantiates an InterAdminTipo object and sets this record as its parent.
@@ -413,6 +435,10 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return void
 	 */
 	public function save() {
+		if ($this->id && !isset($this->log)) {
+			$this->getFieldsValues('log');
+		}
+		$this->log = date('d/m/Y H:i') . ' - ' . self::$log_user . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13) . $this->log;
 		$this->date_modify = date('c');
 		return parent::save();
 	}
@@ -432,5 +458,33 @@ class InterAdmin extends InterAdminAbstract {
 			// Compatibilidade, tenta encontrar na tabela global
 			return $this->db_prefix . $this->table;
 		}
+	}
+    /**
+     * Returns $log_user.
+     *
+     * @see InterAdmin::$log_user
+     * @return string
+     */
+    public static function getLogUser() {
+        return self::$log_user;
+    }
+    /**
+     * Sets $log_user.
+     *
+     * @see InterAdmin::$log_user
+     * @param object $log_user
+     * @return void
+     */
+    public static function setLogUser($log_user) {
+        self::$log_user = $log_user;
+    }
+	/**
+	 * Sets this row as deleted as saves it.
+	 * 
+	 * @return 
+	 */
+	public function delete() {
+		$this->deleted = 'S';
+		$this->save();
 	}
 }
