@@ -16,21 +16,38 @@
  */
 class Jp7_Inflector {
 	
-	public static function plural ($str) {
-		if ($str[strlen($str) - 1] != 's') {
-			$str .= 's';
+	public static $plural_inflections = array(
+		'(m)$' => 'ns',
+		'([r|z])$' => '\1es',
+		'([i])l$' => '\1s',
+		'([a|e|o|u])l$' => '\1is',
+		'([^s])$' => '\1s'
+	);
+	
+	/**
+	 * Returns the plural form of the word in the string.
+	 * 
+	 * @param object $word
+	 * @return string
+	 */
+	public static function plural ($word) {
+		foreach (self::$plural_inflections as $pattern => $replacement) {
+			if (preg_match('/' . $pattern . '/', $word)) {
+				$word = preg_replace('/' . $pattern . '/', $replacement, $word);
+				break;
+			}
 		}
-		return $str;
+		return $word;
 	}
 	
 	/**
 	 * Converts from CamelCase to underscore_case.
 	 * 
-	 * @param object $str
-	 * @return 
+	 * @param object $camelCasedWord
+	 * @return string
 	 */
-	public static function underscore ($str) {
-		return strtolower(preg_replace('/([a-z])([A-Z])/', '\1_\2', $str));
+	public static function underscore ($camelCasedWord) {
+		return strtolower(preg_replace('/([a-z])([A-Z])/', '\1_\2', $camelCasedWord));
 	}
 	
 	

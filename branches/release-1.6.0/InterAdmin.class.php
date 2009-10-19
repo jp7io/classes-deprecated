@@ -121,12 +121,15 @@ class InterAdmin extends InterAdminAbstract {
 			$options = (array) $args[0];
 			if (strpos($methodName, 'getFirst') === 0) {
 				$offset = strlen('getFirst');
-				$options['limit'] = 1;
 				$methodName = Jp7_Inflector::plural($methodName);
 			}
 			$nome_id = Jp7_Inflector::underscore(substr($methodName, $offset)); 
 			if ($child = $children[$nome_id]) {
-				return $this->getChildren($child['id_tipo'], $options);
+				if ($offset == strlen('get')) {
+					return $this->getChildren($child['id_tipo'], $options);
+				} else {
+					return reset($this->getChildren($child['id_tipo'], array('limit' => '1') + $options));
+				}
 			}
 		} elseif (strpos($methodName, 'add') === 0) {
 			$attributes = (array) $args[0];
@@ -481,7 +484,7 @@ class InterAdmin extends InterAdminAbstract {
 	/**
 	 * Sets this row as deleted as saves it.
 	 * 
-	 * @return 
+	 * @return void
 	 */
 	public function delete() {
 		$this->deleted = 'S';
