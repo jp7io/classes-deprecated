@@ -206,8 +206,10 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return array Array of InterAdmin objects.
 	 */
 	public function getInterAdmins($options = array()) {
-		if ($options['fields'] == '*') {
-			$options['fields'] = $this->getCamposNames();
+		if ($options['fields'] == '*' || in_array('*', (array) $options['fields'])) {
+			$options['fields'] = (array) $options['fields'];
+			unset($options['fields'][array_search('*', $options['fields'])]);
+			$options['fields'] = array_merge($options['fields'], $this->getCamposNames());
 		}
 		// FIXME temporário para wheres que eram com string
 		if (!is_array($options['where'])) {
@@ -274,7 +276,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdmin First InterAdmin object found.
 	 */
 	public function getInterAdminById($id, $options = array()) {
-		$options['where'] = array("id = " . intval($id));
+		$options['where'][] = "id = " . intval($id);
 		return $this->getFirstInterAdmin($options);
 	}
 	/**
@@ -284,7 +286,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdmin First InterAdmin object found.
 	 */
 	public function getInterAdminByIdString($id_string, $options = array()) {
-		$options['where'] = array("id_string = '" . $id_string . "'");
+		$options['where'][] = "id_string = '" . $id_string . "'";
 		return $this->getFirstInterAdmin($options);
 	}
 	/**

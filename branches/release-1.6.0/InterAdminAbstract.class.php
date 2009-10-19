@@ -73,8 +73,10 @@ abstract class InterAdminAbstract {
 		if ($this->_deleted) {
 			throw new Exception('This record has been deleted.');
 		}
-		if ($fields == '*' || $fields == array('*')) {
-			$fields = $this->getAttributesNames();
+		if ($fields == '*' || in_array('*', (array) $fields)) {
+			$fields = (array) $fields;
+			unset($fields[array_search('*', $fields)]);
+			$fields = array_merge($fields, $this->getAttributesNames());
 		}
 		// cache
 		$fieldsToLoad = array();
@@ -350,7 +352,7 @@ abstract class InterAdminAbstract {
 					$this->_addJoinAlias($options, $join, $nome, $campos);
 					$joinTipo = $campos[$nome]['nome'];
 					if ($fields[$join] == array('*')) {
-						$fields[$join] = array_keys($joinTipo->getCampos());
+						$fields[$join] = $joinTipo->getCamposNames();
 					}
 					$joinOptions = array(
 						'fields' => $fields[$join],
