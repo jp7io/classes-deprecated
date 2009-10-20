@@ -107,7 +107,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * Magic method calls
 	 * 
 	 * Available magic methods:
-	 * - add{$childName}(array $attributes = array())
+	 * - create{$childName}(array $attributes = array())
 	 * - get{$childName}(array $options = array())
 	 * - getFirst{$childName}(array $options = array())
 	 * 
@@ -115,9 +115,9 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return mixed
 	 */
 	public function __call($methodName, $args) {
-		$offset = strlen('get');
 		$children = $this->getTipo()->getInterAdminsChildren();
 		if (strpos($methodName, 'get') === 0) {
+			$offset = strlen('get');
 			$options = (array) $args[0];
 			if (strpos($methodName, 'getFirst') === 0) {
 				$offset = strlen('getFirst');
@@ -131,12 +131,12 @@ class InterAdmin extends InterAdminAbstract {
 					return reset($this->getChildren($child['id_tipo'], array('limit' => '1') + $options));
 				}
 			}
-		} elseif (strpos($methodName, 'add') === 0) {
+		} elseif (strpos($methodName, 'create') === 0) {
 			$attributes = (array) $args[0];
 			$methodName = Jp7_Inflector::plural($methodName);
-			$nome_id = Jp7_Inflector::underscore(substr($methodName, $offset)); 
+			$nome_id = Jp7_Inflector::underscore(substr($methodName, strlen('create'))); 
 			if ($child = $children[$nome_id]) {
-				return $this->addChild($child['id_tipo'], $attributes);
+				return $this->createChild($child['id_tipo'], $attributes);
 			}
 		} 
 		// Default error when method doesn´t exist
@@ -212,17 +212,14 @@ class InterAdmin extends InterAdminAbstract {
 		$this->_parent = $parent;
 	}
 	/**
-	 * Adds a child record (the record is created and saved). 
+	 * Creates and returns a child record. 
 	 * 
 	 * @param int $id_tipo
 	 * @param array $attributes Attributes to be merged into the new record.
 	 * @return 
 	 */
-	public function addChild($id_tipo, array $attributes = array()) {
-		$childrenTipo = $this->getChildrenTipo($id_tipo);
-		$child = $childrenTipo->createInterAdmin($attributes);
-		$child->save();
-		return $child;
+	public function createChild($id_tipo, array $attributes = array()) {
+		return $this->getChildrenTipo($id_tipo)->createInterAdmin($attributes);
 	}
 	/**
 	 * Instantiates an InterAdminTipo object and sets this record as its parent.
