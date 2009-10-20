@@ -146,6 +146,8 @@ abstract class InterAdminAbstract {
 			$key = ($aliases[$key]) ? $aliases[$key] : $key;
 			if (is_object($value)) {
 				$valuesToSave[$key] = (string) $value;
+			} elseif (is_array($value)) {
+				$valuesToSave[$key] = implode(',', $value);
 			} else {
 				$valuesToSave[$key] = $value;
 			}
