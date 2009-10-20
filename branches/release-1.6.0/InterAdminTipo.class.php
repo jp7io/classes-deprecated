@@ -19,8 +19,7 @@
  * @package InterAdminTipo
  */
 class InterAdminTipo extends InterAdminAbstract {
-	const DEFAULT_CLASS = 'InterAdmin';
- 	/**
+	/**
 	 * Stores metadata to be shared by instances with the same $id_tipo.
 	 * @var array 
 	 */
@@ -126,7 +125,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function getParent($options = array()) {
 		if ($this->_parent) return $this->_parent;
 		if ($this->parent_id_tipo || $this->getFieldsValues('parent_id_tipo')) {
-			$options['default_class'] = $this->_getDefaultClass() . 'Tipo';
+			$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo';
 			return $this->_parent = InterAdminTipo::getInstance($this->parent_id_tipo, $options);
 		}
 	}
@@ -172,7 +171,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$tipo = InterAdminTipo::getInstance($row->{'main.id_tipo'}, array(
 				'db_prefix' => $this->db_prefix,
 				'class' => $options['class'],
-				'default_class' => $this->_getDefaultClass() . 'Tipo'
+				'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
 			));
 			$tipo->setParent($this);
 			$this->_getAttributesFromRow($row, $tipo, $options);
@@ -231,6 +230,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		// Internal use
 		$options['aliases'] = $this->getCamposAlias();
 		$options['campos'] = $this->getCampos();
+		$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
 		
 		$rs = $this->_executeQuery($options);
 		
@@ -238,7 +238,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		while ($row = $rs->FetchNextObj()) {
 			$record = InterAdmin::getInstance($row->{'main.id'}, array(
 				'class' => $options['class'],
-				'default_class' => $this->_getDefaultClass()
+				'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin'
 			), $this);
 			$record->setTipo($this);
 			if ($this->_parent instanceof InterAdmin) {
@@ -331,7 +331,7 @@ class InterAdminTipo extends InterAdminAbstract {
 					if ($isSelect && $A[$parameters[0]]['nome'] != 'all') {
 						$id_tipo = $A[$parameters[0]]['nome'];
 						$A[$parameters[0]]['nome'] = InterAdminTipo::getInstance($id_tipo, array(
-							'default_class' =>	$this->_getDefaultClass() . 'Tipo'
+							'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
 						));
 					}
 				}
@@ -586,7 +586,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdmin
 	 */
 	public function createInterAdmin(array $attributes = array()) {
-		$options = array('default_class' => $this->_getDefaultClass());
+		$options = array('default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin');
 		$record = InterAdmin::getInstance(0, $options, $this);
 		$mostrar = $this->getCamposAlias('char_key');
 		$record->$mostrar = 'S';

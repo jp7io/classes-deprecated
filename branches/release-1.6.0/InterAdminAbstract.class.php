@@ -1,5 +1,8 @@
 <?php
 abstract class InterAdminAbstract {
+	const DEFAULT_FIELDS_ALIAS = false;
+	const DEFAULT_NAMESPACE = '';
+	
 	protected $_primary_key = 'id';	
 	/**
 	 * Array of all the attributes with their names as keys and the values of the attributes as values.
@@ -168,7 +171,7 @@ abstract class InterAdminAbstract {
 	 * @return mixed The object created by the key or the value itself.
 	 */
 	protected function _getByForeignKey(&$value, $field, $campo = '', $object) {
-		$interAdminClass = $this->_getDefaultClass();
+		$interAdminClass = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin';
 		
 		$options = array();
 		if (strpos($field, 'select_') === 0) {
@@ -447,12 +450,17 @@ abstract class InterAdminAbstract {
 		}
 	}
 	
-	protected function _getDefaultClass() {
-		$obj = $this;
-		if ($obj instanceof InterAdmin) {
-			$obj = $obj->getTipo();
+	/**
+	 * Equals to static::CONSTNAME on PHP 5.3
+	 * 
+	 * @param object $constname
+	 * @return 
+	 */
+	protected function staticConst($constname) {
+		$constname = get_class($this) . '::' . $constname;
+		if (defined($constname)) {
+			return constant($constname);
 		}
-		return constant(get_class($obj) . '::DEFAULT_CLASS');
 	}
 	
 	abstract function getAttributesCampos();

@@ -59,6 +59,7 @@ class InterAdmin extends InterAdminAbstract {
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
 		$this->table = ($options['table']) ? '_' . $options['table'] : '';
 		if ($options['fields']) {
+			$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
 			$this->getFieldsValues($options['fields'], false, $options['fields_alias']);
 		}
 	}
@@ -194,7 +195,7 @@ class InterAdmin extends InterAdminAbstract {
 			$this->getFieldsValues('parent_id');
 		}
 		if (!$this->_parent) {
-			$options['default_class'] = $this->_getDefaultClass();
+			$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin';
 			$this->_parent = InterAdmin::getInstance($this->parent_id, $options);
 			if ($this->_parent->id) {
 				$this->getTipo()->setParent($this->_parent);
@@ -232,7 +233,7 @@ class InterAdmin extends InterAdminAbstract {
 		if (!$options['db_prefix']) {
 			$options['db_prefix'] = $this->getTipo()->db_prefix;
 		}
-		$options['default_class'] = $this->_getDefaultClass() . 'Tipo';
+		$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo';
 		$childrenTipo = InterAdminTipo::getInstance($id_tipo, $options);
 		$childrenTipo->setParent($this);
 		return $childrenTipo;
@@ -248,6 +249,7 @@ class InterAdmin extends InterAdminAbstract {
 		global $db;
 		$children = array();
 		if ($id_tipo) {
+			$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
 			$children = $this->getChildrenTipo($id_tipo)->getInterAdmins($options);
 		}
 		return $children;
