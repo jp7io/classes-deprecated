@@ -76,11 +76,7 @@ abstract class InterAdminAbstract {
 		if ($this->_deleted) {
 			throw new Exception('This record has been deleted.');
 		}
-		if ($fields == '*' || in_array('*', (array) $fields)) {
-			$fields = (array) $fields;
-			unset($fields[array_search('*', $fields)]);
-			$fields = array_merge($fields, $this->getAttributesNames());
-		}
+		$this->_resolveWildcard($fields, $this);
 		// cache
 		$fieldsToLoad = array();
 		if ($forceAsString || $this->_updated) {
@@ -447,6 +443,21 @@ abstract class InterAdminAbstract {
 					$attributes[$table]->$alias = $value;
 				}
 			}
+		}
+	}
+	
+	/**
+	 * Resolves '*'
+	 * 
+	 * @param array $fields
+	 * @param InterAdminAbstract $object
+	 * @return void
+	 */
+	protected function _resolveWildcard(&$fields, InterAdminAbstract $object) {
+		if ($fields == '*' || in_array('*', (array) $fields)) {
+			$fields = (array) $fields;
+			unset($fields[array_search('*', $fields)]);
+			$fields = array_merge($fields, $object->getAttributesNames());
 		}
 	}
 	

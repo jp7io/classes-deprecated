@@ -205,11 +205,14 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return array Array of InterAdmin objects.
 	 */
 	public function getInterAdmins($options = array()) {
-		if ($options['fields'] == '*' || in_array('*', (array) $options['fields'])) {
-			$options['fields'] = (array) $options['fields'];
-			unset($options['fields'][array_search('*', $options['fields'])]);
-			$options['fields'] = array_merge($options['fields'], $this->getCamposNames());
-		}
+		$optionsInstance = array(
+			'class' => $options['class'],
+			'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin'
+		);
+		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
+		
+		$this->_resolveWildcard($options['fields'], $recordModel);
+		
 		// FIXME temporário para wheres que eram com string
 		if (!is_array($options['where'])) {
 			if ($options['where']) {
@@ -221,25 +224,22 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		
 		$options['fields'] = array_merge(array('id'), (array) $options['fields']);
-		$options['from'] = $this->getInterAdminsTableName() . " AS main";
+		$options['from'] = $recordModel->getTableName() . " AS main";
 		$options['where'][] = "id_tipo = " . $this->id_tipo;
 		if ($this->_parent instanceof InterAdmin) {
 			$options['where'][] =  "parent_id = " . $this->_parent->id;
 		}
 		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . $this->getInterAdminsOrder();
 		// Internal use
-		$options['aliases'] = $this->getCamposAlias();
-		$options['campos'] = $this->getCampos();
+		$options['aliases'] = $recordModel->getAttributesAliases();
+		$options['campos'] = $recordModel->getAttributesCampos();
 		$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
 		
 		$rs = $this->_executeQuery($options);
 		
 		$records = array();
 		while ($row = $rs->FetchNextObj()) {
-			$record = InterAdmin::getInstance($row->{'main.id'}, array(
-				'class' => $options['class'],
-				'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin'
-			), $this);
+			$record = InterAdmin::getInstance($row->{'main.id'}, $optionsInstance, $this);
 			$record->setTipo($this);
 			if ($this->_parent instanceof InterAdmin) {
 				$record->setParent($this->_parent);
