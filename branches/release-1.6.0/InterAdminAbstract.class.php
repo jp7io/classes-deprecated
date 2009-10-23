@@ -367,8 +367,14 @@ abstract class InterAdminAbstract {
 				}
 			// Com função
 			} elseif (strpos($campo, '(') !== false) {
-				$fields[$join] = preg_replace('/([\(,][ ]*)/', '\1' . $table . '.', $campo) .
-				 	' AS `' . $table . '.' . trim(strtolower(preg_replace('/[\(\),]/', '_', $campo)), '_') . '`';
+				if (strpos($campo, ' AS ') === false) {
+					$aggregateAlias = trim(strtolower(preg_replace('/[\(\),]/', '_', $campo)), '_');
+				} else {
+					list($campo, $aggregateAlias) = explode(' AS ', $campo);
+				}
+				// @todo Implementar mesma busca do _resolveClauseAlias()
+				$fields[$join] = preg_replace('/([\(,][ ]*)(\b[a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1' . $table . '.\2', $campo) .
+				 	' AS `' . $table . '.' . $aggregateAlias . '`'; 
 			// Sem join
 			} else {
 				$nome = ($aliases[$campo]) ? $aliases[$campo] : $campo;
