@@ -24,7 +24,11 @@ abstract class InterAdminAbstract {
 	 * @return mixed
 	 */
 	public function &__get($attributeName) {
-		return $this->attributes[$attributeName];
+		if (isset($this->attributes[$attributeName])) {
+			return $this->attributes[$attributeName];
+		} else {
+			return null;
+		}
 	}
 	/**
 	 * Magic set acessor.
