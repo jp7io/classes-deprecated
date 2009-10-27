@@ -339,7 +339,7 @@ abstract class InterAdminAbstract {
 	 * @param string $table Table alias for the fields.
 	 * @return array Revolved $fields.
 	 */
-	protected function _resolveFieldsAlias(&$options = array(), $table = 'main') {
+	protected function _resolveFieldsAlias(&$options = array(), $table = 'main.') {
 		$campos = &$options['campos'];
 		$aliases = &$options['aliases'];
 		$fields = $options['fields'];
@@ -348,7 +348,7 @@ abstract class InterAdminAbstract {
 			if (is_array($campo)) {
 				$nome = ($aliases[$join]) ? $aliases[$join] : $join;
 				if ($nome) {
-					$fields[] = $table . '.' . $nome . ' AS `' . $table . '.' . $nome . '`';
+					$fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
 					// Join e Recursividade
 					$this->_addJoinAlias($options, $join, $nome, $campos);
 					$joinTipo = $campos[$nome]['nome'];
@@ -361,7 +361,7 @@ abstract class InterAdminAbstract {
 						'campos' => $joinTipo->getCampos(),
 						'aliases' => array_flip($joinTipo->getCamposAlias())
 					);
-					$this->_resolveFieldsAlias($joinOptions, $join);
+					$this->_resolveFieldsAlias($joinOptions, $join . '.');
 					$fields = array_merge($fields, $joinOptions['fields']);
 					unset($fields[$join]);
 				}
@@ -373,15 +373,15 @@ abstract class InterAdminAbstract {
 					list($campo, $aggregateAlias) = explode(' AS ', $campo);
 				}
 				// @todo Implementar mesma busca do _resolveClauseAlias()
-				$fields[$join] = preg_replace('/([\(,][ ]*)(\b[a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1' . $table . '.\2', $campo) .
-				 	' AS `' . $table . '.' . $aggregateAlias . '`'; 
+				$fields[$join] = preg_replace('/([\(,][ ]*)(\b[a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1' . $table . '\2', $campo) .
+				 	' AS `' . $table . $aggregateAlias . '`';
 			// Sem join
 			} else {
 				$nome = ($aliases[$campo]) ? $aliases[$campo] : $campo;
 				if (strpos($nome, 'file_') === 0 && strpos($nome, '_text') === false) {
-					$fields[] = $table . '.' . $nome . '_text  AS `' . $campo . '.text`';
-				}			
-				$fields[$join] = $table . '.' . $nome . ' AS `' . $table . '.' . $nome . '`';
+					$fields[] = $table . $nome . '_text  AS `' . $campo . '.text`';
+				}
+				$fields[$join] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
 			}
 		}
 		$options['fields'] = $fields;
@@ -423,8 +423,13 @@ abstract class InterAdminAbstract {
 			$fields = array_flip($aliases);
 		}
 		$attributes = &$object->attributes;
+
 		foreach ($row as $key => $value) {
 			list($table, $field) = explode('.', $key);
+			if (!$field) {
+				$field = $table;
+				$table = 'main';
+			} 
 			if ($table == 'main') {
 				$alias = ($aliases[$field]) ? $aliases[$field] : $field;
 				$value = $this->_getByForeignKey($value, $field, $campos[$field], $object);
