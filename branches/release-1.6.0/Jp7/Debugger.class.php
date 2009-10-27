@@ -34,7 +34,7 @@ class Jp7_Debugger{
 	 * In order to prevent errors with output and headers, set this variable <tt>TRUE</tt> after the headers are sent.
 	 * @var bool 
 	 */
-	public $safePoint;
+	protected $_safePoint;
 	/**
 	 * Array containing the activity log for queries, filenames and their processing time.
 	 * @var array 
@@ -96,7 +96,7 @@ class Jp7_Debugger{
 		// Retrieves and deletes the last value
 		$debug_starttime = array_pop($this->_startTime);
 		$debug_totaltime = round(($debug_mtime[0] + $debug_mtime[1] - $debug_starttime) * 1000);
-		if ($output && $this->safePoint) echo '<div class="debug_msg">Processed in: ' . $debug_totaltime . 'ms.</div>';
+		if ($output && $this->isSafePoint()) echo '<div class="debug_msg">Processed in: ' . $debug_totaltime . 'ms.</div>';
 		return $debug_totaltime;
 	}
 	/**
@@ -108,7 +108,7 @@ class Jp7_Debugger{
 	 */	
 	public function showFilename($filename) {
 		global $c_doc_root;
-		if ($this->debugFilename && $this->safePoint) echo '<div class="debug_msg">' .  str_replace($c_doc_root, '/', $filename ) . '</div>';
+		if ($this->debugFilename && $this->isSafePoint()) echo '<div class="debug_msg">' .  str_replace($c_doc_root, '/', $filename ) . '</div>';
 		if ($this->active) {
 			// Creates a new log entry for this file
 			$this->addLog($filename, 'file');
@@ -124,7 +124,7 @@ class Jp7_Debugger{
 	 * @return void
 	 */	
 	public function showSql($sql, $forceDebug = false, $style = '') {
-		if (!$this->safePoint) return;
+		if (!$this->isSafePoint()) return;
 		if ($this->debugSql || $forceDebug) echo '<div class="debug_sql" style="' . $style . '">' . preg_replace(array('/(SELECT )/','/( FROM )/','/( WHERE )/','/( ORDER BY )/'),'<b>\1</b>', $sql, 1) . '</div>';
 	}
 	/**
@@ -257,7 +257,7 @@ class Jp7_Debugger{
  	 * @return void
 	 */
 	public function showToolbar() {
-		if (!$this->active || !$this->safePoint) return;
+		if (!$this->active || !$this->isSafePoint()) return;
 		
 		if ($this->_templateFilename ) echo ('Template: ' . $this->_templateFilename);
 		else echo('PHP_SELF: ' . $_SERVER['PHP_SELF']);
@@ -265,5 +265,10 @@ class Jp7_Debugger{
 		jp7_print_r($this->_log);
 		$this->getTime(true);
 	}
+	public function isSafePoint() {
+		return $this->_savePoint || headers_sent();
+	}
+	public function setSafePoint($bool) {
+		$this->_savePoint = $bool;
+	}
 }
-?>
