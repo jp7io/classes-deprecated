@@ -23,7 +23,7 @@ abstract class InterAdminAbstract {
 	 * @param string $attributeName
 	 * @return mixed
 	 */
-	public function __get($attributeName) {
+	public function &__get($attributeName) {
 		return $this->attributes[$attributeName];
 	}
 	/**
@@ -246,8 +246,12 @@ abstract class InterAdminAbstract {
 			" FROM " . implode(' LEFT JOIN ', $options['from']) .
 			$clauses .
 			(($options['limit']) ? " LIMIT " . $options['limit'] : '');
-	
+		
 		if ($jp7_app) {
+			global $debugger;
+			if ($debugger) {
+				$debugger->showSql($sql, $sql_debug);
+			}
 			$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		} else {
 			$rs = interadmin_query($sql);
