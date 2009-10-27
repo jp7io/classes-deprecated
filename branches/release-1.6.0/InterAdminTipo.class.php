@@ -168,7 +168,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		$tipos = array();
 		while ($row = $rs->FetchNextObj()) {
-			$tipo = InterAdminTipo::getInstance($row->{'main.id_tipo'}, array(
+			$tipo = InterAdminTipo::getInstance($row->id_tipo, array(
 				'db_prefix' => $this->db_prefix,
 				'class' => $options['class'],
 				'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
@@ -239,7 +239,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		$records = array();
 		while ($row = $rs->FetchNextObj()) {
-			$record = InterAdmin::getInstance($row->{'main.id'}, $optionsInstance, $this);
+			$record = InterAdmin::getInstance($row->id, $optionsInstance, $this);
 			$record->setTipo($this);
 			if ($this->_parent instanceof InterAdmin) {
 				$record->setParent($this->_parent);
