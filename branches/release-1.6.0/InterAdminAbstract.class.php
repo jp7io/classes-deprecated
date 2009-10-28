@@ -542,4 +542,31 @@ abstract class InterAdminAbstract {
 		$this->attributes = array();
 		$this->_deleted = true;
 	}
+	
+	public function getRelatedInterAdminsByTags($id_tipo = 0) {
+		global $db, $debugger;
+		$pk = $this->_primary_key;
+		if ($this->$pk) {
+			if ($id_tipo) {
+				$sql = "SELECT tags.id_tag,tags.parent_id,tags.id,tags.id_tipo".
+					" FROM " . $this->db_prefix . "_tags AS tags" .
+					" INNER JOIN " . $this->db_prefix . " AS registros" .
+					" ON tags.parent_id = registros.id" .
+					" WHERE tags." . $this->_primary_key . " = " . $this->$pk .
+					" AND registros.id_tipo = " . $id_tipo;
+			} else {
+				$sql = "SELECT * FROM " . $this->db_prefix . "_tags" .
+					" WHERE " . $this->_primary_key . " = " . $this->$pk;
+			}
+			if ($debugger) {
+				$debugger->showSql($sql, $sql_debug);
+			}
+			$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+			while ($row = $rs->FetchNextObj()) {
+				$return[] = new InterAdmin($row->parent_id);
+			}
+			$rs->Close();
+			return $return;
+		}
+	}
 }
