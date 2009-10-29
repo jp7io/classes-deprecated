@@ -108,36 +108,50 @@ class InterAdmin extends InterAdminAbstract {
 	 * Magic method calls
 	 * 
 	 * Available magic methods:
-	 * - create{$childName}(array $attributes = array())
-	 * - get{$childName}(array $options = array())
-	 * - getFirst{$childName}(array $options = array())
+	 * - create{Child}(array $attributes = array())
+	 * - get{Children}(array $options = array())
+	 * - getFirst{Child}(array $options = array())
+	 * - get{Child}ById(int $id, array $options = array())
+	 * - delete{Children}(array $options = array())
 	 * 
 	 * @param string $methodName
 	 * @return mixed
 	 */
 	public function __call($methodName, $args) {
 		$children = $this->getTipo()->getInterAdminsChildren();
+		// get*
 		if (strpos($methodName, 'get') === 0) {
-			$offset = strlen('get');
-			$options = (array) $args[0];
+			// getFirst*
 			if (strpos($methodName, 'getFirst') === 0) {
-				$offset = strlen('getFirst');
-				$methodName = Jp7_Inflector::plural($methodName);
-			}
-			$nome_id = Jp7_Inflector::underscore(substr($methodName, $offset)); 
-			if ($child = $children[$nome_id]) {
-				if ($offset == strlen('get')) {
-					return $this->getChildren($child['id_tipo'], $options);
-				} else {
-					return reset($this->getChildren($child['id_tipo'], array('limit' => '1') + $options));
+				$nome_id = Jp7_Inflector::tableize(substr($methodName, 8));
+				if ($child = $children[$nome_id]) {
+					return $this->getFirstChild($child['id_tipo'], (array) $args[0]);
 				}
-			}
+			// get*ById
+			} elseif (substr($methodName, -4) == 'ById') {
+				$nome_id = Jp7_Inflector::tableize(substr($methodName, 3, -4));
+				if ($child = $children[$nome_id]) {
+					$options = (array) $args[1];
+					$options['where'][] = "id = " . $args[0];
+					return $this->getFirstChild($child['id_tipo'], $options);
+				}
+			} else {
+				$nome_id = Jp7_Inflector::underscore(substr($methodName, 3)); 
+				if ($child = $children[$nome_id]) {
+					return $this->getChildren($child['id_tipo'], (array) $args[0]);
+				}
+			} 
+		// create*
 		} elseif (strpos($methodName, 'create') === 0) {
-			$attributes = (array) $args[0];
-			$methodName = Jp7_Inflector::plural($methodName);
-			$nome_id = Jp7_Inflector::underscore(substr($methodName, strlen('create'))); 
+			$nome_id = Jp7_Inflector::tableize(substr($methodName, strlen('create'))); 
 			if ($child = $children[$nome_id]) {
-				return $this->createChild($child['id_tipo'], $attributes);
+				return $this->createChild($child['id_tipo'], (array) $args[0]);
+			}
+		// delete *
+		} elseif (strpos($methodName, 'delete') === 0) {
+			$nome_id = Jp7_Inflector::underscore(substr($methodName, strlen('delete')));
+			if ($child = $children[$nome_id]) {
+				return $this->deleteChildren($child['id_tipo'], (array) $args[0]);
 			}
 		} 
 		// Default error when method doesn´t exist
@@ -254,6 +268,33 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		return $children;
 	}
+	
+	/**
+	 * Returns the first Child.
+	 * 
+	 * @param int $id_tipo
+	 * @param array $options [optional]
+	 * @return InterAdmin
+	 */
+	public function getFirstChild($id_tipo, $options = array()) {
+		return reset($this->getChildren($id_tipo, array('limit' => 1) + $options));	
+	}
+	
+	/**
+	 * Deletes all the children of a given $id_tipo.
+	 * 
+	 * @param int $id_tipo
+	 * @param array $options [optional]
+	 * @return int Number of deleted children.
+	 */
+	public function deleteChildren($id_tipo, $options = array()) {
+		$children = $this->getChildren($id_tipo, $options);
+		foreach ($children as $child) {
+			$child->delete();
+		}
+		return count($children);
+	}
+	
 	/**
 	 * Retrieves the uploaded files of this record.
 	 * 
