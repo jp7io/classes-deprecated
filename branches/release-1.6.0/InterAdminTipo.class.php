@@ -40,6 +40,10 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @var InterAdminTipo
 	 */
 	protected $_parent;
+	
+	// @todo Remove this
+	protected $_loadedfrommodel;
+	
 	/**
 	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
 	 * 
@@ -107,10 +111,11 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return mixed
 	 */
 	public function __get($var) {
-		if (!isset($this->attributes[$var])) {
-			if ($var == 'class' || $var == 'tabela') {
+		if ($var == 'class' || $var == 'tabela') {
+			if (!isset($this->attributes[$var]) || !isset($this->_loadedfrommodel[$var])) {
 				if (!$this->$var && !$this->getFieldsValues($var)) {
 					$this->$var = $this->getModel()->getFieldsValues($var);
+					$this->_loadedfrommodel[$var] = true;
 				}
 			}
 		}
@@ -311,6 +316,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function getCampos() {
 		if (!$A = $this->_getMetadata('campos')) {
 			$model = $this->getModel();
+			
+			
 			$campos = $model->getFieldsValues('campos');
 			unset($model->campos);
 			$campos_parameters = array(
