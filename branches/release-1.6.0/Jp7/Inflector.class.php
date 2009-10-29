@@ -58,4 +58,15 @@ class Jp7_Inflector {
 	public static function underscore ($camelCasedWord) {
 		return strtolower(preg_replace('/([a-z])([A-Z])/', '\1_\2', $camelCasedWord));
 	}
+	
+	/**
+	 * Combination of plural and underscore, ex: 'BlueSuedShoe' => 'blue_sued_shoes'
+	 * 
+	 * @param object $camelCasedWord Such as BlueSuedShoe.
+	 * @return string Underscored word in plural, such as blue_sued_shoes.
+	 */
+	public static function tableize($camelCasedWord) {
+		return self::plural(self::underscore($camelCasedWord));
+	}
+	
 } 

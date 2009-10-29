@@ -318,10 +318,10 @@ class InterAdminTipo extends InterAdminAbstract {
 				'lista', 'orderby', 'combo', 'readonly', 'form', 'label', 'permissoes',
 				'default', 'nome_id'
 			);
-			$campos	= split('{;}', $campos);
+			$campos	= explode('{;}', $campos);
 			$A = array();
 			for ($i = 0; $i < count($campos); $i++) {
-				$parameters = split("{,}", $campos[$i]);
+				$parameters = explode("{,}", $campos[$i]);
 				if ($parameters[0]) {
 					$A[$parameters[0]]['ordem'] = ($i+1);
 					$isSelect = (strpos($parameters[0], 'select_') !== false);
@@ -483,6 +483,19 @@ class InterAdminTipo extends InterAdminAbstract {
 		$this->deleted_tipo = 'S';
 		$this->save();
 	}
+	/**
+	 * Deletes all the InterAdmins.
+	 * 
+	 * @param array $options [optional]
+	 * @return int Count of deleted InterAdmins.
+	 */
+	public function deleteInterAdmins($options = array()) {
+		$records = $this->getInterAdmins($options);
+		foreach ($records as $record) {
+			$record->delete();
+		}
+		return count($records);
+	}
 	public function getAttributesNames() {
 		return array('id_tipo', 'model_id_tipo', 'parent_id_tipo', 'redirect_id_tipo',
 			'nome', 'nome_en', 'texto', 'class', 'class_tipo', 'template', 'editpage', 
@@ -569,9 +582,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function getInterAdminsChildren() {
 		if (!$children = $this->_getMetadata('children')) {
 			$children = array();
-			$childrenArr = split("{;}", $this->getFieldsValues('children'));
+			$childrenArr = explode("{;}", $this->getFieldsValues('children'));
 			for ($i = 0; $i < count($childrenArr) - 1; $i++) {
-				$child = array_combine(array('id_tipo', 'nome', 'ajuda', 'netos'), split('{,}', $childrenArr[$i]));
+				$child = array_combine(array('id_tipo', 'nome', 'ajuda', 'netos'), explode('{,}', $childrenArr[$i]));
 				$nome_id = toId($child['nome'], false, '_');
 				$children[$nome_id] = $child;
 			}
