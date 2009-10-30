@@ -1057,7 +1057,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 	* @static
 	*/
 	private static function _array(&$data, $name) {
-		$count = ($name == 'attributes') ? count($data) - 1 : count($data); 
+		$count = ($name === 'attributes') ? count($data) - 1 : count($data); 
 ?>
 <li class="krumo-child">
 	
