@@ -132,7 +132,7 @@ class InterAdmin extends InterAdminAbstract {
 				$nome_id = Jp7_Inflector::tableize(substr($methodName, 3, -4));
 				if ($child = $children[$nome_id]) {
 					$options = (array) $args[1];
-					$options['where'][] = "id = " . $args[0];
+					$options['where'][] = "id = " . intval($args[0]);
 					return $this->getFirstChild($child['id_tipo'], $options);
 				}
 			} else {
@@ -268,7 +268,6 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		return $children;
 	}
-	
 	/**
 	 * Returns the first Child.
 	 * 
@@ -279,7 +278,6 @@ class InterAdmin extends InterAdminAbstract {
 	public function getFirstChild($id_tipo, $options = array()) {
 		return reset($this->getChildren($id_tipo, array('limit' => 1) + $options));	
 	}
-	
 	/**
 	 * Deletes all the children of a given $id_tipo.
 	 * 
@@ -294,7 +292,6 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		return count($children);
 	}
-	
 	/**
 	 * Retrieves the uploaded files of this record.
 	 * 
