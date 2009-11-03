@@ -1,6 +1,7 @@
 <?php
 
-class InterAdminFieldFile {	protected $_parent;
+class InterAdminFieldFile {
+	protected $_parent;
 	/**
 	 * Créditos/Legenda da imagem.
 	 * @var
@@ -12,8 +13,9 @@ class InterAdminFieldFile {	protected $_parent;
 	 */
 	public $url;
 		
-	public function __construct($url) {
+	public function __construct($url, $text = '') {
 		$this->url = $url;
+		$this->text = $text;
 	}
 	
 	public function __toString() {
