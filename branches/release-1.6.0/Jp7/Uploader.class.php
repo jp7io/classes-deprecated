@@ -22,44 +22,43 @@ class Jp7_Uploader {
 	 * @param string $extensionsFilter Regex for $extensions [optional]
 	 * @param string $typesFilter Regex for $types [optional]
 	 */
-	public function __construct($fieldName, $extensionsFilter = '/\.(jp[e]?g|gif|png|bmp)$/i', $typesFilter = '/image\/([p]?jp[e]?g|gif|png|bmp)/i') {
+	public function __construct($fieldName = '', $extensionsFilter = '/\.(jp[e]?g|gif|png|bmp)$/i', $typesFilter = '/image\/([p]?jp[e]?g|gif|png|bmp)/i') {
 		$this->fieldName = $fieldName;
 		$this->extensionsFilter = $extensionsFilter;
 		$this->typesFilter = $typesFilter;
 	}
 	
 	/**
-	 * Checks if the key has a valid file.
-	 * 
-	 * @param object $key
-	 * @throws Jp7_Uploader_InvalidExtensionException  For type/extension not valid.
-	 * @throws Exception For unknown upload error (browser, server, etc). 
-	 * @return bool
-	 */
-	public function hasFile($key) {
-		extract($_FILES[$this->fieldName]);
-		if ($name[$key]) {
-			if ($error[$key]) {
-				throw new Exception('There was an error while uploading: ' . $name[$key]);
-			}
-			if (!preg_match($this->extensionsFilter, $name[$key]) || !preg_match($this->typesFilter, $type[$key])) {
-				throw new Jp7_Uploader_InvalidExtensionException($name[$key] . ' is not in a valid extension/type.');
-			}
-			return true;
-		}
-		return false;
-	}
-	/**
 	 * Saves the file to the given destination (keeping the uploaded extension).
 	 * 
-	 * @param object $key
-	 * @param object $destination
+	 * @param string $key
+	 * @param string $destination
+	 * @param array $size  array(width, height)
+	 * @param string $resizeMode Available: resize, crop
 	 * @return string Full destination path (Base + Destination + Uploaded extension).
+	 * @throws Jp7_Uploader_InvalidExtensionException  For type/extension not valid.
+	 * @throws Exception For unknown upload error (browser, server, etc).
 	 */
-	public function save($key, $destination) {
+	public function save($key, $destination, array $newsize = array(), $resizeMode = 'resize') {
 		extract($_FILES[$this->fieldName]);
+				
+		// Validation
+		if (!$name[$key]) {
+			return false;
+		}
+		if ($error[$key]) {
+			throw new Exception('There was an error while uploading: ' . $name[$key]);
+		}
+		if (!preg_match($this->extensionsFilter, $name[$key]) || !preg_match($this->typesFilter, $type[$key])) {
+			throw new Jp7_Uploader_InvalidExtensionException($name[$key] . ' is not in a valid extension/type.');
+		}
 		
-		$finalDestination = $this->getBasePath() . $destination . preg_replace('/(.*)(\.[^\.]*)$/', '\2', $name[$key]);
+		// Copy
+		$extension = strtolower(preg_replace('/(.*)(\.[^\.]*)$/', '\2', $name[$key]));
+		if ($extension == '.jpeg') {
+			$extension = '.jpg';
+		}
+		$finalDestination = $this->getBasePath() . $destination . $extension;
 		
 		// Mkdir if needed
 		if (!is_dir(dirname($finalDestination))) {
@@ -67,10 +66,15 @@ class Jp7_Uploader {
 			@chmod(dirname($finalDestination), 0777);
 		}
 		
-		// Copy
-		copy($tmp_name[$key], $finalDestination);
+		if ($newsize && in_array($extension, array('.gif', '.jpg'))) {
+			$resource = ($extension == '.jpg') ? imagecreatefromjpeg($tmp_name[$key]) : imagecreatefromgif($tmp_name[$key]);
+			jp7_resizeImage($resource, $tmp_name[$key], $finalDestination, $newsize[0], $newsize[1], 90, 10000000, $resizeMode == 'crop');
+			imagedestroy($resource);
+		} else {
+			// Copy
+			copy($tmp_name[$key], $finalDestination);
+		}
 		@chmod($finalDestination, 0777);
-		
 		return $finalDestination;
 	}
     /**
