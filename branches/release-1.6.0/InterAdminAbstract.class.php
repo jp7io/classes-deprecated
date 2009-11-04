@@ -492,7 +492,18 @@ abstract class InterAdminAbstract {
 			return constant($constname);
 		}
 	}
-	
+	/**
+	 * Sets this object´s attributes with the given array keys and values.
+	 * 
+	 * @param array $attributes
+	 * @return void
+	 */
+	public function setAttributes($attributes) {
+		foreach ($attributes as $key => $value) {
+			$this->$key = $value;
+		}
+	}
+		
 	abstract function getAttributesCampos();
 	abstract function getAttributesNames();
 	abstract function getAttributesAliases();

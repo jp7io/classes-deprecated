@@ -1,5 +1,5 @@
 <?php
-class JP7_Collections {
+class Jp7_Collections {
  	/**
      * @param array $ary the array we want to sort 
      * @param string $clause a string specifying how to sort the array similar to SQL ORDER BY clause 
