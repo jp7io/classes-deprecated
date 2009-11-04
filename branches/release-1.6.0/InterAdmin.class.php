@@ -316,7 +316,7 @@ class InterAdmin extends InterAdminAbstract {
 		
 		$sql = "SELECT id_arquivo" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . 
 			" FROM " . $this->getTipo()->getArquivosTableName() . '_arquivos' .
-			" WHERE id_tipo = " . intval($this->id_tipo) . " AND id=" . $this->id .
+			" WHERE id_tipo = " . intval($this->id_tipo) . " AND id=" . intval($this->id) .
 			(($options['where']) ? $options['where'] : '') .
 			" ORDER BY " . (($options['order']) ? $options['order'] . ',' : '') . ' ordem' .
 			(($options['limit']) ? " LIMIT " . $options['limit'] : '');

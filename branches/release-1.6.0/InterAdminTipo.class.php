@@ -232,7 +232,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$options['from'] = $recordModel->getTableName() . " AS main";
 		$options['where'][] = "id_tipo = " . $this->id_tipo;
 		if ($this->_parent instanceof InterAdmin) {
-			$options['where'][] =  "parent_id = " . $this->_parent->id;
+			$options['where'][] =  "parent_id = " . intval($this->_parent->id);
 		}
 		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . $this->getInterAdminsOrder();
 		// Internal use
