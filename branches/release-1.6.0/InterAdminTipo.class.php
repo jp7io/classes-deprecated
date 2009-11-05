@@ -125,10 +125,12 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * Gets the parent InterAdminTipo object for this record, which is then cached on the $_parent property.
 	 * 
 	 * @param array $options Default array of options. Available keys: db_prefix, fields, class.
-	 * @return InterAdminTipo
+	 * @return InterAdminTipo|InterAdminAbstract
 	 */
 	public function getParent($options = array()) {
-		if ($this->_parent) return $this->_parent;
+		if ($this->_parent) {
+			return $this->_parent;
+		}
 		if ($this->parent_id_tipo || $this->getFieldsValues('parent_id_tipo')) {
 			$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo';
 			return $this->_parent = InterAdminTipo::getInstance($this->parent_id_tipo, $options);
@@ -137,10 +139,10 @@ class InterAdminTipo extends InterAdminAbstract {
 	/**
 	 * Sets the parent InterAdminTipo or InterAdmin object for this record, changing the $_parent property.
 	 *
-	 * @param InterAdminTipo|InterAdmin $parent
+	 * @param InterAdminAbstract $parent
 	 * @return void
 	 */
-	public function setParent($parent) {
+	public function setParent(InterAdminAbstract $parent = null) {
 		$this->_parent = $parent;
 	}
 	/**
@@ -613,7 +615,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$record->date_publish = date('c');
 		$record->date_insert = date('c');
 		if ($this->_parent instanceof InterAdmin) {
-			$record->parent_id = $this->_parent->id;
+			$record->setParent($this->_parent);
 			// Childs are published by default on InterAdmin.
 			$record->publish = 'S';
 		}

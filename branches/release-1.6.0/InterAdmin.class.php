@@ -194,7 +194,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @param InterAdminTipo $tipo
 	 * @return void
 	 */
-	public function setTipo($tipo) {
+	public function setTipo(InterAdminTipo $tipo = null) {
 		$this->id_tipo = $tipo->id_tipo;
 		$this->_tipo = $tipo;
 	}
@@ -223,7 +223,11 @@ class InterAdmin extends InterAdminAbstract {
 	 * @param InterAdmin $parent
 	 * @return void
 	 */
-	public function setParent($parent) {
+	public function setParent(InterAdmin $parent = null) {
+		if (!isset($parent->id)) {
+			$parent->id = 0; // Necessário para que a referência funcione
+		}
+		$this->attributes['parent_id'] = &$parent->id;
 		$this->_parent = $parent;
 	}
 	/**
