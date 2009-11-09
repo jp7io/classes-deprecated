@@ -1025,7 +1025,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 	*/
 	private static function _recursion($data = null) {
 		if (is_object($data)) {
-			$texto = get_class($data) . (isset($data->id) ? ' - ' . $data->id : '');
+			$texto = get_class($data) . (($data instanceof InterAdminAbstract) ? ' - ' . $data : '');
 		} else {
 			$texto = gettype($data);
 		}
@@ -1119,7 +1119,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 
 			<a class="krumo-name"><?php echo $name;?></a>
 			(<em class="krumo-type">Object</em>) 
-			<strong class="krumo-class"><?php echo get_class($data) . ((isset($data->id)) ? ' - ' . $data->id : '');?></strong>
+			<strong class="krumo-class"><?php echo get_class($data) . (($data instanceof InterAdminAbstract) ? ' - ' . $data : '');?></strong>
 	</div>
 
 	<?php if (count($data)) {

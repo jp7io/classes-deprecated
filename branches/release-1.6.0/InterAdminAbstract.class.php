@@ -74,7 +74,7 @@ abstract class InterAdminAbstract {
 	 * @param bool $forceAsString Gets the string value for fields referencing to another InterAdmin ID (fields started by "select_").
 	 * @param bool $fieldsAlias If <tt>TRUE</tt> the names of the fields are replaced by the Alias that were inserted on the InterAdmin.
 	 * @return mixed If $fields is an array an object will be returned, otherwise it will return the value retrieved.
-	 * @todo (FIXME - Multiple languages) When there is no id_tipo yet, the function is unable to decide which language table it should use.
+	 * @todo Multiple languages - When there is no id_tipo yet, the function is unable to decide which language table it should use.
 	 */
 	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
 		if ($this->_deleted) {
@@ -139,7 +139,6 @@ abstract class InterAdminAbstract {
 	 * Saves this record.
 	 * 
 	 * @return void
-	 * @todo ver como fazer o log
 	 */
 	public function save() {
 		$pk = $this->_primary_key;
@@ -464,7 +463,6 @@ abstract class InterAdminAbstract {
 			}
 		}
 	}
-	
 	/**
 	 * Resolves '*'
 	 * 
@@ -479,7 +477,6 @@ abstract class InterAdminAbstract {
 			$fields = array_merge($fields, $object->getAttributesNames());
 		}
 	}
-	
 	/**
 	 * Equals to static::CONSTNAME on PHP 5.3
 	 * 
@@ -503,13 +500,6 @@ abstract class InterAdminAbstract {
 			$this->$key = $value;
 		}
 	}
-		
-	abstract function getAttributesCampos();
-	abstract function getAttributesNames();
-	abstract function getAttributesAliases();
-	abstract function getTableName();
-	abstract function delete();
-	
 	/**
 	 * Reloads all the attributes.
 	 * 
@@ -537,7 +527,15 @@ abstract class InterAdminAbstract {
 		$newobject->attributes = $this->attributes;
 		return $newobject;
 	}
-	
+	/**
+	 * Sets this row as deleted as saves it.
+	 * 
+	 * @return void
+	 */
+	public function delete() {
+		$this->deleted = 'S';
+		$this->save();
+	}
 	/**
 	 * Deletes this row from the table.
 	 * 
@@ -553,7 +551,6 @@ abstract class InterAdminAbstract {
 		$this->attributes = array();
 		$this->_deleted = true;
 	}
-	
 	public function getRelatedInterAdminsByTags($id_tipo = 0) {
 		global $db, $debugger;
 		$pk = $this->_primary_key;
@@ -580,4 +577,24 @@ abstract class InterAdminAbstract {
 			return $return;
 		}
 	}
+	
+	/**
+	 * @param array $where
+	 * FIXME temporário para wheres que eram com string 
+	 */
+	protected function _whereArrayFix(&$where) {
+		if (!is_array($where)) {
+			if ($where) {
+				$where = explode(' AND ', $where);
+				$where = array_filter($where, 'array_trim'); // Para remover itens vazios
+			} else {
+				$where = array();
+			}
+		}
+	}
+	
+	abstract function getAttributesCampos();
+	abstract function getAttributesNames();
+	abstract function getAttributesAliases();
+	abstract function getTableName();
 }

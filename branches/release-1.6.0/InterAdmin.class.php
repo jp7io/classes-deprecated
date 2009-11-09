@@ -303,43 +303,34 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return array Array of InterAdminArquivo objects.
 	 */
 	public function getArquivos($options = array()) {
-		global $db;
-		global $lang;
-		global $jp7_app;
 		$arquivos = array();
 		
 		$className = (class_exists($options['class'])) ? $options['class'] : 'InterAdminArquivo';
+		$arquivoModel = new $className(0);
+		$arquivoModel->setTipo($this->getTipo());
 		
-		if ($options['fields'] == '*') {
-			$options['fields'] = call_user_method('getAllFieldsNames', $className);
-		}
+		$this->_resolveWildcard($options['fields'], $arquivoModel);
+		$this->_whereArrayFix($options['where']); // FIXME
 		
-		if (is_array($options['where'])) {
-			$options['where'] = ' AND ' . implode(' AND ', $options['where']);
-		}
+		$options['fields'] = array_merge(array('id_arquivo'), (array) $options['fields']);
+		$options['from'] = $arquivoModel->getTableName() . " AS main";
+		$options['where'][] = "id_tipo = " . intval($this->id_tipo);
+		$options['where'][] = "id = " . intval($this->id);
+		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . ' ordem';
+		// Internal use
+		$options['aliases'] = $arquivoModel->getAttributesAliases();
+		$options['campos'] = $arquivoModel->getAttributesCampos();
 		
-		$sql = "SELECT id_arquivo" . (($options['fields']) ? ',' . implode(',', (array)$options['fields']) : '') . 
-			" FROM " . $this->getTipo()->getArquivosTableName() . '_arquivos' .
-			" WHERE id_tipo = " . intval($this->id_tipo) . " AND id=" . intval($this->id) .
-			(($options['where']) ? $options['where'] : '') .
-			" ORDER BY " . (($options['order']) ? $options['order'] . ',' : '') . ' ordem' .
-			(($options['limit']) ? " LIMIT " . $options['limit'] : '');
-			
-		if ($jp7_app) {
-			$rs = $db->Execute($sql)or die(jp7_debug($db->ErrorMsg(), $sql));
-		} else {
-			$rs = interadmin_query($sql);
-		}
+		$rs = $this->_executeQuery($options);
+		
+		$records = array();
 		while ($row = $rs->FetchNextObj()) {
 			$arquivo = new $className($row->id_arquivo, array('db_prefix' => $this->getTipo()->db_prefix));
 			$arquivo->setTipo($this->getTipo());
 			$arquivo->setParent($this);
-			foreach ((array) $options['fields'] as $field) {
-				$arquivo->$field = $row->$field;
-			}
+			$this->_getAttributesFromRow($row, $arquivo, $options);
 			$arquivos[] = $arquivo;
 		}
-		$rs->Close();
 		return $arquivos;
 	}
 	/**
@@ -522,13 +513,4 @@ class InterAdmin extends InterAdminAbstract {
     public static function setLogUser($log_user) {
         self::$log_user = $log_user;
     }
-	/**
-	 * Sets this row as deleted as saves it.
-	 * 
-	 * @return void
-	 */
-	public function delete() {
-		$this->deleted = 'S';
-		$this->save();
-	}
 }

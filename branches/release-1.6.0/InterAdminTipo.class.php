@@ -152,15 +152,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return array Array of InterAdminTipo objects.
 	 */
 	public function getChildren($options = array()) {
-		// FIXME temporário para wheres que eram com string
-		if (!is_array($options['where'])) {
-			if ($options['where']) {
-				$options['where'] = jp7_explode(' AND ', $options['where']);
-			} else {
-				$options['where'] = array();
-			}
-		}
-		
+		$this->_whereArrayFix($options['where']); // FIXME
+				
 		$options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
 		$options['from'] = $this->getTableName() . " AS main";
 		$options['where'][] = "parent_id_tipo = " . $this->id_tipo;
@@ -219,16 +212,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
 		
 		$this->_resolveWildcard($options['fields'], $recordModel);
-		
-		// FIXME temporário para wheres que eram com string
-		if (!is_array($options['where'])) {
-			if ($options['where']) {
-				$options['where'] = explode(' AND ', $options['where']);
-				$options['where'] = array_filter($options['where'], 'array_trim'); // Para remover itens vazios
-			} else {
-				$options['where'] = array();
-			}
-		}
+		$this->_whereArrayFix($options['where']); // FIXME
 		
 		$options['fields'] = array_merge(array('id'), (array) $options['fields']);
 		$options['from'] = $recordModel->getTableName() . " AS main";
@@ -577,7 +561,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		if ($this->language) {
 			$table .= $lang->prefix;
 		}
-		return $table;
+		return $table . '_arquivos';
 	}
 	protected function _setMetadata($varname, $value) {
 		self::$_metadata[$this->id_tipo][$varname] = $value;

@@ -47,10 +47,11 @@ class Jp7_Uploader {
 			return false;
 		}
 		if ($error[$key]) {
+			// @todo exibir mensagem de acordo com o erro encontrado
 			throw new Exception('There was an error while uploading: ' . $name[$key]);
 		}
 		if (!preg_match($this->extensionsFilter, $name[$key]) || !preg_match($this->typesFilter, $type[$key])) {
-			throw new Jp7_Uploader_InvalidExtensionException($name[$key] . ' is not in a valid extension/type.');
+			throw new Jp7_Uploader_InvalidExtensionException($name[$key]);
 		}
 		
 		// Copy
