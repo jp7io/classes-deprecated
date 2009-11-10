@@ -495,7 +495,7 @@ abstract class InterAdminAbstract {
 	 * @param array $attributes
 	 * @return void
 	 */
-	public function setAttributes($attributes) {
+	public function setAttributes(array $attributes) {
 		foreach ($attributes as $key => $value) {
 			$this->$key = $value;
 		}

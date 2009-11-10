@@ -296,6 +296,15 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		return count($children);
 	}
+	
+	public function createArquivo(array $attributes = array()) {
+		$arquivo = new InterAdminArquivo();
+		$arquivo->setParent($this);
+		$arquivo->setTipo($this->getTipo());
+		$arquivo->mostrar = 'S';
+		$arquivo->setAttributes($attributes);
+		return $arquivo;
+	}
 	/**
 	 * Retrieves the uploaded files of this record.
 	 * 

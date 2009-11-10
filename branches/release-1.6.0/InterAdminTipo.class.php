@@ -603,9 +603,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			// Childs are published by default on InterAdmin.
 			$record->publish = 'S';
 		}
-		if ($attributes) {
-			$record->attributes = array_merge($record->attributes,  $attributes);
-		}
+		$record->setAttributes($attributes);
 		return $record;
 	}
 	

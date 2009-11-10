@@ -107,6 +107,51 @@ class InterAdminArquivo extends InterAdminAbstract {
 		$url = str_replace('../../', $c_url, $url);
 		return $url; 
 	}
+	/**
+	 * Adds this file to the table _arquivos_banco and sets it's $url with the new $id_arquivo_banco.
+	 *
+	 * @return Url New $url created with the $id_arquivo_banco of the added record.
+	 * @todo Create a class for _arquivos_banco 
+	 */
+	public function addToArquivosBanco() {
+		global $lang;
+		// Inserindo no banco de arquivos
+		$fieldsValues = array(
+			'id_tipo' => $this->id_tipo,
+			'id' => $this->id,
+			'tipo' => $this->getExtension(),
+			'parte' => intval($this->parte),
+			'keywords' => $this->nome,
+			'lang' => $lang->lang
+		);
+		
+		$id_arquivo_banco = jp7_db_insert($this->getTableName() . '_banco', 'id_arquivo_banco', '', $fieldsValues);
+		$newurl = str_pad($id_arquivo_banco, 8, '0', STR_PAD_LEFT);
+		
+		// Descobrindo o caminho da pasta
+		$parent = $this->getParent();
+		if ($parent->getParent()) {
+			$parent = $parent->getParent();
+		}
+		
+		$folder = toId($parent->getTipo()->getFieldsValues('nome'));
+		// Montando nova url
+		$newurl = '../../upload/' . $folder . '/' . $newurl . '.' . $fieldsValues['tipo'];
+		
+		// Movendo arquivo temporário
+		rename($this->url, $newurl);
+		$this->url = $newurl;
+		return $this->url; 
+	}
+	
+	/**
+	 * Returns the extension of this file.
+	 * 
+	 * @return string Extension, such as 'jpg' or 'gif'.
+	 */
+	public function getExtension() {
+		return preg_replace('/(.*)\.(.*)$/', '\2', $this->url);
+	}
 	
     function getAttributesAliases() {
        return array();

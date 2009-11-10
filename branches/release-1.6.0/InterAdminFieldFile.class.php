@@ -12,24 +12,20 @@ class InterAdminFieldFile {
 	 * @var
 	 */
 	public $url;
-		
+	
 	public function __construct($url, $text = '') {
 		$this->url = $url;
 		$this->text = $text;
 	}
-	
 	public function __toString() {
 		return $this->url;
 	}
-	
 	public function getUrl() {
 		return $this->url;
 	}
-	
 	public function getText() {
 		return $this->text;
 	}
-	
 	/**
      * Returns $parent.
      *
@@ -38,7 +34,6 @@ class InterAdminFieldFile {
     public function getParent() {
         return $this->_parent;
     }
-    
     /**
      * Sets $parent.
      *
@@ -48,5 +43,4 @@ class InterAdminFieldFile {
     public function setParent($parent) {
         $this->_parent = $parent;
     }
-    
 }
