@@ -126,7 +126,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 		);
 		
 		$id_arquivo_banco = jp7_db_insert($this->getTableName() . '_banco', 'id_arquivo_banco', '', $fieldsValues);
-		$newurl = str_pad($id_arquivo_banco, 8, '0', STR_PAD_LEFT);
+		$id_arquivo_banco = str_pad($id_arquivo_banco, 8, '0', STR_PAD_LEFT);
 		
 		// Descobrindo o caminho da pasta
 		$parent = $this->getParent();
@@ -134,13 +134,19 @@ class InterAdminArquivo extends InterAdminAbstract {
 			$parent = $parent->getParent();
 		}
 		
-		$folder = toId($parent->getTipo()->getFieldsValues('nome'));
+		$folder = '../../upload/' . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
 		// Montando nova url
-		$newurl = '../../upload/' . $folder . '/' . $newurl . '.' . $fieldsValues['tipo'];
+		$newurl = $folder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
 		
 		// Movendo arquivo temporário
-		rename($this->url, $newurl);
+		@rename($this->url, $newurl);
 		$this->url = $newurl;
+		// Movendo o thumb
+		if ($this->url_thumb) {
+			$newurl_thumb = $folder . $id_arquivo_banco . '_t.' . $fieldsValues['tipo'];
+			@rename($this->url_thumb, $newurl_thumb);
+			$this->url_thumb = $newurl_thumb;
+		}
 		return $this->url; 
 	}
 	

@@ -296,7 +296,12 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		return count($children);
 	}
-	
+	/**
+	 * Creates a new InterAdminArquivo with id_tipo, id and mostrar set.
+	 * 
+	 * @param array $attributes [optional]
+	 * @return InterAdminArquivo
+	 */
 	public function createArquivo(array $attributes = array()) {
 		$arquivo = new InterAdminArquivo();
 		$arquivo->setParent($this);
@@ -341,6 +346,19 @@ class InterAdmin extends InterAdminAbstract {
 			$arquivos[] = $arquivo;
 		}
 		return $arquivos;
+	}
+	/**
+	 * Deletes all the InterAdminArquivo records related with this record.
+	 * 
+	 * @param array $options [optional]
+	 * @return int Number of deleted arquivos.
+	 */
+	public function deleteArquivos($options = array()) {
+		$arquivos = $this->getArquivos($options);
+		foreach ($arquivos as $arquivo) {
+			$arquivo->delete();
+		}
+		return count($arquivos);
 	}
 	/**
 	 * Returns the full url for this record.
