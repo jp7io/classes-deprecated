@@ -31,6 +31,16 @@ class InterSite extends InterAdmin {
 	 */
 	public $langs = array();
 	
+	
+	public $allowAttributes = false;
+	public function __set($var, $value) {
+		if (!$this->allowAttributes) {
+			parent::__set($var, $value);
+		} else {
+			$this->$var = $value;
+		}
+	}
+		
 	/**
 	 * Populates and returns the array of servers for this site.
 	 * 
@@ -293,15 +303,7 @@ class InterSite extends InterAdmin {
 		return $content;
 	}
 		
-	protected function _removeFromArray($val, array &$array)
-	{
-		$posicao = array_search($val, $array);
-		if ($posicao !== false) {
-			unset($array[$posicao]);
-		}
-	}
-	
-	protected function _removeAttributes($object, array $attributes = array('id', 'id_tipo', 'table', 'db_prefix'))
+	protected function _removeUnneeded($object, array $attributes = array('id', 'id_tipo'))
 	{
 		foreach ($attributes as $name) 
 		{
@@ -311,13 +313,7 @@ class InterSite extends InterAdmin {
 	
 	protected function _toSimpleObject($object)
 	{
-		$retorno = new stdClass();
-		foreach ((array) $object as $key => $atributo) {
-			if ($key[0] != chr(0)) {
-				$retorno->$key = $atributo;
-			}
-		}
-		return $retorno;
+		return (object) $object->attributes;
 	}
 	
 	/**
@@ -343,29 +339,29 @@ class InterSite extends InterAdmin {
 	{
 		foreach ($this->servers as $key => &$server) {
 			$server = $this->_toSimpleObject($server);
-			$this->_removeAttributes($server);
+			$this->_removeUnneeded($server);
 			if ($server->db) {
 				$server->db = $this->_toSimpleObject($server->db);
-				$this->_removeAttributes($server->db);
+				$this->_removeUnneeded($server->db);
 			}
 		}
 		
 		foreach ($this->langs as $key => &$lang) {
 			$lang = $this->_toSimpleObject($lang);
-			$this->_removeAttributes($lang);
+			$this->_removeUnneeded($lang);
 		}
 		
-		$atributos = array_keys(get_object_vars($this));
-
-		$this->_removeFromArray('_tipo', $atributos);
-		$this->_removeFromArray('_parent', $atributos);
-		$this->_removeFromArray('interadmin_logo', $atributos);
-		$this->_removeFromArray('db_prefix', $atributos);
-		$this->_removeFromArray('table', $atributos);
-		$this->_removeFromArray('id', $atributos);
-		$this->_removeFromArray('id_tipo', $atributos);
-	
-		return $atributos;
+		unset($this->attributes['interadmin_logo']);
+		unset($this->attributes['id']);
+		unset($this->attributes['id_tipo']);
+		
+		// FIXME hack para funcionar com versões antigas das classes no host do site
+		$this->allowAttributes = true; 
+		foreach ($this->attributes as $var => $value) {
+			$this->$var = $value;
+		}
+				
+		return array_merge(array_keys($this->attributes), array('servers', 'langs'));
 	}
 	
 	/**

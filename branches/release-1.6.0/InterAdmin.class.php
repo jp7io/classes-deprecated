@@ -54,7 +54,7 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function __construct($id = 0, $options = array()) {
 		if ($id) {
-			$this->id = $id;
+			$this->id = (string) $id;
 		}
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
 		$this->table = ($options['table']) ? '_' . $options['table'] : '';
