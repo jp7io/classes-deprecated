@@ -5,20 +5,30 @@ class Jp7_InterAdmin_Tagcloud
 	public $minFontSize = 9;
 	public $limit = 10;
 	public function getTags($class = 'InterAdmin') {
-		global $db_prefix, $lang;
+		
+		global $db, $db_prefix, $lang;
+		$DbNow = $db->BindTimeStamp(date("Y-m-d H:i:s"));
 		$tags_arr = array();
-		$sql = "SELECT id, hits FROM " . $db_prefix . $lang->prefix .
-		" WHERE hits > 0" .
-		" ORDER BY date_hit DESC" .
+		$sql = "SELECT registros.id, registros.hits" .
+		" FROM " . $db_prefix . $lang->prefix . " AS registros" .
+		" INNER JOIN " . $db_prefix . $lang->prefix . "_tags AS tags" .
+		" ON registros.id = tags.parent_id" .
+		" WHERE registros.hits > 0" .
+		" AND registros.char_key <> ''" .
+		" AND registros.deleted = ''" .
+		" AND (registros.date_publish <= '" . $DbNow . "' OR registros.date_publish IS NULL)" .
+		" AND (registros.date_expire > '" . $DbNow . "' OR registros.date_expire IS NULL OR registros.date_expire='0000-00-00 00:00:00')" .
+		" GROUP BY registros.id" .
+		" ORDER BY registros.date_hit DESC" .
 		" LIMIT " . $this->limit;
-		$rs = interadmin_query($sql);
+		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		while ($row = $rs->FetchNextObj()) {
 			$interadminCloud = new $class($row->id);
 			$interadminCloud->hits = $row->hits;
 			$tags_arr = array_merge($tags_arr, $interadminCloud->getTags());
 		}
 		$rs->Close();
-		//krumo($tags_arr);
+		
 		$tags_arr_unique = array();
 		foreach ($tags_arr as $tag) {
 			$tag_key = ($tag->id) ? $tag->id_tipo . ';' . $tag->id : $tag->id_tipo;
