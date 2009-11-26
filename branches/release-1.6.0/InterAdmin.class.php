@@ -319,7 +319,7 @@ class InterAdmin extends InterAdminAbstract {
 	public function getArquivos($options = array()) {
 		$arquivos = array();
 		
-		$className = (class_exists($options['class'])) ? $options['class'] : 'InterAdminArquivo';
+		$className = (class_exists($options['class'])) ? $options['class'] : $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminArquivo';
 		$arquivoModel = new $className(0);
 		$arquivoModel->setTipo($this->getTipo());
 		
@@ -397,7 +397,7 @@ class InterAdmin extends InterAdminAbstract {
 			$rs = $db->Execute($sql);
 			$this->tags = array();
 			while ($row = $rs->FetchNextObj()) {
-				$tag_tipo = new InterAdminTipo($row->id_tipo);
+				$tag_tipo = InterAdminTipo::getInstance($row->id_tipo);
 				$tag_text = $tag_tipo->getFieldsValues('nome');
 				if ($row->id) {
 					$options = array(
