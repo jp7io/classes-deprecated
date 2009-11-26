@@ -101,11 +101,20 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 *
 	 * @return string
 	 */
-	public function getUrl(){
+	public function getUrl() {
 		global $c_url;
 		$url = ($this->url) ? $this->url : $this->getFieldsValues('url');
 		$url = str_replace('../../', $c_url, $url);
 		return $url; 
+	}
+	/**
+	 * Returns the description of this file.
+	 *
+	 * @return string
+	 */
+	public function getText() {
+		$text = ($this->legenda) ? $this->legenda : $this->getFieldsValues('legenda');
+		return $text; 
 	}
 	/**
 	 * Adds this file to the table _arquivos_banco and sets it's $url with the new $id_arquivo_banco.
