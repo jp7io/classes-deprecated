@@ -111,6 +111,7 @@ class InterAdminField{
 			"<option value=\"0\">Selecione</option>" .
 			"<option value=\"0\">--------------------</option>";
 			if ($xtra == 'radio') {
+				$temp_campo_nome=interadmin_tipos_nome((is_numeric($campo_nome))?$campo_nome:0);
 				$form = interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', '', 'radio', $campo . '[' . $j . ']', $temp_campo_nome, $obrigatorio);
 			} elseif ($xtra == 'radio_tipos') {
 				$form = interadmin_tipos_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, '', '', 'radio', $campo . '[' . $j . ']', true, $readonly, $obrigatorio);
