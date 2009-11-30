@@ -608,33 +608,19 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 	
 	/**
-	 * @todo Usar método getInterAdmins e permitir select de campos passados pelo options
+	 * Returns the InterAdmins having the given tags.
+	 * 
+	 * @param InterAdmin $tags
+	 * @param array $options [optional]
+	 * @return InterAdmin[]
 	 */
-	function getInterAdminsByTags($tagsObj = 0, $options = array()) {
+	function getInterAdminsByTags($tags, $options = array()) {
 		global $db, $debugger;
-		//$pk = $this->_primary_key;
-		
-		$sql = "SELECT tags.id_tag,tags.parent_id,tags.id,tags.id_tipo".
-			" FROM " . $this->db_prefix . "_tags AS tags" .
-			" INNER JOIN " . $this->db_prefix . " AS registros" .
-			" ON tags.parent_id = registros.id" .
-			" WHERE tags.id IN (" . implode(',', $tagsObj) . ")".
-			" AND registros.id_tipo = " . $this->id_tipo;
-		if ($debugger) {
-			$debugger->showSql($sql, $sql_debug);
+		if (is_array($tags)) {
+			$options['where'][] = "tags.id IN (" . implode(',', $tags) . ")";
+		} elseif ($tags) {
+			$options['where'][] = "tags.id = " . $tags;
 		}
-		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
-		
-		$optionsInstance = array(
-			'class' => $options['class'],
-			'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin'
-		);
-		$record = InterAdmin::getInstance(0, $optionsInstance, $this);
-		$classname = get_class($record);
-		while ($row = $rs->FetchNextObj()) {
-			$return[] = new $classname($row->parent_id);
-		}
-		$rs->Close();
-		return $return;
+		return $this->getInterAdmins($options);
 	}
 }

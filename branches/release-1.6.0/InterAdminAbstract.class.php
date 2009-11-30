@@ -279,8 +279,8 @@ abstract class InterAdminAbstract {
 		);
 		
 		// Group by para wheres com children
-		if (strpos($options['where'], 'children_') !== false) { // Performance
-			preg_match_all('/(' . $quoted . '|children_[a-zA-Z0-9_.]+)/', $options['where'], $matches);
+		if (strpos($options['where'], 'children_') !== false || strpos($options['where'], 'tags.') !== false) { // Performance
+			preg_match_all('/(' . $quoted . '|tags.|children_[a-zA-Z0-9_.]+)/', $options['where'], $matches);
 			foreach ($matches[1] as $match) {
 				if ($match[0] != "'") { // Filter
 					$options['group'] .= (($options['group']) ? ',' : '') . 'main.id';
@@ -303,8 +303,16 @@ abstract class InterAdminAbstract {
 					list($table, $termo) = explode('.', $termo);
 				}
 				if ($table != 'main') {
+					// Joins com tags @todo Verificar jeito mais modularizado de fazer esses joins 
+					if ($table == 'tags') {
+						if (!in_array($table, (array) $options['from_alias'])) {
+							$options['from_alias'][] = $table;
+							$options['from'][] = $this->db_prefix . "_tags AS " . $table .		
+								" ON " . $table . ".parent_id = main.id";
+						}
+						$joinAliases = array();
 					// Joins com children
-					if (strpos($table, 'children_') === 0) {
+					} elseif (strpos($table, 'children_') === 0) {
 						$joinNome = substr($table, 9);
 						$childrenArr = $this->getInterAdminsChildren();
 						if (!$childrenArr[$joinNome]) {
