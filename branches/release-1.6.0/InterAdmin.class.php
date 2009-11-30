@@ -390,7 +390,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * 
 	 * @return string
 	 */
-	public function getTags($class_tipo = 'InterAdminTipo', $class = 'InterAdmin'){
+	public function getTags() {
 		if (!$this->_tags) {
 			global $db;
 			$sql = "SELECT * FROM " . $this->db_prefix . "_tags WHERE parent_id = " . $this->id;
