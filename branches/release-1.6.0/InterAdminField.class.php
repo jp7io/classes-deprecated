@@ -63,7 +63,7 @@ class InterAdminField{
 		}
 		$valor=stripslashes($GLOBALS[$campo]);
 		if(!$valor&&!$id)$valor=$valor_default;
-		$_th="<th title=\"".$campo. ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome, false, '_')) . ')' . "\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
+		$_th="<th title=\"".$campo. ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . ')' . "\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
 		if($ajuda)$S_ajuda="<input type=\"button\" value=\"?\" tabindex=\"-1\" class=\"bt_ajuda\" onclick=\"alert('".$ajuda."')\" />";
 		if($readonly=="hidden")$readonly_hidden=true;
 		if($readonly||($campo_array[permissoes]&&$campo_array[permissoes]!=$s_user['tipo']&&!$s_user['sa']))$readonly=" disabled";
@@ -256,7 +256,7 @@ class InterAdminField{
 				if(!$readonly_hidden){
 					echo "".
 					"<tr".(($s_session['mode']=="light"&&strpos($campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
-						"<th title=\"" . $campo . ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome, false, '_')) . ')' . "\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>".
+						"<th title=\"" . $campo . ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . ')' . "\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>".
 						"<td colspan=\"2\">".$form."</td>".
 						"<td>".$S_ajuda."</td>".
 					"</tr>\n";

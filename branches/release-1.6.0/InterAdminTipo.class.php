@@ -373,7 +373,7 @@ class InterAdminTipo extends InterAdminAbstract {
 						$alias = $alias->getFieldsValues('nome');	
 					}
 				}
-				$alias = ($alias) ? toId($alias, false, '_') : $field;
+				$alias = ($alias) ? toId($alias) : $field;
 				$aliases[$field] = $alias;
 				// Cache
 				$campos[$field]['nome_id'] = $alias; 
@@ -578,7 +578,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$childrenArr = explode("{;}", $this->getFieldsValues('children'));
 			for ($i = 0; $i < count($childrenArr) - 1; $i++) {
 				$child = array_combine(array('id_tipo', 'nome', 'ajuda', 'netos'), explode('{,}', $childrenArr[$i]));
-				$nome_id = toId($child['nome'], false, '_');
+				$nome_id = toId($child['nome']);
 				$children[$nome_id] = $child;
 			}
 			$this->_setMetadata('children', $children);
