@@ -14,7 +14,7 @@ class Jp7_Date extends DateTime {
 	 * @param int|string $timeStamp Timestamp ou Datetime. 
 	 * @return string
 	 */
-	public static function humanDiff($timeStamp) {
+	public function humanDiff($timeStamp) {
 		if (!is_int($timeStamp)) {
 			$timeStamp = strtotime($timeStamp);
 		}
@@ -30,10 +30,13 @@ class Jp7_Date extends DateTime {
 		$seconds = $currentTime - $timeStamp;
 		if ($seconds <= 60) {
 			return 'agora';
+		} elseif ($seconds >= $units['dia'] && $seconds < $units['dia'] * 2) {
+			return 'ontem';
 		}
 		foreach ($units as $unit => $seconds_in_period) {
 			if ($seconds >= $seconds_in_period) {
 				$count = floor($seconds / $seconds_in_period);
+				
 				$unit = Jp7_Inflector::plural($unit, $count);
 				return $count . ' ' . $unit . ' atrás';
 			}
@@ -43,24 +46,30 @@ class Jp7_Date extends DateTime {
 	/**
 	 * Returns the age based on the birthdate and the current date.
 	 * 
-	 * @param string|int $birth Datetime (string) or Timestamp (int).
-	 * @param string|int $now [optional]
+	 * Static: 		yearsDiff($from, $to = null)
+	 * Instance: 	yearsDiff($to = false)
+	 * 
+	 * @param string|int $from [only with static calls] Datetime (string) or Timestamp (int).
+	 * @param string|int $to [optional]
 	 * @return int Age in years.
 	 */
-	public static function yearsDiff($birth, $now = null) {
-		// Override
-		if (is_integer($birth)) {
-			$birth = date('Y-m-d', $birth);
-		}
-		if (is_null($now)) {
-			$now = time();
+	public function yearsDiff($to = false) {
+		if (isset($this)) {
+			$from = $this;
 		} else {
-			$now = self::toTime($now);
+			$from = $to; 
+			$to = @func_get_arg(1);
+		}
+		$from = self::_toTime($from);
+		if ($to === false) { 
+			$to = time();
+		} else {
+			$to = self::_toTime($to);
 		}
 		// Function itself
-		list($y, $m, $d) = explode('-', $birth);
-		$years = date('Y', $now) - $y;
-		if (date('md', $now) < $m . $d) {
+		list($y, $m, $d) = explode('-', date('Y-m-d', $from));
+		$years = date('Y', $to) - $y;
+		if (date('md', $to) < $m . $d) {
 			$years--;
 		}
 		return $years;
@@ -69,17 +78,27 @@ class Jp7_Date extends DateTime {
 	/**
 	 * Difference of days between 2 timestamps.
 	 * 
-	 * @param int $from
+	 * Static: 		daysDiff($from, $to = null)
+	 * Instance: 	daysDiff($to = false)
+	 * 
+	 * @param int $from [only with static calls] 
 	 * @param int $to [optional]
 	 * @return int
 	 */
-	public static function daysDiff($from, $to = null) {
-		$from = self::toTime($from);
-		if (is_null($to)) { 
+	public function daysDiff($to = false) {
+		if (isset($this)) {
+			$from = $this;
+		} else {
+			$from = $to; 
+			$to = @func_get_arg(1);
+		}
+		$from = self::_toTime($from);
+		if ($to === false) { 
 			$to = time();
 		} else {
-			$to = self::toTime($to);
+			$to = self::_toTime($to);
 		}
+		// Function itself
 		$diff = $to - $from;
 		$days = round($diff / 86400);
 		return $days;
@@ -91,83 +110,70 @@ class Jp7_Date extends DateTime {
 	 * @param string $datetime
 	 * @return int 
 	 */
-	public static function toTime($datetime) {
-		if (is_string($datetime)) {
+	protected static function _toTime($datetime) {
+		if (!is_int($datetime)) {
 			$datetime = strtotime($datetime);
 		}
 		return $datetime;
 	}
 	
 	/**
-["y"]=>  int(2)
-["m"]=>  int(0) 
-["d"]=>  int(1) 
-["h"]=>  int(0) 
-["i"]=>  int(0)
-["s"]=>  int(0)
-["invert"]=>  int(0) 
-["days"]=>  int(6015) 
-	
-	$d1 = new DateTime('1992-01-01');
-	$d2 = new DateTime('1992-12-31');
-	var_dump(class_exists('DateInterval'));
-	
-	var_dump($d1->diff($d2));
-    */
+	 * Returns the difference between two Jp7_Date objects.
+	 * 
+	 * @param Jp7_Date $datetime
+	 * @return DateInterval|object
+     */
 	public function diff(Jp7_Date $datetime) {
-		if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+		if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
 			// Versão 5.3 já possui método
 			$retorno = parent::diff($datetime);
 		} else {
 			// Versões antigas precisam fazer "manualmente"
-			$keys = array('y', 'm', 'd', 'h');
 			if ($this < $datetime){
-				$temp = $datetime->getTimestamp();
-				$d1 = date_parse($datetime->format('Y-m-d H:i:s'));
-				$d2 = date_parse($this->format('Y-m-d H:i:s'));
+				$d1 = $datetime;
+				$d2 = $this;
 			} else {
-				$temp = $this->getTimestamp();
-			    $d1 = date_parse($this->format('Y-m-d H:i:s'));
-				$d2 = date_parse($datetime->format('Y-m-d H:i:s'));
+			    $d1 = $this;
+				$d2 = $datetime;
 			}
-			
-			
-			krumo($d1);
-			die();
-			if ($d1['s'] >= $d2['s']) {
-				$diff['s'] = $d1['s'] - $d2['s'];
+			$temp = $d1->getTimestamp();
+			$keys = array('y', 'm', 'd', 'h', 'i', 's', '_', '_', '_', '_', '_', '_');
+			$d1 = (object) array_combine($keys, date_parse($d1->format('Y-m-d H:i:s')));
+			$d2 = (object) array_combine($keys, date_parse($d2->format('Y-m-d H:i:s')));
+			if ($d1->s >= $d2->s) {
+				$diff->s = $d1->s - $d2->s;
 			} else {
-				$d1['i']--;
-				$diff['s'] = 60 - $d2['s'] + $d1['s'];
+				$d1->i--;
+				$diff->s = 60 - $d2->s + $d1->s;
 			}
-			if ($d1['i'] >= $d2['i']){
-				$diff['i'] = $d1['i'] - $d2['i'];
+			if ($d1->i >= $d2->i) {
+				$diff->i = $d1->i - $d2->i;
 			} else {
-				$d1['h']--;
-				$diff['i'] = 60 - $d2['i'] + $d1['i'];
+				$d1->h--;
+				$diff->i = 60 - $d2->i + $d1->i;
 			}
-			if ($d1['h'] >= $d2['h']) {
-				$diff['h'] = $d1['h'] - $d2['h'];
+			if ($d1->h >= $d2->h) {
+				$diff->h = $d1->h - $d2->h;
 			} else {
-				$d1['d']--;
-				$diff['h'] = 24 - $d2['h'] + $d1['h'];
+				$d1->d--;
+				$diff->h = 24 - $d2->h + $d1->h;
 			}
-			if ($d1['d'] >= $d2['d']) {
-				$diff['d'] = $d1['d'] - $d2['d'];
+			if ($d1->d >= $d2->d) {
+				$diff->d = $d1->d - $d2->d;
 			} else {
-				$d1['m']--;
-				$diff['d'] = date('t', $temp) - $d2['d'] + $d1['d'];
+				$d1->m--;
+				$diff->d = date('t', $temp) - $d2->d + $d1->d;
 			}
-			if ($d1['m'] >= $d2['m']) {
-				$diff['m'] = $d1['m'] - $d2['m'];
+			if ($d1->m >= $d2->m) {
+				$diff->m = $d1->m - $d2->m;
 			} else {
-				$d1['y']--;
-				$diff['m'] = 12 - $d2['m'] + $d1['m'];
+				$d1->y--;
+				$diff->m = 12 - $d2->m + $d1->m;
 			}
-			$diff['y'] = $d1['y'] - $d2['y'];
+			$diff->y = $d1->y - $d2->y;
 			$retorno = $diff;
 		}
-		//$retorno->days = '';
+		//$retorno->days; // Bugado até mesmo na 'oficial' PHP 5.3
 		return $retorno;
 	}
 	
