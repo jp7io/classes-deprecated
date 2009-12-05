@@ -365,8 +365,8 @@ class InterAdmin extends InterAdminAbstract {
 	 * 
 	 * @return string
 	 */
-	public function getUrl(){
-		global $seo;
+	public function getUrl($sep = null){
+		global $seo, $seo_sep;
 		if ($seo && $this->getParent()->id) {
 			$link = $this->_parent->getUrl() . '/' . toSeo($this->getTipo()->getFieldsValues('nome'));
 		} else {
@@ -379,7 +379,10 @@ class InterAdmin extends InterAdminAbstract {
 			} else {
 				$nome = $this->getFieldsValues('varchar_key');
 			}
-			$link .= '.' . toSeo($nome);
+			if (is_null($sep)) {
+				$sep = $seo_sep;
+			}
+			$link .= $sep . toSeo($nome);
 		} else {
 			$link .= '?id=' . $this->id;
 		}
