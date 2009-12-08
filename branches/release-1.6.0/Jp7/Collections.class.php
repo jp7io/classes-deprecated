@@ -8,17 +8,19 @@ class Jp7_Collections {
 	 * @return array Processed collection.
 	 */
 	public static function query($array, $options) {
-		if ($options['where']) {
-			$array = self::filter($array, $options['where']);
-		}
-		if ($options['group']) {
-			$array = self::group($array, $options['group']);
-		}
-		if ($options['order']) {
-			$array = self::sort($array, $options['order']);
-		}
-		if ($options['limit']) {
-			$array = self::slice($array, $options['limit']);
+		if ($array) {
+			if ($options['where']) {
+				$array = self::filter($array, $options['where']);
+			}
+			if ($options['group']) {
+				$array = self::group($array, $options['group']);
+			}
+			if ($options['order']) {
+				$array = self::sort($array, $options['order']);
+			}
+			if ($options['limit']) {
+				$array = self::slice($array, $options['limit']);
+			}
 		}
 		return $array;
 	}
@@ -42,6 +44,28 @@ class Jp7_Collections {
 	public static function filter($array, $clause) {
 		// $callback = 'fazer';
 		// array_filter($ary, $callback);
+	}
+	/**
+	 * Flips an array of $itens->subitem into an array of $subitem->itens; 
+	 * 
+	 * @param object $compactedArray Such as array('newPropertyName' => $array).
+	 * @param object $property Name of the property to be flipped.
+	 * @return array
+	 */
+	public static function flip($compactedArray, $property) {
+		$newPropertyName = key($compactedArray);
+		$subitens = array();
+		foreach ($compactedArray[$newPropertyName] as $item) {
+			$subitem = $item->$property;
+			unset($item->$property);
+			$key = $subitem->__toString();
+			if (!in_array($key, $subitens)) {
+				$subitem->$newPropertyName = array();
+				$subitens[$key] = $subitem;
+			}
+			$subitens[$key]->{$newPropertyName}[] = $item;
+		}
+		return $subitens;
 	}
 	/**
  	 * Acts like an order by on an SQL.
@@ -71,14 +95,29 @@ class Jp7_Collections {
 			if ($k == 'RAND()') {
             	$aStr = $bStr = 'rand()';
 			} else {
+				$k = str_replace('.', '->', $k);
 				$aStr = '$a->' . $k;
             	$bStr = '$b->' . $k;
 			}
 			
-            $fnBody = 'if (' . $aStr . ' == ' . $bStr . ') {' . //"\n" .
-					$retorno . //"\n" .
-				' } ' . //"\n" .
-				'return (' . $aStr . ' < ' . $bStr . ') ? ' . $t . ' : ' . $f . ';';// . "\n";
+			// Checagem de string para usar collate correto
+			$attr = explode('->', $k);
+			$valor = reset($array)->{$attr[0]};
+			if ($k[1]) {
+				$valor = $valor->{$attr[1]};
+			}
+			if (is_string($valor)) {
+				 $fnBody = '$cmp = strcoll(' . $aStr . ', ' . $bStr . ');' .
+				 	' if ($cmp == 0) {' .
+						$retorno .
+					' } ' .
+					'return ($cmp < 0) ? ' . $t . ' : ' . $f . ';';
+			} else {
+	            $fnBody = 'if (' . $aStr . ' == ' . $bStr . ') {' .
+						$retorno .
+					' } ' .
+					'return (' . $aStr . ' < ' . $bStr . ') ? ' . $t . ' : ' . $f . ';';
+			}
 			$retorno = &$fnBody;
         }
         if ($fnBody) {
@@ -104,5 +143,4 @@ class Jp7_Collections {
 		}
 		return array_slice($array, $offset, $length);
 	}
-
 }
