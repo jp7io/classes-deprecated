@@ -125,7 +125,7 @@ class Jp7_Debugger{
 	 */	
 	public function showSql($sql, $forceDebug = false, $style = '') {
 		if (!$this->isSafePoint()) return;
-		if ($this->debugSql || $forceDebug) echo '<div class="debug_sql" style="' . $style . '">' . preg_replace(array('/(SELECT )/','/( FROM )/','/( WHERE )/','/( ORDER BY )/'),'<b>\1</b>', $sql, 1) . '</div>';
+		if ($this->debugSql || $forceDebug) echo '<div class="debug_sql" style="' . $style . '">' . preg_replace('/(SELECT | FROM | WHERE | ORDER BY |HAVING|GROUP BY|LEFT JOIN)/','<b>\1</b>', $sql) . '</div>';
 	}
 	/**
 	 * Formats and returns the backtrace.
