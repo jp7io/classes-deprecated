@@ -279,8 +279,8 @@ abstract class InterAdminAbstract {
 		);
 		
 		// Group by para wheres com children
-		if (strpos($options['where'], 'children_') !== false || strpos($options['where'], 'tags.') !== false) { // Performance
-			preg_match_all('/(' . $quoted . '|tags.|children_[a-zA-Z0-9_.]+)/', $options['where'], $matches);
+		if (strpos($options['where'] . $options['order'], 'children_') !== false || strpos($options['where'] . $options['order'], 'tags.') !== false) { // Performance
+			preg_match_all('/(' . $quoted . '|tags\.|children_[a-zA-Z0-9_.]+)/', $options['where'] . $options['order'], $matches);
 			foreach ($matches[1] as $match) {
 				if ($match[0] != "'") { // Filter
 					$options['group'] .= (($options['group']) ? ',' : '') . 'main.id';
