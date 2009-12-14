@@ -610,17 +610,21 @@ class InterAdminTipo extends InterAdminAbstract {
 	/**
 	 * Returns the InterAdmins having the given tags.
 	 * 
-	 * @param InterAdmin $tags
+	 * @param InterAdmin[] $tags
 	 * @param array $options [optional]
 	 * @return InterAdmin[]
 	 */
 	function getInterAdminsByTags($tags, $options = array()) {
 		global $db, $debugger;
-		if (is_array($tags)) {
-			$options['where'][] = "tags.id IN (" . implode(',', $tags) . ")";
-		} elseif ($tags) {
-			$options['where'][] = "tags.id = " . $tags;
+		$tagsWhere = array();
+		foreach ((array) $tags as $tag) {
+			if ($tag instanceof InterAdminTipo) {
+				$tagsWhere[] = "(tags.id_tipo = " . $tag->id_tipo . " AND tags.id = 0)";
+			} elseif ($tag instanceof InterAdmin) {
+				$tagsWhere[] = "(tags.id = " . $tag->id . " AND tags.id_tipo = '" . $tag->id_tipo . "')";
+			}
 		}
+		$options['where'][] = '(' . implode(' OR ', $tagsWhere) . ')';
 		return $this->getInterAdmins($options);
 	}
 }
