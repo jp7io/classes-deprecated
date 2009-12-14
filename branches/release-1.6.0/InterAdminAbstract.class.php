@@ -173,6 +173,9 @@ abstract class InterAdminAbstract {
 		$interAdminClass = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin';
 		
 		$options = array();
+//		if (strpos($field, 'date_') === 0) {
+//			return new Jp7_Date($value);
+//		}
 		if (strpos($field, 'select_') === 0) {
 			$isMulti = (strpos($field, 'select_multi') === 0);
 			$isTipo = in_array($campo['xtra'], array('S', 'ajax_tipos', 'radio_tipos'));
@@ -253,11 +256,11 @@ abstract class InterAdminAbstract {
 		if ($jp7_app) {
 			global $debugger;
 			if ($debugger) {
-				$debugger->showSql($sql, $sql_debug);
+				$debugger->showSql($sql, $options['debug']);
 			}
 			$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		} else {
-			$rs = interadmin_query($sql);
+			$rs = interadmin_query($sql, '', $options['debug']);
 		}
 		return $rs;
 	}

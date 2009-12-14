@@ -615,9 +615,11 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdmin[]
 	 */
 	function getInterAdminsByTags($tags, $options = array()) {
-		global $db, $debugger;
+		if (!is_array($tags)) {
+			$tags = array($tags);
+		}
 		$tagsWhere = array();
-		foreach ((array) $tags as $tag) {
+		foreach ($tags as $tag) {
 			if ($tag instanceof InterAdminTipo) {
 				$tagsWhere[] = "(tags.id_tipo = " . $tag->id_tipo . " AND tags.id = 0)";
 			} elseif ($tag instanceof InterAdmin) {
