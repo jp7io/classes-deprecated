@@ -42,8 +42,11 @@ class Jp7_Collections {
 	 * @return array
 	 */
 	public static function filter($array, $clause) {
-		// $callback = 'fazer';
-		// array_filter($ary, $callback);
+		$clause = preg_replace('/([^=])(=)([^=])/', '\1\2=\3', $clause);
+		$clause = preg_replace('/(\b[a-zA-Z0-9_.]+\b)/', '$a->\1', $clause);
+		$fnBody = 'return ' . $clause . ';';
+		
+		return array_filter($array, create_function('$a', $fnBody));
 	}
 	/**
 	 * Flips an array of $itens->subitem into an array of $subitem->itens; 
