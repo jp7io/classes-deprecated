@@ -278,7 +278,7 @@ abstract class InterAdminAbstract {
 		$keyword = '\b[a-zA-Z0-9_.]+\b(?![ ]?\()'; // won't match CONCAT() or IN (1,2)
 		$reserved = array(
 			'WHERE', 'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
-			'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP'
+			'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING'
 		);
 		
 		// Group by para wheres com children
@@ -294,6 +294,7 @@ abstract class InterAdminAbstract {
 		
 		$clause = " WHERE " . $options['where'] .
 			(($options['group']) ? " GROUP BY " . $options['group'] : '') .
+			(($options['having']) ? " HAVING " . implode(' AND ', $options['having']) : '') .
 			(($options['order']) ? " ORDER BY " . $options['order'] : '');
 		
 		$offset = 0;
