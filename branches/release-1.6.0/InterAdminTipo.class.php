@@ -623,7 +623,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			if ($tag instanceof InterAdminTipo) {
 				$tagsWhere[] = "(tags.id_tipo = " . $tag->id_tipo . " AND tags.id = 0)";
 			} elseif ($tag instanceof InterAdmin) {
-				$tagsWhere[] = "(tags.id = " . $tag->id . " AND tags.id_tipo = '" . $tag->id_tipo . "')";
+				$tagsWhere[] = "(tags.id = " . $tag->id . " AND tags.id_tipo = '" . $tag->getTipo()->id_tipo . "')";
 			} elseif (is_numeric($tag)) {
 				$tagsWhere[] = "(tags.id_tipo = " . $tag . " AND tags.id <> 0)";
 			}
