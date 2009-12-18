@@ -214,7 +214,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$this->_resolveWildcard($options['fields'], $recordModel);
 		$this->_whereArrayFix($options['where']); // FIXME
 		
-		if (count($options['fields']) == 1 && strpos($options['fields'][0], 'COUNT(') === false) {
+		if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {
 			$options['fields'] = array_merge(array('id'), (array) $options['fields']);
 		}
 		$options['from'] = $recordModel->getTableName() . " AS main";
