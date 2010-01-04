@@ -391,9 +391,27 @@ abstract class InterAdminAbstract {
 				} else {
 					list($campo, $aggregateAlias) = explode(' AS ', $campo);
 				}
+				
+				$aggrTable = $table;
+				if (strpos($campo, 'children_') !== false ) {
+					$aggrTable = preg_replace('/.*\((.*)\.(.*)\)/', '\1', $campo); // Pega "children_bla" de "COUNT(children_bla.id)"
+					$joinNome = substr($aggrTable, 9);
+					$childrenArr = $this->getInterAdminsChildren();
+					if (!$childrenArr[$joinNome]) {
+						throw new Exception('The field "' . $aggrTable . '" cannot be used as a join on $options.');
+					}
+					$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo']);
+					if (!in_array($aggrTable, (array) $options['from_alias'])) {
+						$options['from_alias'][] = $aggrTable;
+						$options['from'][] = $joinTipo->getInterAdminsTableName() .
+            				' AS ' . $aggrTable . ' ON ' . $aggrTable . '.parent_id = main.id AND ' . $aggrTable . '.id_tipo = ' . $joinTipo->id_tipo;
+					}
+					$aggrTable = '';
+				}
+				
 				// @todo Implementar mesma busca do _resolveClauseAlias()
-				$fields[$join] = preg_replace('/([\(,][ ]*)(\b[a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1' . $table . '\2', $campo) .
-				 	' AS `' . $table . $aggregateAlias . '`';
+				$fields[$join] = preg_replace('/([\(,][ ]*)(\b[a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1' . $aggrTable . '\2', $campo) .
+				 	' AS `' . $aggrTable . $aggregateAlias . '`';
 			// Sem join
 			} else {
 				$nome = ($aliases[$campo]) ? $aliases[$campo] : $campo;
