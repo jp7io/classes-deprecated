@@ -31,6 +31,7 @@ class Pagination{
 	 * @param string $go_char_plus Character used on the "Last" button or link.
 	 * @param string $back_char_plus Character used on the "First" button or link.
 	 * @param string $records Total number of records, it is only used if no $sql is given. The default value is <tt>NULL</tt>.
+	 * @param string $request_uri URI of the current page.
 	 * @global ADOConnection
 	 * @global ADORecordSet
 	 * @global string
@@ -38,9 +39,15 @@ class Pagination{
 	 * @author JP, Cristiano
 	 * @version (2008/06/26) Update by Carlos
 	 */
-	function __construct($sql = NULL, $limit = 10, $page = 1, $type = '', $numbers_limit = 10, $parameters = '', $separador = '|', $next_char = '&gt;', $back_char = '&lt;', $last_char = '&raquo;', $first_char = '&laquo;', $records = NULL) {
+	function __construct($sql = null, $limit = 10, $page = 1, $type = '', $numbers_limit = 10, $parameters = '', $separador = '|', $next_char = '&gt;', $back_char = '&lt;', $last_char = '&raquo;', $first_char = '&laquo;', $records = null, $request_uri = null) {
 		global $db, $rs, $seo;
-
+		
+		if (func_num_args() == 1 && is_array($sql)) {
+			$options = func_get_arg(0);
+			$sql = null;
+			extract($options);
+		}
+		
 		if ($sql) {
 			if ($GLOBALS["jp7_app"]) $rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 			else $rs = interadmin_query($sql);		
@@ -65,9 +72,12 @@ class Pagination{
 		$this->query_string = preg_replace('([&]?p_page=[0-9]+)', '', $_SERVER['QUERY_STRING']); // Retira a pagina atual da Query String
 		if ($seo) $this->query_string = preg_replace('([&]?baseurl=true)', '', $this->query_string); // Retira a baseurl se a pagina tiver S.E.O.
 		$this->query_string = preg_replace('([&]?go_url=' . $_GET['go_url'] . ')', '', $this->query_string); // Retira a GO Url da Query String
-		if ($this->query_string[0] == '&') $this->query_string = substr($this->query_string,1); // Limpa & que sobrou no começo da string
+		if ($this->query_string[0] == '&') {
+			$this->query_string = substr($this->query_string,1); // Limpa & que sobrou no começo da string
+		}
 		$this->parameters = $parameters;
-		$this->request_uri = preg_replace('/[?](.*)/', '', $_SERVER['REQUEST_URI']);
+		$this->request_uri = (is_null($request_uri)) ? preg_replace('/[?](.*)/', '', $_SERVER['REQUEST_URI']): $request_uri;
+		
 		//$this->query_string=substr($this->query_string,1);
 		
 		foreach ($_POST as $key=>$value) {
