@@ -249,9 +249,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return int Count of InterAdmins found.
 	 */
 	public function getInterAdminsCount($options = array()) {
-		$options['fields'] = array('COUNT(id)');
+		$options['fields'] = array('COUNT(DISTINCT id)');
 		$retorno = $this->getFirstInterAdmin($options);
-		return intval($retorno->count_id);
+		return intval($retorno->count_distinct_id);
 	}
 	/**
 	 * Retrieves the first records which have this InterAdminTipo's id_tipo.

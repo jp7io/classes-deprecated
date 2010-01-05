@@ -285,7 +285,7 @@ abstract class InterAdminAbstract {
 		if (strpos($options['where'] . $options['order'], 'children_') !== false || strpos($options['where'] . $options['order'], 'tags.') !== false) { // Performance
 			preg_match_all('/(' . $quoted . '|tags\.|children_[a-zA-Z0-9_.]+)/', $options['where'] . $options['order'], $matches);
 			foreach ($matches[1] as $match) {
-				if ($match[0] != "'") { // Filter
+				if ($match[0] != "'" && strpos($options['fields'][0], 'DISTINCT') === false) { // Filter, DISTINCT para o getInterAdminsCount()
 					$options['group'] .= (($options['group']) ? ',' : '') . 'main.id';
 					break;
 				}
@@ -387,31 +387,20 @@ abstract class InterAdminAbstract {
 			// Com função
 			} elseif (strpos($campo, '(') !== false) {
 				if (strpos($campo, ' AS ') === false) {
-					$aggregateAlias = trim(strtolower(preg_replace('/[\(\),]/', '_', $campo)), '_');
+					$aggregateAlias = trim(strtolower(preg_replace('/[^[:alnum:]]/', '_', $campo)), '_');
 				} else {
 					list($campo, $aggregateAlias) = explode(' AS ', $campo);
 				}
 				
 				$aggrTable = $table;
 				if (strpos($campo, 'children_') !== false ) {
-					$aggrTable = preg_replace('/.*\((.*)\.(.*)\)/', '\1', $campo); // Pega "children_bla" de "COUNT(children_bla.id)"
-					$joinNome = substr($aggrTable, 9);
-					$childrenArr = $this->getInterAdminsChildren();
-					if (!$childrenArr[$joinNome]) {
-						throw new Exception('The field "' . $aggrTable . '" cannot be used as a join on $options.');
-					}
-					$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo']);
-					if (!in_array($aggrTable, (array) $options['from_alias'])) {
-						$options['from_alias'][] = $aggrTable;
-						$options['from'][] = $joinTipo->getInterAdminsTableName() .
-            				' AS ' . $aggrTable . ' ON ' . $aggrTable . '.parent_id = main.id AND ' . $aggrTable . '.id_tipo = ' . $joinTipo->id_tipo;
-					}
 					$aggrTable = '';
+					$aggrCampo = preg_replace('/.*\((.*)\)/', '\1', $campo); // Pega "children_bla.id" de "COUNT(children_bla.id)"
+					$options['order'] .= ($options['order'] ? "," : "") . $aggrCampo;
 				}
-				
 				// @todo Implementar mesma busca do _resolveClauseAlias()
-				$fields[$join] = preg_replace('/([\(,][ ]*)(\b[a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1' . $aggrTable . '\2', $campo) .
-				 	' AS `' . $aggrTable . $aggregateAlias . '`';
+				$fields[$join] = preg_replace('/([\(,][ ]*)(DISTINCT )?(\b[a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1\2' . $aggrTable . '\3', $campo) .
+				 	' AS `' . $table . $aggregateAlias . '`';
 			// Sem join
 			} else {
 				$nome = ($aliases[$campo]) ? $aliases[$campo] : $campo;
