@@ -566,6 +566,7 @@ abstract class InterAdminAbstract {
 		if ($this->$pk) {
 			$sql = "DELETE FROM " . $this->getTableName() . 
 				" WHERE " . $this->_primary_key . " = " . $this->$pk;
+			$db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		}
 		$this->attributes = array();
 		$this->_deleted = true;
