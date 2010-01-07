@@ -399,7 +399,7 @@ abstract class InterAdminAbstract {
 					$options['order'] .= ($options['order'] ? "," : "") . $aggrCampo;
 				}
 				// @todo Implementar mesma busca do _resolveClauseAlias()
-				$fields[$join] = preg_replace('/([\(,][ ]*)(DISTINCT )?(\b[a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1\2' . $aggrTable . '\3', $campo) .
+				$fields[$join] = preg_replace('/([\(,][ ]*)(DISTINCT )?(\b[a-zA-Z_][a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1\2' . $aggrTable . '\3', $campo) .
 				 	' AS `' . $table . $aggregateAlias . '`';
 			// Sem join
 			} else {

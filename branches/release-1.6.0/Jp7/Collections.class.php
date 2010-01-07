@@ -38,12 +38,15 @@ class Jp7_Collections {
 	 * Filters the array using SQL Where.
 	 * 
 	 * @param array $array
-	 * @param string $clause Similar to SQL WHERE Clause.
+	 * @param string $clause Similar to SQL WHERE Clause, only supports simple comparations by now.
 	 * @return array
 	 */
 	public static function filter($array, $clause) {
-		$clause = preg_replace('/([^=])(=)([^=])/', '\1\2=\3', $clause);
-		$clause = preg_replace('/(\b[a-zA-Z0-9_.]+\b)/', '$a->\1', $clause);
+		if (is_array($clause)) {
+			$clause = implode(' AND ', $clause);
+		}
+		$clause = preg_replace('/([^=!])(=)([^=])/', '\1\2=\3', $clause);
+		$clause = preg_replace('/(?<!\')(\b[a-zA-Z_][a-zA-Z0-9_.]+\b)/', '$a->\1', $clause);
 		$fnBody = 'return ' . $clause . ';';
 		
 		return array_filter($array, create_function('$a', $fnBody));
@@ -101,12 +104,12 @@ class Jp7_Collections {
 				$k = str_replace('.', '->', $k);
 				$aStr = '$a->' . $k;
             	$bStr = '$b->' . $k;
-			}
+			}			
 			
 			// Checagem de string para usar collate correto
 			$attr = explode('->', $k);
 			$valor = reset($array)->{$attr[0]};
-			if ($k[1]) {
+			if ($attr[1]) {
 				$valor = $valor->{$attr[1]};
 			}
 			if (is_string($valor)) {
@@ -123,7 +126,7 @@ class Jp7_Collections {
 			}
 			$retorno = &$fnBody;
         }
-        if ($fnBody) {
+		if ($fnBody) {
             usort($array, create_function('$a,$b', $fnBody));        
         }
 		return $array;
