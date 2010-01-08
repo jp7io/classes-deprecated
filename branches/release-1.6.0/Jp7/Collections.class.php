@@ -32,6 +32,7 @@ class Jp7_Collections {
 	 * @return array
 	 */
 	public static function group($array, $clause) {
+		return $array;
 		// @todo
 	}
 	/**
