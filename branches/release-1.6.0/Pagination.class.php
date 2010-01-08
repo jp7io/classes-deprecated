@@ -15,37 +15,43 @@
  * @version (2007/06/13)
  * @package Pagination
  */
-class Pagination{
+class Pagination {
 	/**
 	 * Creates pagination based on a SQL query, the pagination can be retrieved using its "htm" propertie ($this->htm).
 	 *
-	 * @param string $sql SQL string, by now it needs "records" as a column alias for the total of records, e.g. "SELECT COUNT(id) as records". The default value is <tt>NULL</tt>.
-	 * @param int $limit Itens per page, the default value is 10.
-	 * @param int $page Current page, the default value is 1.
- 	 * @param string $type Type of the pagination, the available types are "combo", "numbers-top", "numbers-bottom", the default value is "".
-	 * @param int $numbers_limit Maximum number of pages listed, the default value is 10.
-	 * @param string $parameters Values to be inserted before the query string when creating links for the pages, the default value is "".
-	 * @param string $separador Separator which will be placed between two pages, default value is "|".
-	 * @param string $go_char Character used on the "Next" button or link.
-	 * @param string $back_char Character used on the "Back" button or link.
-	 * @param string $go_char_plus Character used on the "Last" button or link.
-	 * @param string $back_char_plus Character used on the "First" button or link.
-	 * @param string $records Total number of records, it is only used if no $sql is given. The default value is <tt>NULL</tt>.
-	 * @param string $request_uri URI of the current page.
+	 * @param array|string 	$options_or_sql	Array of options | SQL string, by now it needs "records" as a column alias for the total of records, e.g. "SELECT COUNT(id) as records". The default value is <tt>NULL</tt>.
+	 * @param int 			$limit 			Itens per page, the default value is 10.
+	 * @param int 			$page 			Current page, the default value is $_GET['p_page'].
+ 	 * @param string 		$type 			Type of the pagination, the available types are "combo", "numbers-top", "numbers-bottom", the default value is "".
+	 * @param int 			$numbers_limit 	Maximum number of pages listed, the default value is 10.
+	 * @param string 		$parameters		Values to be inserted before the query string when creating links for the pages, the default value is "".
+	 * @param string		$separator 		Separator which will be placed between two pages, default value is "|".
+	 * @param string 		$next_char 		Character used on the "Next" button or link.
+	 * @param string 		$back_char 		Character used on the "Back" button or link.
+	 * @param string 		$last_char 		Character used on the "Last" button or link.
+	 * @param string 		$first_char 	Character used on the "First" button or link.
+	 * @param string 		$records 		Total number of records, it is only used if no $sql is given. The default value is <tt>NULL</tt>.
+	 * @param string 		$request_uri 	URI of the current page.
 	 * @global ADOConnection
-	 * @global ADORecordSet
 	 * @global string
 	 * @return string|Pagination If neither $sql nor $records is given the string "[aa]" is returned.
 	 * @author JP, Cristiano
 	 * @version (2008/06/26) Update by Carlos
 	 */
-	function __construct($sql = null, $limit = 10, $page = 1, $type = '', $numbers_limit = 10, $parameters = '', $separador = '|', $next_char = '&gt;', $back_char = '&lt;', $last_char = '&raquo;', $first_char = '&laquo;', $records = null, $request_uri = null) {
-		global $db, $rs, $seo;
-		
-		if (func_num_args() == 1 && is_array($sql)) {
-			$options = func_get_arg(0);
+	function __construct($options_or_sql = null, $limit = 10, $page = null, $type = '', $numbers_limit = 10, $parameters = '', $separator = '|', $next_char = '&gt;', $back_char = '&lt;', $last_char = '&raquo;', $first_char = '&laquo;', $records = null, $request_uri = null) {
+		// Para receber options
+		if (func_num_args() == 1 && is_array($options_or_sql)) {
 			$sql = null;
+			$options = &$options_or_sql;
 			extract($options);
+		} else {
+			$sql = $options_or_sql;
+		}
+		
+		global $db, $seo;
+		
+		if (is_null($page)) {
+			$page = $_GET['p_page'];
 		}
 		
 		if ($sql) {
@@ -103,8 +109,8 @@ class Pagination{
 					$this->htm_numbers .= $this->_createLink($i, $i, ($i == $page) ? ' class="on"' : '');
 					$this->htm_numbers_extra .= $this->_createLink($i, $i, ($i == $page) ? ' class="on"' : '');
 					if ($i != $max) {
-						$this->htm_numbers .= '<li>' . $separador."</li>";
-						$this->htm_numbers_extra .= '<li>' . $separador . '</li>';
+						$this->htm_numbers .= '<li class="separator">' . $separador."</li>";
+						$this->htm_numbers_extra .= '<li class="separator">' . $separador . '</li>';
 					}
 				}
 				rs . $this->query_string . '&p_page=' . $this->total . '\'">' . $go_char_plus . '</li>';
@@ -142,7 +148,7 @@ class Pagination{
 	 * @author Carlos
 	 * @version (2008/06/13)
 	 */
-	private function _createLink($pageNumber, $pageLabel, $className = ''){
+	private function _createLink($pageNumber, $pageLabel, $className = '') {
 		return '<li' . $className . '><a href="' .  $this->request_uri . '?' . $this->parameters . $this->query_string . (($this->parameters || $this->query_string) ? '&' : '') . 'p_page=' . $pageNumber . '">' . $pageLabel . '</a></li>';
 	}
 }
