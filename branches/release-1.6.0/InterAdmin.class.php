@@ -208,7 +208,7 @@ class InterAdmin extends InterAdminAbstract {
 		if (!$this->parent_id) {
 			$this->getFieldsValues('parent_id');
 		}
-		if (!$this->_parent) {
+		if (!$this->_parent && $this->parent_id) {
 			$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin';
 			$this->_parent = InterAdmin::getInstance($this->parent_id, $options);
 			if ($this->_parent->id) {
@@ -367,6 +367,7 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function getUrl($sep = null){
 		global $seo, $seo_sep;
+				
 		if ($seo && $this->getParent()->id) {
 			$link = $this->_parent->getUrl() . '/' . toSeo($this->getTipo()->getFieldsValues('nome'));
 		} else {
@@ -389,36 +390,67 @@ class InterAdmin extends InterAdminAbstract {
 		return $link;
 	}
 	/**
+	 * Sets the tags for this record. It DELETES the previous records.
+	 * 
+	 * @param array $tags Array of object to be saved as tags.
+	 * @return void
+	 */
+	public function setTags(array $tags) {
+		global $db;
+		$sql = "DELETE FROM " . $this->db_prefix . "_tags WHERE parent_id = " .  $this->id;
+		$db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+		
+		foreach ($tags as $tag) {
+			$sql = "INSERT INTO " . $this->db_prefix . "_tags (parent_id, id, id_tipo) VALUES 
+				(" . $this->id . "," .
+				(($tag instanceof InterAdmin) ? $tag->id : 0) . "," .
+				(($tag instanceof InterAdmin) ? $tag->getFieldsValues('id_tipo') : $tag->id_tipo) . ")";
+			$db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+		}
+	}
+	/**
 	 * Returns the tags.
 	 * 
-	 * @return string
+	 * @param array $options Available keys: where, group, limit.
+	 * @return array
 	 */
-	public function getTags() {
-		if (!$this->_tags) {
+	public function getTags($options = array()) {
+		if (!$this->_tags || $options) {
 			global $db;
-			$sql = "SELECT * FROM " . $this->db_prefix . "_tags WHERE parent_id = " . $this->id;
-			$rs = $db->Execute($sql);
-			$this->tags = array();
+			
+			$options['where'][] = "parent_id = " . $this->id;	
+			$sql = "SELECT * FROM " . $this->db_prefix . "_tags " .
+				"WHERE " . implode(' AND ', $options['where']) .
+				(($options['group']) ? " GROUP BY " . $options['group'] : '') .
+				(($options['limit']) ? " LIMIT " . $options['limit'] : '');
+			$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+			
+			$this->_tags = array();
 			while ($row = $rs->FetchNextObj()) {
 				$tag_tipo = InterAdminTipo::getInstance($row->id_tipo);
 				$tag_text = $tag_tipo->getFieldsValues('nome');
 				if ($row->id) {
 					$options = array(
 						'fields' => array('varchar_key'),
-						'where' => array('id=' . $row->id)
+						'where' => array('id = ' . $row->id)
 					);
 					$tag_registro = $tag_tipo->getFirstInterAdmin($options);
 					$tag_text = $tag_registro->varchar_key . ' (' . $tag_tipo->nome . ')';
 					$tag_registro->interadmin = $this;
-					$this->_tags[] = $tag_registro;
+					$retorno[] = $tag_registro;
 				} else {
 					$tag_tipo->interadmin = $this;
-					$this->_tags[] = $tag_tipo;
+					$retorno[] = $tag_tipo;
 				}
 			}
 			$rs->Close();
+		} else {
+			$retorno = $this->_tags;
 		}
-		return (array) $this->_tags;
+		if (!$options) {
+			$this->_tags = $retorno; // cache somente para getTags sem $options
+		}
+		return (array) $retorno;
 	}
 	/**
 	 * Checks if this object is published using the same rules used on interadmin_query().
