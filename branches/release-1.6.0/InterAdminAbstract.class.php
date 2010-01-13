@@ -221,11 +221,11 @@ abstract class InterAdminAbstract {
 	/**
 	 * Executes a SQL Query based on the values passed by $options.
 	 * 
-	 * @param array $options Default array of options. Available keys: fields, fields_alias, from, where, order, group, limit, campos and aliases.
+	 * @param array $options Default array of options. Available keys: fields, fields_alias, from, where, order, group, limit, all, campos and aliases.
 	 * @return ADORecordSet
 	 */
 	protected function _executeQuery($options) {
-		global $jp7_app, $db;
+		global $jp7_app, $db, $debugger;
 		// Type casting 
 		if (!is_array($options['from'])) {
     		$options['from'] = (array) $options['from'];
@@ -253,8 +253,10 @@ abstract class InterAdminAbstract {
 			$clauses .
 			(($options['limit']) ? " LIMIT " . $options['limit'] : '');
 		
-		if ($jp7_app) {
-			global $debugger;
+		if ($options['debug']) {
+			ob_flush();
+		}
+		if ($jp7_app || $options['all']) {
 			if ($debugger) {
 				$debugger->showSql($sql, $options['debug']);
 			}
@@ -262,6 +264,7 @@ abstract class InterAdminAbstract {
 		} else {
 			$rs = interadmin_query($sql, '', $options['debug']);
 		}
+		
 		return $rs;
 	}
 	/**
