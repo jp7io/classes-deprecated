@@ -97,7 +97,7 @@ abstract class InterAdminAbstract {
 				'where' => array($this->_primary_key . " = " . intval($this->{$this->_primary_key})),
 				// Internal use
 				'aliases' => $this->getAttributesAliases(),
-				'campos' => $this->getAttributesCampos()		
+				'campos' => $this->getAttributesCampos()
 			);
 			$rs = $this->_executeQuery($options);
 			if ($forceAsString) {
