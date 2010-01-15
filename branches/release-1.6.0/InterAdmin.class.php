@@ -532,11 +532,23 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return void
 	 */
 	public function save() {
+		// id_string
+		if (isset($this->varchar_key)) {
+			$this->id_string = toId($this->varchar_key);
+		} else {
+			$alias_varchar_key = ($this->getTipo()->getCamposAlias('varchar_key'));
+			if (isset($this->$alias_varchar_key)) {
+				$this->id_string = toId($this->$alias_varchar_key);
+			}
+		}
+		// log
 		if ($this->id && !isset($this->log)) {
 			$this->getFieldsValues('log');
 		}
 		$this->log = date('d/m/Y H:i') . ' - ' . self::$log_user . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13) . $this->log;
+		// date_modify
 		$this->date_modify = date('c');
+				
 		return parent::save();
 	}
 	public function getAttributesNames() {
