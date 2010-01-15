@@ -496,7 +496,7 @@ abstract class InterAdminAbstract {
 		if ($fields == '*' || in_array('*', (array) $fields)) {
 			$fields = (array) $fields;
 			unset($fields[array_search('*', $fields)]);
-			$fields = array_merge($fields, $object->getAttributesNames());
+			$fields = array_merge($object->getAttributesNames(), $fields);
 		}
 	}
 	/**
