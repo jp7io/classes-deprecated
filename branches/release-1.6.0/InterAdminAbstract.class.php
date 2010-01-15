@@ -81,11 +81,15 @@ abstract class InterAdminAbstract {
 			throw new Exception('This record has been deleted.');
 		}
 		$this->_resolveWildcard($fields, $this);
-		// cache
-		$fieldsToLoad = array();
+		
 		if ($forceAsString || $this->_updated) {
+			// reload
 			$fieldsToLoad = $fields;
+		} elseif (is_string($fields) && isset($this->attributes[$fields])) {
+			// Performance for 1 field only, does the same thing as the last line
+			return $this->attributes[$fields]; 
 		} else {
+			// use cache
 			$fieldsToLoad = array_diff((array) $fields, array_keys($this->attributes));
 		}
 		// Retrieving data
@@ -493,7 +497,7 @@ abstract class InterAdminAbstract {
 	 * @return void
 	 */
 	protected function _resolveWildcard(&$fields, InterAdminAbstract $object) {
-		if ($fields == '*' || in_array('*', (array) $fields)) {
+		if ($fields == '*' || (is_array($fields) && in_array('*', $fields))) {
 			$fields = (array) $fields;
 			unset($fields[array_search('*', $fields)]);
 			$fields = array_merge($object->getAttributesNames(), $fields);
