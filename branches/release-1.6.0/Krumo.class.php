@@ -583,7 +583,7 @@ This is a list of all the values from the <code><b><?php echo realpath($ini_file
 		?>
 <div class="krumo-root">
 	<ul class="krumo-node krumo-first">
-		<div style="float:right;background:white;line-height:24px;color:black;padding:0px 4px;cursor:pointer;position:relative;margin-right:-20px;left:-20px;" title="Expandir" onclick="$('.krumo-expand:not(.krumo-opened)', $(this).parent()).each(function(){krumo.toggle(this);})" ondblclick="$(this).parent().css('position','absolute')">+</div>
+		<div style="float:right;background:white;line-height:24px;color:black;padding:0px 4px;cursor:pointer;position:relative;margin-right:-20px;left:-20px;" title="Expandir" onclick="$('.krumo-expand:not(.krumo-opened)', $(this).parent()).each(function(){krumo.toggle(this);})" ondblclick="$(this).parent().css('position','absolute');$(this).hide();">+</div>
 		<?php echo Krumo::_dump($data);?>
 		<li class="krumo-footnote">
 			<div class="krumo-version" style="white-space:nowrap;">
