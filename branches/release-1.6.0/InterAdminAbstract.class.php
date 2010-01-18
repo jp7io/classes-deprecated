@@ -356,6 +356,10 @@ abstract class InterAdminAbstract {
 		}
 		return $clause;
 	}
+	protected function _getJoinTipo($campos, $nome) {
+		return $campos[$nome]['nome'];
+	}
+	
 	/**
 	 * Resolves Aliases on $options fields.
 	 * 
@@ -377,7 +381,7 @@ abstract class InterAdminAbstract {
 					$fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
 					// Join e Recursividade
 					$this->_addJoinAlias($options, $join, $nome, $campos);
-					$joinTipo = $campos[$nome]['nome'];
+					$joinTipo = $this->_getJoinTipo($campos, $nome);
 					if ($fields[$join] == array('*')) {
 						$fields[$join] = $joinTipo->getCamposNames();
 					}
@@ -425,10 +429,7 @@ abstract class InterAdminAbstract {
 	 * @return void 
 	 */
 	protected function _addJoinAlias(&$options = array(), $alias, $nome, $campos, $table = 'main') {
-		$joinTipo = $campos[$nome]['nome'];
-		if (!is_object($joinTipo)) {
-			throw new Exception('The field "' . $alias . '" cannot be used as a join on $options.');
-		}
+		$joinTipo = $this->_getJoinTipo($campos, $nome);
 		$options['from_alias'][] = $alias; // Used as cache when resolving Where
 		if ($campos[$nome]['xtra'] == 'S') { // @todo testar
             $options['from'][] = $joinTipo->getTableName() . 
@@ -473,7 +474,7 @@ abstract class InterAdminAbstract {
 			} else {
 				$joinAlias = '';
 				$join = ($fields[$table]) ? $fields[$table] : $table;
-				$joinTipo = $campos[$join]['nome'];
+				$joinTipo = $this->_getJoinTipo($campos, $join);
 				if (is_object($joinTipo)) {
 					$joinCampos = $joinTipo->getCampos();
 					$joinAlias = $joinTipo->getCamposAlias($field);
