@@ -83,7 +83,7 @@ class InterSite extends InterAdmin {
 			$server->type = $type->varchar_key;
 			// Database
 			$options = array(
-				'fields' => array('varchar_key', 'varchar_1', 'varchar_2', 'varchar_3', 'varchar_4', 'password_key', 'select_2'),
+				'fields' => array('varchar_key', 'varchar_1', 'varchar_2', 'varchar_3', 'varchar_4', 'varchar_6','password_key', 'select_2'),
 				'fields_alias' => true
 			);
 			if ($server->db) {
