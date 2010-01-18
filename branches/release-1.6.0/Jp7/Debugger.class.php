@@ -124,6 +124,9 @@ class Jp7_Debugger{
 	 * @return void
 	 */	
 	public function showSql($sql, $forceDebug = false, $style = '') {
+		if ($forceDebug) {
+			ob_flush();
+		}
 		if (!$this->isSafePoint()) return;
 		if ($this->debugSql || $forceDebug) echo '<div class="debug_sql" style="' . $style . '">' . preg_replace('/(SELECT | FROM | WHERE | ORDER BY |HAVING|GROUP BY|LEFT JOIN)/','<b>\1</b>', $sql) . '</div>';
 	}

@@ -251,24 +251,28 @@ abstract class InterAdminAbstract {
 		// Resolve Alias and Joins for 'where', 'group' and 'order';
 		$clauses = $this->_resolveSqlClausesAlias($options);
 		
+		if (!$options['all']) {
+			foreach ($options['from'] as $key => $from) {
+				list($table, $alias) = explode(' AS ', $from);
+				if ($alias == 'main') {
+					$filters = self::getPublishedFilters($table, $alias);
+				} else {
+					$join = explode(' ON', $alias);
+					$options['from'][$key] = $table . ' AS ' . $join[0] . ' ON ' . self::getPublishedFilters($table, $join[0]) . $join[1];
+				}
+			}
+		}
 		// Sql
 		$sql = "SELECT " . implode(',', $options['fields']) .
 			" FROM " . implode(' LEFT JOIN ', $options['from']) .
-			$clauses .
+			" WHERE " . $filters . $clauses .
 			(($options['limit']) ? " LIMIT " . $options['limit'] : '');
-		
-		if ($options['debug']) {
-			ob_flush();
+		// Debug
+		if ($debugger) {
+			$debugger->showSql($sql, $options['debug']);
 		}
-		if ($jp7_app || $options['all']) {
-			if ($debugger) {
-				$debugger->showSql($sql, $options['debug']);
-			}
-			$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
-		} else {
-			$rs = interadmin_query($sql, '', $options['debug']);
-		}
-		
+		// Run SQL
+		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		return $rs;
 	}
 	/**
@@ -284,7 +288,7 @@ abstract class InterAdminAbstract {
 		$quoted = '(\'((?<=\\\\)\'|[^\'])*\')';
 		$keyword = '\b[a-zA-Z0-9_.]+\b(?![ ]?\()'; // won't match CONCAT() or IN (1,2)
 		$reserved = array(
-			'WHERE', 'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
+			'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'NOT', 'LIKE', 'IS',
 			'NULL', 'DESC', 'ASC', 'BETWEEN', 'REGEXP', 'HAVING'
 		);
 		
@@ -299,7 +303,7 @@ abstract class InterAdminAbstract {
 			}
 		}
 		
-		$clause = " WHERE " . $options['where'] .
+		$clause = $options['where'] .
 			(($options['group']) ? " GROUP BY " . $options['group'] : '') .
 			(($options['having']) ? " HAVING " . implode(' AND ', $options['having']) : '') .
 			(($options['order']) ? " ORDER BY " . $options['order'] : '');
@@ -625,4 +629,27 @@ abstract class InterAdminAbstract {
 	abstract function getAttributesNames();
 	abstract function getAttributesAliases();
 	abstract function getTableName();
+	
+	public static function getPublishedFilters($table, $alias) {
+		global $db, $c_publish, $s_session;
+		$DbNow = $db->BindTimeStamp(date("Y-m-d H:i:s"));
+		// Tipos
+		if (strpos($table, '_tipos') === (strlen($table) - strlen('_tipos'))) {
+			return $alias . ".mostrar <> '' AND " . $alias . ".deleted_tipo = '' AND ";
+		// Tags
+		} elseif (strpos($table, '_tags') === (strlen($table) - strlen('_tags'))) {
+			// do nothing
+		// Arquivos
+		} elseif (strpos($table, '_arquivos') === (strlen($table) - strlen('_arquivos'))) {
+			return $alias . ".mostrar <> '' AND " . $alias . ".deleted = '' AND ";
+		// Registros
+		} else {
+			return $alias . ".date_publish <= '" . $DbNow . "'" .
+				" AND (" . $alias . ".date_expire > '" . $DbNow . "' OR " . $alias . ".date_expire = '0000-00-00 00:00:00')" .
+				" AND " . $alias . ".char_key <> ''" .
+				" AND " . $alias . ".deleted = ''" .
+				(($c_publish && !$s_session['preview']) ? " AND " . $alias . ".publish <> ''" : "") . " AND ";
+		}
+	}
+	
 }
