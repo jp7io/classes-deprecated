@@ -57,8 +57,7 @@ class Jp7_Youtube {
 	 * @return string
 	 */
 	public static function getId($youTubeVideoUrl) {
-		//http://www.youtube.com/watch?v=rkJLn-FzP3s&NR=1
-		return preg_replace('/.*watch[?|\/]v=([^&]*).*/', '\1', $youTubeVideoUrl);
+		return preg_replace('/.*(watch\?v=|v\/)([^&]*).*/', '\2', $youTubeVideoUrl);
 	}
 	
 }
