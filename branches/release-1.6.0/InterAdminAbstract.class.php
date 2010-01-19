@@ -251,7 +251,7 @@ abstract class InterAdminAbstract {
 		// Resolve Alias and Joins for 'where', 'group' and 'order';
 		$clauses = $this->_resolveSqlClausesAlias($options);
 		
-		if (!$options['all']) {
+		if (!$options['all'] || $jp7_app) {
 			foreach ($options['from'] as $key => $from) {
 				list($table, $alias) = explode(' AS ', $from);
 				if ($alias == 'main') {
