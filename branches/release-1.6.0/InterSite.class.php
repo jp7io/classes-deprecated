@@ -452,6 +452,8 @@ class InterSite extends InterAdmin {
 		$GLOBALS['c_demo'] = $this->interadmin_demo;
 		$GLOBALS['c_cliente_url_path'] = $this->server->path;
 		$GLOBALS['c_cliente_title'] = $this->name;
+		$GLOBALS['c_nobackup'] = $this->nobackup;
+		
 		foreach ($this->servers as $host => $server) {
 			$GLOBALS['c_cliente_domains'][] = $host;
 			$GLOBALS['c_cliente_domains'] = array_merge($GLOBALS['c_cliente_domains'], $server->aliases);
