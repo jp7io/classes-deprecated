@@ -630,6 +630,10 @@ class InterAdminTipo extends InterAdminAbstract {
 				$tagsWhere[] = "(tags.id_tipo = " . $tag . " AND tags.id <> 0)";
 			}
 		}
+		if (!$tagsWhere) {
+			return array();
+		}
+		
 		$options['where'][] = '(' . implode(' OR ', $tagsWhere) . ')';
 		return $this->getInterAdmins($options);
 	}
