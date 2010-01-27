@@ -85,7 +85,7 @@ class FileCache {
 			}
 			
 			// Falha de segurança. Passou com conteúdo inválido. Investigar depois.
-			if (strpos($this->fileName, '%') !== false || strpos($this->fileName, '=') !== false || strlen($this->fileName) > 200) {
+			if (preg_match('(%|:|=|\.\.|\*|\?)', $this->fileName) || strlen($this->fileName) > 200) {
 				return;
 			}
 			$this->fileName .= '.cache';
