@@ -53,12 +53,13 @@ class InterAdmin extends InterAdminAbstract {
 	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias.
 	 */
 	public function __construct($id = 0, $options = array()) {
-		if ($id) {
-			$this->id = (string) $id;
+		if (is_object($id)) {
+			$id = (string) $id;
 		}
+		$this->id = intval($id);
 		$this->db_prefix = ($options['db_prefix']) ? $options['db_prefix'] : $GLOBALS['db_prefix'];
 		$this->table = ($options['table']) ? '_' . $options['table'] : '';
-		if ($options['fields']) {
+		if ($options['fields'] && $id) {
 			$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
 			$this->getFieldsValues($options['fields'], false, $options['fields_alias']);
 		}
