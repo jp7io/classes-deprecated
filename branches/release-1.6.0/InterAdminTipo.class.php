@@ -569,7 +569,10 @@ class InterAdminTipo extends InterAdminAbstract {
 		self::$_metadata[$this->id_tipo][$varname] = $value;
 	}
 	protected function _getMetadata($varname) {
-		return self::$_metadata[$this->id_tipo][$varname];
+		global $db_prefix;
+		if ($db_prefix == $this->db_prefix) {
+			return self::$_metadata[$this->id_tipo][$varname];
+		}
 	}
 	/**
 	 * @return array
