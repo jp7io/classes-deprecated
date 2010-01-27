@@ -437,7 +437,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		$url_arr = array_reverse((array) $url_arr);
 
 		if ($seo) {
-			$url = $c_url . join("/", $url_arr);
+			$url = (($jp7_app) ? $c_cliente_url . $c_cliente_url_path : $c_url) . join("/", $url_arr);
 		} else {
 			$url = (($jp7_app) ? $c_cliente_url . $c_cliente_url_path : $c_url) . $lang->path_url . implode("_", $url_arr);
 			$pos = strpos($url, '_');
