@@ -67,8 +67,10 @@ class FileCache {
 		$this->cachePath = $this->fileRoot . $config->name_id . '/' . $cachePath . '/';
 		
 		if ($partial) {
-			$this->fileName = '--partial-' . $storeId . '.cache';
+			$nocache_force = $_GET['nocache_partial'];
+			$this->fileName = '_partial_' . $storeId . '.cache';
 		} else {
+			$nocache_force = $_GET['nocache_force'];
 			// Retirando query string e $c_path
 			$this->fileName = preg_replace('/\/' . addcslashes($c_path, '/') . '([^?]*)(.*)/', '\1', $_SERVER['REQUEST_URI']);
 			$this->fileName = jp7_path($this->fileName, true);
@@ -96,7 +98,7 @@ class FileCache {
 		$this->setDelay($c_cache_delay);
 		
 		// Retrieving/creating cache - Está cacheada
-		if ($this->checkLog($lifetime) && !$_GET['nocache_force']) {
+		if ($this->checkLog($lifetime) && !$nocache_force) {
 			$this->getCache();
 		} else {
 			$this->startCache(); // Não está cacheada, cachear agora
