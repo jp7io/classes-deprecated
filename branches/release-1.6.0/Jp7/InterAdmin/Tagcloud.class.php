@@ -10,17 +10,18 @@ class Jp7_InterAdmin_Tagcloud
 		$DbNow = $db->BindTimeStamp(date("Y-m-d H:i:s"));
 		$tags_arr = array();
 		$sql = "SELECT registros.id, registros.hits" .
-		" FROM " . $db_prefix . $lang->prefix . " AS registros" .
-		" INNER JOIN " . $db_prefix . $lang->prefix . "_tags AS tags" .
-		" ON registros.id = tags.parent_id" .
-		" WHERE registros.hits > 0" .
-		" AND registros.char_key <> ''" .
-		" AND registros.deleted = ''" .
-		" AND (registros.date_publish <= '" . $DbNow . "' OR registros.date_publish IS NULL)" .
-		" AND (registros.date_expire > '" . $DbNow . "' OR registros.date_expire IS NULL OR registros.date_expire='0000-00-00 00:00:00')" .
-		" GROUP BY registros.id" .
-		" ORDER BY registros.date_hit DESC" .
-		" LIMIT " . $this->limit;
+			" FROM " . $db_prefix . $lang->prefix . " AS registros" .
+			" INNER JOIN " . $db_prefix . $lang->prefix . "_tags AS tags" .
+			" ON registros.id = tags.parent_id" .
+			" WHERE registros.hits > 0" .
+			" AND registros.char_key <> ''" .
+			" AND registros.deleted = ''" .
+			" AND (registros.date_publish <= '" . $DbNow . "' OR registros.date_publish IS NULL)" .
+			" AND (registros.date_expire > '" . $DbNow . "' OR registros.date_expire IS NULL OR registros.date_expire='0000-00-00 00:00:00')" .
+			" GROUP BY registros.id" .
+			" ORDER BY DATE(registros.date_hit) DESC, HOUR(registros.date_hit) DESC, registros.hits DESC" .
+			" LIMIT " . $this->limit * 2;
+		
 		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		while ($row = $rs->FetchNextObj()) {
 			$interadminCloud = new $class($row->id);
@@ -28,7 +29,7 @@ class Jp7_InterAdmin_Tagcloud
 			$tags_arr = array_merge($tags_arr, $interadminCloud->getTags());
 		}
 		$rs->Close();
-		
+				
 		$tags_arr_unique = array();
 		foreach ($tags_arr as $tag) {
 			$tag_key = ($tag->id) ? $tag->id_tipo . ';' . $tag->id : $tag->id_tipo;
@@ -37,6 +38,7 @@ class Jp7_InterAdmin_Tagcloud
 		}
 		$min = 1000;
 		$max = 0;
+		
 		foreach ($tags_arr_unique as $tag) {
 			if ($tag['hits'] < $min) {
 				$min = $tag['hits'];
@@ -64,7 +66,7 @@ class Jp7_InterAdmin_Tagcloud
 				$tags_arr_unique[$key]['fontSize'] = $this->minFontSize + round($fontSizeDiff / 2);
 			}
 		}
-		return $tags_arr_unique;
+		return array_slice($tags_arr_unique, 0, $this->limit);
 	}
 }
 ?>
