@@ -420,8 +420,15 @@ abstract class InterAdminAbstract {
 			} else {
 				$nome = ($aliases[$campo]) ? $aliases[$campo] : $campo;
 				if (strpos($nome, 'file_') === 0 && strpos($nome, '_text') === false) {
-					$fields[] = $table . $nome . '_text  AS `' . $campo . '.text`';
+					if (strpos($campo, 'file_') === 0) {
+						// necessário para quando o parametro fields está sem alias, mas o retorno está com alias
+						$file_campo = array_search($campo, $aliases);
+					} else {
+						$file_campo = $campo;
+					}
+					$fields[] = $table . $nome . '_text  AS `' . $file_campo . '.text`';
 				}
+				
 				$fields[$join] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
 			}
 		}
