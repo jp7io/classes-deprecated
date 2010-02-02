@@ -36,9 +36,7 @@ class Jp7_Date extends DateTime {
 		foreach ($units as $unit => $seconds_in_period) {
 			if ($seconds >= $seconds_in_period) {
 				$count = floor($seconds / $seconds_in_period);
-				
-				$unit = Jp7_Inflector::plural($unit, $count);
-				return $count . ' ' . $unit . ' atrás';
+				return Jp7_Inflector::plural($unit, $count) . ' atrás';
 			}
 		}
 	}

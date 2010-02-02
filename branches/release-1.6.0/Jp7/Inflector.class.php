@@ -37,16 +37,31 @@ class Jp7_Inflector {
 	 * @param int|array $itens The word will only be pluralized $itens > 1 OR count($itens) > 1.
 	 * @return string
 	 */
-	public static function plural ($word, $itens = 2) {
-		if (is_numeric($itens) && $itens > 1 || is_array($itens) && count($itens) > 1) {
-			foreach (self::$plural_inflections as $pattern => $replacement) {
-				if (preg_match($pattern, $word)) {
-					$word = preg_replace($pattern, $replacement, $word);
-					break;
-				}
+	public static function plural ($word, $itens = null) {
+		static $resolved = array();
+				
+		if (is_null($itens)) {
+			$itens = 0;
+		} else {
+			if (is_array($itens)) {
+				$itens = count($itens);
 			}
+			$prefix = $itens . ' ';
 		}
-		return $word;
+		
+		if (is_numeric($itens) && $itens != 1) {
+			if (!isset($resolved[$word])) {
+				foreach (self::$plural_inflections as $pattern => $replacement) {
+					if (preg_match($pattern, $word)) {
+						$resolved[$word] = preg_replace($pattern, $replacement, $word);
+						break;
+					}
+				}		
+			}
+			$word = $resolved[$word];
+		}
+		
+		return $prefix . $word;
 	}
 	
 	/**
