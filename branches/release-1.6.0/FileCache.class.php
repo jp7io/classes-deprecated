@@ -177,7 +177,7 @@ class FileCache {
 			readfile($this->cachePath . $this->fileName);
 			
 			// Debug
-            if ($c_jp7) {
+            if ($c_jp7 && strpos($this->fileName, 'xml') === false) {
                 global $config;
                 $css = 'position:absolute;border:1px solid black;border-top:0px;font-weight:bold;top:0px;padding:5px;background:#FFCC00;filter:alpha(opacity=50);opacity: .5;z-index:1000;cursor:pointer;';
                 $title = array(
