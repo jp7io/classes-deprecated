@@ -936,7 +936,6 @@ class FirePHP {
    * @return string|false
    */
   protected function getUserAgent() {
-  	return 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.1.3) Gecko/20090824 Firefox/3.5.3 (.NET CLR 3.5.30729) FirePHP/0.3';
     if(!isset($_SERVER['HTTP_USER_AGENT'])) return false;
     return $_SERVER['HTTP_USER_AGENT'];
   }
