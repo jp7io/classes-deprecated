@@ -398,9 +398,12 @@ class InterSite extends InterAdmin {
 		global $debugger, $jp7_app;
 		$thisHost = $_SERVER['HTTP_HOST'];
 		
+		// @todo Não extender mais o InterAdmin.
+		$this->allowAttributes = true; 
+		
 		// This server is a main host
 		$this->server = $this->servers[$thisHost];
-		
+				
 		while (!$this->server) {
 			// InterAdmin Remote
 			if ($jp7_app) {
