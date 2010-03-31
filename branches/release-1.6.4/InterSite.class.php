@@ -45,7 +45,7 @@ class InterSite {
 	 * Current server type: 'main', 'alias' or 'remote'.
 	 * @var string
 	 */
-	public $serverType = 'main';
+	public $hostType;
 	/**
 	 * Current Database.
 	 * @var object
@@ -114,7 +114,8 @@ class InterSite {
 		
 		// This server is a main host
 		$this->server = $this->servers[$host];
-				
+		$this->hostType = 'main';
+		
 		// Not Found, searching aliases
 		while (!$this->server) {
 			foreach ($this->servers as $serverHost => $server) {
@@ -123,14 +124,14 @@ class InterSite {
 					$remotes = $server->interadmin_remote;
 					if (in_array($host, $remotes) || in_array('www.' . $host, $remotes)) {
 						$this->server = $this->servers[$host] = $server;
-						$this->serverType = 'remote';
+						$this->hostType = 'remote';
 						break 2;  // Exit foreach and while.
 					}
 				}
 				// Aliases
 				if (in_array($host, $server->aliases)) {
 					$this->server = $this->servers[$host] = $server;
-					$this->serverType = 'alias';
+					$this->hostType = 'alias';
 					break 2;  // Exit foreach and while.
 				}
 			}
@@ -173,7 +174,7 @@ class InterSite {
 		
 		$this->init($_SERVER['HTTP_HOST']);
 		
-		switch ($this->serverType) {
+		switch ($this->hostType) {
 			case 'alias':
 				header('Location: http://' . $this->server->host . $_SERVER['REQUEST_URI']);
 				exit;
