@@ -138,6 +138,7 @@ class InterSite {
 			if (self::isAtLocalhost()) {
 				if ($server = $this->getFirstServerByType(self::DESENVOLVIMENTO)) {
 					$this->server = $this->servers[$host] = $server;
+					$this->server->host = $host;
 				}
 			}
 		}
