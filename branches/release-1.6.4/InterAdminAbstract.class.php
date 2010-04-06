@@ -123,12 +123,13 @@ abstract class InterAdminAbstract {
 		}
 	}
 	/**
-	 * Updates the values into the database table. If this object has no 'id', the data is inserted.
+	 * DEPRECATED: Updates the values into the database table. If this object has no 'id', the data is inserted.
 	 * 
 	 * @param array $fields_values Array with the values, the keys are the fields names.
 	 * @param bool $force_magic_quotes_gpc If TRUE the string will be quoted even if 'magic_quotes_gpc' is not active.
 	 * @return void
 	 * @todo Verificar necessidade de $force_magic_quotes_gpc no jp7_db_insert
+	 * @deprecated Utilizar save()
 	 */
 	public function setFieldsValues($fields_values, $force_magic_quotes_gpc = false) {
 		$pk = $this->_primary_key;
@@ -140,15 +141,34 @@ abstract class InterAdminAbstract {
 		$this->_updated = true; // FIXME Hack temporário
 	}
 	/**
+	 * Updates all the attributes from the passed-in array and saves the record.
+	 * 
+	 * @param array $attributes Array with fields names and values.
+	 * @return void
+	 */
+	public function updateAttributes($attributes) {
+		$this->setAttributes($attributes);
+		$this->_update($attributes);
+	}
+	/**
 	 * Saves this record.
 	 * 
 	 * @return void
 	 */
 	public function save() {
-		$pk = $this->_primary_key;
+		$this->_update($this->attributes);
+	}
+	/**
+	 * Updates using SQL.
+	 * 
+	 * @param array $attributes
+	 * @return void
+	 */
+	protected function _update($attributes) {
 		$valuesToSave = array();
 		$aliases = array_flip($this->getAttributesAliases());
-		foreach ($this->attributes as $key => $value) {
+		
+		foreach ($attributes as $key => $value) {
 			$key = ($aliases[$key]) ? $aliases[$key] : $key;
 			if (is_object($value)) {
 				$valuesToSave[$key] = (string) $value;
@@ -158,6 +178,8 @@ abstract class InterAdminAbstract {
 				$valuesToSave[$key] = $value;
 			}
 		}
+		
+		$pk = $this->_primary_key;
 		if ($this->$pk) {
 			jp7_db_insert($this->getTableName(), $this->_primary_key, $this->$pk, $valuesToSave);
 		} else {
@@ -177,9 +199,9 @@ abstract class InterAdminAbstract {
 		$interAdminClass = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin';
 		
 		$options = array();
-//		if (strpos($field, 'date_') === 0) {
-//			return new Jp7_Date($value);
-//		}
+		if (strpos($field, 'date_') === 0) {
+			return new Jp7_Date($value);
+		}
 		if (strpos($field, 'select_') === 0) {
 			$isMulti = (strpos($field, 'select_multi') === 0);
 			$isTipo = in_array($campo['xtra'], array('S', 'ajax_tipos', 'radio_tipos'));
