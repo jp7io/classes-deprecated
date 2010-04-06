@@ -11,13 +11,17 @@ class Jp7_Date extends DateTime {
 	 * O valor é arredondado: 2 anos e 4 meses retorna '2 anos atrás'.
 	 * Diferenças menores de 1 minuto retornam 'agora'.
 	 * 
-	 * @param int|string $timeStamp Timestamp ou Datetime. 
+	 * Static: 		humanDiff($timeStamp = false)
+	 * Instance: 	humanDiff()
+	 * 
+	 * @param int|string $timeStamp [only with static calls] Timestamp ou Datetime. 
 	 * @return string
 	 */
-	public function humanDiff($timeStamp) {
-		if (!is_int($timeStamp)) {
-			$timeStamp = strtotime($timeStamp);
+	public function humanDiff($timeStamp = false) {
+		if (isset($this)) {
+			$timeStamp = $this;
 		}
+		$timeStamp = self::_toTime($timeStamp);
 		$currentTime = time();
 		$units = array(
 			'ano' => 31556926,
@@ -201,7 +205,12 @@ class Jp7_Date extends DateTime {
 		if (strpos($format, 'F') !== false) {
 			$format = preg_replace('/F/', addcslashes(jp7_date_month($this->format('m')), 'A..z'), $format);
 		}
-		return parent::format($format);
+		
+		$retorno = parent::format($format);
+		// Bug:
+		$retorno = str_replace('-001-11-30T', '0000-00-00T', $retorno);	
+		
+		return $retorno;		
 	}
 	
 	public function __toString() {
