@@ -44,6 +44,9 @@ class Jp7_Bootstrap {
 	}
 	
 	public static function initLanguage() {
+		// TODO Retirar língua das variáveis globais
+		global $lang;
+		
 		$config = Zend_Registry::get('config');
 		$frontController = Zend_Controller_Front::getInstance();
 		$request = new Zend_Controller_Request_Http();
