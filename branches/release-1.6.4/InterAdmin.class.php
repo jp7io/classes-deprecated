@@ -16,13 +16,13 @@
  */
 class InterAdmin extends InterAdminAbstract {
 	/**
-	 * Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
+	 * DEPRECATED: Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
 	 * @var string
 	 * @deprecated It will only use this property if there is no id_tipo yet
 	 */
 	public $db_prefix;
 	/**
-	 * Table suffix of this record. e.g.: the table 'interadmin_client_registrations' would have 'registrations' as $table.
+	 * DEPRECATED: Table suffix of this record. e.g.: the table 'interadmin_client_registrations' would have 'registrations' as $table.
 	 * @var string
 	 * @deprecated It will only use this property if there is no id_tipo yet
 	 */
@@ -470,7 +470,7 @@ class InterAdmin extends InterAdminAbstract {
 		);
 	}
 	/**
-	 * Gets the string value for fields referencing to another InterAdmin ID (fields started by "select_").
+	 * DEPRECATED: Gets the string value for fields referencing to another InterAdmin ID (fields started by "select_").
 	 * 
 	 * @param array $sqlRow
 	 * @param string $tipoLanguage
