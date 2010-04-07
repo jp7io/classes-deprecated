@@ -7,6 +7,11 @@
  */
 class Jp7_Date extends DateTime {
 	/**
+	 * @var string
+	 */
+	private $_serializedValue;
+	
+	/**
 	 * Retorna string da diferença de tempo, ex: '3 dias atrás'.
 	 * O valor é arredondado: 2 anos e 4 meses retorna '2 anos atrás'.
 	 * Diferenças menores de 1 minuto retornam 'agora'.
@@ -215,6 +220,28 @@ class Jp7_Date extends DateTime {
 	
 	public function __toString() {
 		return $this->format('c');
+	}
+	
+	/**
+	 * DateTime does not support serialization by default.
+	 * 
+	 * @todo Retirar quando migrar para PHP 5.3
+	 * @return 
+	 */
+	public function __wakeUp() {
+		parent::__construct($this->_serializedValue);
+		unset($this->_serializedValue);
+	}
+	
+	/** 
+	 * DateTime does not support serialization by default.
+	 * 
+	 * @todo Retirar quando migrar para PHP 5.3
+	 * @return void
+	 */
+	public function __sleep() {
+		$this->_serializedValue = $this->__toString();
+		return array('_serializedValue');
 	}
 	
 	public function minute() {
