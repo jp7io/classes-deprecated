@@ -596,4 +596,24 @@ class InterAdmin extends InterAdminAbstract {
     public static function setLogUser($log_user) {
         self::$log_user = $log_user;
     }
+	/**
+	 * Merges two option arrays.
+	 * 
+	 * Values of 'where' will be merged
+	 * Values of 'fields' will be merged
+	 * Other values (such as 'limit') can be overwritten by the $extended array of options.
+	 * 
+	 * @param array $initial 	Initial array of options.
+	 * @param array $extended 	Array of options that will extend the initial array.
+	 * @return array 			Array of $options properly merged.
+	 */
+	public static function mergeOptions($initial, $extended) {
+		if ($initial['fields'] && $extended['fields']) {
+			$extended['fields'] = array_merge($extended['fields'], $initial['fields']);
+		}
+		if ($initial['where'] && $extended['where']) {
+			$extended['where'] = array_merge($extended['where'], $initial['where']);
+		}
+		return $extended + $initial;
+	}
 }
