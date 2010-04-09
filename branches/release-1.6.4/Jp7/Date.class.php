@@ -204,31 +204,34 @@ class Jp7_Date extends DateTime {
 	 * @return 
 	 */
 	public function format($format) {
-		if (strpos($format, 'M') !== false) {
-			$format = preg_replace('/M/', addcslashes(jp7_date_month($this->format('m'), true), 'A..z'), $format);
-		}
-		if (strpos($format, 'F') !== false) {
-			$format = preg_replace('/F/', addcslashes(jp7_date_month($this->format('m')), 'A..z'), $format);
-		}
-		
-		$retorno = parent::format($format);
-		// Bug:
+		// Bug PHP para datas zeradas
 		if (parent::format('Y') === '-0001') {
+			// Switch usado para performance, default: é o tratamento completo do erro
 			switch ($format) {
-				case 'Y':
-					$retorno = '0000';
-					break;
-				case 'm':
 				case 'd':
-					$retorno = '00';
-					break;
+					return '00';
+				case 'm':
+					return '00';
+				case 'Y':
+					return '0000';
+				case 'Y-m-d H:i:s':
+					return  '0000-00-00 00:00:00';
 				default:
-					$retorno = str_replace('-001-11-30', '0000-00-00', $retorno);	
-					$retorno = str_replace('-0001-11-30', '0000-00-00', $retorno);
+					$format = preg_replace('/(?<!\\\\)Y/', '0000', $format);
+					$format = preg_replace('/(?<!\\\\)(d|m|y)/', '00', $format);
+					$format = preg_replace('/(?<!\\\\)c/', '0000-00-00\T00:00:00', $format);
 			}
 		}
 		
-		return $retorno;		
+		if (strpos($format, 'M') !== false) {
+			$format = preg_replace('/(?<!\\\\)M/', addcslashes(jp7_date_month($this->format('m'), true), 'A..z'), $format);
+		}
+		if (strpos($format, 'F') !== false) {
+			krumo($this->format('m'));
+			$format = preg_replace('/(?<!\\\\)F/', addcslashes(jp7_date_month($this->format('m')), 'A..z'), $format);
+		}
+		
+		return parent::format($format);		
 	}
 	
 	public function __toString() {
@@ -274,5 +277,14 @@ class Jp7_Date extends DateTime {
 	}
 	public function year() {
 		return $this->format('Y');
+	}
+	
+	/**
+	 * Checks if its not an invalid date such as '0000-00-00 00:00:00'.
+	 * 
+	 * @return bool
+	 */
+	public function isValid() {
+		return parent::format('Y') !== '-0001';
 	}
 }
