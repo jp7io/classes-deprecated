@@ -213,13 +213,26 @@ class Jp7_Date extends DateTime {
 		
 		$retorno = parent::format($format);
 		// Bug:
-		$retorno = str_replace('-001-11-30T', '0000-00-00T', $retorno);	
+		if (parent::format('Y') === '-0001') {
+			switch ($format) {
+				case 'Y':
+					$retorno = '0000';
+					break;
+				case 'm':
+				case 'd':
+					$retorno = '00';
+					break;
+				default:
+					$retorno = str_replace('-001-11-30', '0000-00-00', $retorno);	
+					$retorno = str_replace('-0001-11-30', '0000-00-00', $retorno);
+			}
+		}
 		
 		return $retorno;		
 	}
 	
 	public function __toString() {
-		return $this->format('c');
+		return $this->format('Y-m-d H:i:s');
 	}
 	
 	/**
