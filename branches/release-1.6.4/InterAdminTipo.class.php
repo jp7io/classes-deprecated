@@ -5,8 +5,8 @@
  * Contains the main custom functions and classes.
  * @author JP7
  * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
- * @category JP7
- * @package InterAdminTipo
+ * @category Jp7
+ * @package InterAdmin
  */
  
 /**
@@ -15,8 +15,7 @@
  * @property string $interadminsOrderby SQL Order By for the records of this InterAdminTipo.
  * @property string $class Class to be instantiated for the records of this InterAdminTipo.
  * @property string $tabela Table of this Tipo, or of its Model, if it has no table.
- * @category Jp7
- * @package InterAdminTipo
+ * @package InterAdmin
  */
 class InterAdminTipo extends InterAdminAbstract {
 	const ID_TIPO = 0;

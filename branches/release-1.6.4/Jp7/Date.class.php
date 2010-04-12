@@ -1,9 +1,18 @@
 <?php 
+/**
+ * JP7's PHP Functions 
+ * 
+ * Contains the main custom functions and classes.
+ * @author JP7
+ * @copyright Copyright 2002-2008 JP7 (http://jp7.com.br)
+ * @category Jp7
+ * @package Jp7_Date
+ */
 
 /**
  * Helper for date utils.
  * 
- * @package Jp7
+ * @package Jp7_Date
  */
 class Jp7_Date extends DateTime {
 	/**
