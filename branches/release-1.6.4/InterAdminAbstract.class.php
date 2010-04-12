@@ -386,7 +386,8 @@ abstract class InterAdminAbstract {
 						if (!in_array($table, (array) $options['from_alias'])) {
 							$this->_addJoinAlias($options, $table, $campos[$joinNome]);
 						}
-						$joinAliases = array_flip($campos[$joinNome]['nome']->getCamposAlias());
+						$joinTipo = $this->_getCampoTipo($campos[$joinNome]);
+						$joinAliases = array_flip($joinTipo->getCamposAlias());
 					}
 					$campo = ($joinAliases[$termo]) ? $joinAliases[$termo] : $termo;
 				} else {
