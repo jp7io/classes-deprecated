@@ -42,7 +42,7 @@ class Jp7_Collections {
 	 * Filters the array using SQL Where.
 	 * 
 	 * @param array $array
-	 * @param string $clause Similar to SQL WHERE Clause, only supports simple comparations by now.
+	 * @param string $clause Similar to SQL WHERE Clause, only supports simple comparations for now.
 	 * @return array
 	 */
 	public static function filter($array, $clause) {
@@ -75,7 +75,8 @@ class Jp7_Collections {
 			}
 			$subitens[$key]->{$newPropertyName}[] = $item;
 		}
-		return $subitens;
+		// Returning values with reindexed keys
+		return array_values($subitens);
 	}
 	/**
  	 * Acts like an order by on an SQL.
