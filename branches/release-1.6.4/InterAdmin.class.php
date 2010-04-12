@@ -612,6 +612,9 @@ class InterAdmin extends InterAdminAbstract {
 			$extended['fields'] = array_merge($extended['fields'], $initial['fields']);
 		}
 		if ($initial['where'] && $extended['where']) {
+			if (!is_array($extended['where'])) {
+				$extended['where'] = array($extended['where']);
+			}
 			$extended['where'] = array_merge($extended['where'], $initial['where']);
 		}
 		return $extended + $initial;
