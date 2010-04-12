@@ -222,35 +222,24 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return array Array of InterAdmin objects.
 	 */
 	public function getInterAdmins($options = array()) {
-		$optionsInstance = array(
-			'class' => $options['class'],
-			'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin'
-		);
-		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
-		
-		$this->_resolveWildcard($options['fields'], $recordModel);
 		$this->_whereArrayFix($options['where']); // FIXME
 		
-		if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {
-			$options['fields'] = array_merge(array('id'), (array) $options['fields']);
-		}
-		$options['from'] = $recordModel->getTableName() . " AS main";
 		$options['where'][] = "id_tipo = " . $this->id_tipo;
 		if ($this->_parent instanceof InterAdmin) {
 			$options['where'][] =  "parent_id = " . intval($this->_parent->id);
 		}
-		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . $this->getInterAdminsOrder();
-		// Internal use
-		$options['aliases'] = $recordModel->getAttributesAliases();
-		$options['campos'] = $recordModel->getAttributesCampos();
-		$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
+		
+		$optionsInstance = array(
+			'class' => $options['class'],
+			'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin'
+		);
+		
+		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
 		$rs = $this->_executeQuery($options);
-		
 		$records = array();
 		while ($row = $rs->FetchNextObj()) {
 			$record = InterAdmin::getInstance($row->id, $optionsInstance, $this);
-			$record->setTipo($this);
 			if ($this->_parent instanceof InterAdmin) {
 				$record->setParent($this->_parent);
 			}
@@ -653,7 +642,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param array $options [optional]
 	 * @return InterAdmin[]
 	 */
-	function getInterAdminsByTags($tags, $options = array()) {
+	public function getInterAdminsByTags($tags, $options = array()) {
 		if (!is_array($tags)) {
 			$tags = array($tags);
 		}
@@ -673,5 +662,79 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		$options['where'][] = '(' . implode(' OR ', $tagsWhere) . ')';
 		return $this->getInterAdmins($options);
+	}
+	
+	protected function _getIdTiposUsingThisModel() {
+		$options = array(
+			'fields' => 'id_tipo',
+			'from' => $this->getTableName() . ' AS main',
+			'where' => array(
+				'model_id_tipo = ' . $this->id_tipo
+			)
+		);
+		
+		$rs = $this->_executeQuery($options);
+		$id_tipos = array();
+		while ($row = $rs->FetchNextObj()) {
+			$id_tipos[] = $row->id_tipo;
+		}
+		$id_tipos[] = $this->id_tipo;
+		return $id_tipos;
+	}
+	/**
+	 * Returns all InterAdminTipo's using this InterAdminTipo as a model (model_id_tipo).
+	 * 
+	 * @param array $options [optional]
+	 * @return InterAdminTipo[]
+	 */
+	public function getTiposUsingThisModel($options = array()) {
+		$tipos = array();
+		$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo';
+		$id_tipos = $this->_getIdTiposUsingThisModel();
+		foreach ($id_tipos as $key => $id_tipo) {
+			$tipos[] = InterAdminTipo::getInstance($id_tipo, $options);
+		}		
+		return $tipos;
+	}
+	
+	protected function _prepareInterAdminsOptions(&$options, $optionsInstance) {
+		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
+		$this->_resolveWildcard($options['fields'], $recordModel);
+		if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {
+			$options['fields'] = array_merge(array('id'), (array) $options['fields']);
+		}
+		$options['from'] = $recordModel->getTableName() . " AS main";
+		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . $this->getInterAdminsOrder();
+		// Internal use
+		$options['aliases'] = $recordModel->getAttributesAliases();
+		$options['campos'] = $recordModel->getAttributesCampos();
+		$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
+	}
+	
+	/**
+	 * Returns all records having an InterAdminTipo that uses this as a model (model_id_tipo).
+	 * 
+	 * @param array $options [optional]
+	 * @return InterAdmin[]
+	 */
+	public function getInterAdminsUsingThisModel($options = array()) {
+		$id_tipos = $this->_getIdTiposUsingThisModel();
+		$options['where'][] = "id_tipo IN (" . implode(',', $id_tipos) . ')';
+		
+		$optionsInstance = array(
+			'class' => $options['class'],
+			'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin'
+		);
+		
+		$this->_prepareInterAdminsOptions($options, $optionsInstance);
+		
+		$rs = $this->_executeQuery($options);
+		$records = array();
+		while ($row = $rs->FetchNextObj()) {
+			$record = InterAdmin::getInstance($row->id, $optionsInstance);
+			$this->_getAttributesFromRow($row, $record, $options);
+			$records[] = $record;
+		}
+		return $records;
 	}
 }
