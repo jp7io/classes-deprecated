@@ -227,7 +227,6 @@ class Jp7_Date extends DateTime {
 			$format = preg_replace('/(?<!\\\\)M/', addcslashes(jp7_date_month($this->format('m'), true), 'A..z'), $format);
 		}
 		if (strpos($format, 'F') !== false) {
-			krumo($this->format('m'));
 			$format = preg_replace('/(?<!\\\\)F/', addcslashes(jp7_date_month($this->format('m')), 'A..z'), $format);
 		}
 		
