@@ -206,6 +206,17 @@ class InterAdminTipo extends InterAdminAbstract {
 		return reset($this->getChildren(array('limit' => 1) + $options));
 	}
 	/**
+	 * Retrieves the first child of this InterAdminTipo which have the given model_id_tipo.
+	 * 
+	 * @param array $options Default array of options. Available keys: fields, where, order, class.
+	 * @return InterAdminTipo
+	 */
+	public function getFirstChildByModel($model_id_tipo, $options = array()) {
+		$options['where'][] = "model_id_tipo = " . $model_id_tipo;
+		$options['limit'] = 1;
+		return reset($this->getChildren($options));
+	}
+	/**
 	 * Retrieves the children of this InterAdminTipo which have the given model_id_tipo.
 	 * 
 	 * @param array $options Default array of options. Available keys: fields, where, order, class.
