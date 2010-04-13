@@ -606,7 +606,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$childrenArr = explode("{;}", $this->getFieldsValues('children'));
 			for ($i = 0; $i < count($childrenArr) - 1; $i++) {
 				$child = array_combine(array('id_tipo', 'nome', 'ajuda', 'netos'), explode('{,}', $childrenArr[$i]));
-				$nome_id = toId($child['nome']);
+				$nome_id = Jp7_Inflector::camelize($child['nome']);
 				$children[$nome_id] = $child;
 			}
 			$this->_setMetadata('children', $children);
@@ -665,20 +665,24 @@ class InterAdminTipo extends InterAdminAbstract {
 	}
 	
 	protected function _getIdTiposUsingThisModel() {
-		$options = array(
-			'fields' => 'id_tipo',
-			'from' => $this->getTableName() . ' AS main',
-			'where' => array(
-				'model_id_tipo = ' . $this->id_tipo
-			)
-		);
-		
-		$rs = $this->_executeQuery($options);
-		$id_tipos = array();
-		while ($row = $rs->FetchNextObj()) {
-			$id_tipos[] = $row->id_tipo;
+		// cache
+		static $id_tipos;		
+		if (!isset($id_tipos)) {
+			$options = array(
+				'fields' => 'id_tipo',
+				'from' => $this->getTableName() . ' AS main',
+				'where' => array(
+					'model_id_tipo = ' . $this->id_tipo
+				)
+			);
+			
+			$rs = $this->_executeQuery($options);
+			$id_tipos = array();
+			while ($row = $rs->FetchNextObj()) {
+				$id_tipos[] = $row->id_tipo;
+			}
+			$id_tipos[] = $this->id_tipo;
 		}
-		$id_tipos[] = $this->id_tipo;
 		return $id_tipos;
 	}
 	/**

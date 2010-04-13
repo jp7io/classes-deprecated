@@ -106,6 +106,21 @@ class InterAdmin extends InterAdminAbstract {
 		return $finalInstance;
 	}
 	/**
+	 * Finds a Child Tipo by a camelcase keyword. 
+	 * 
+	 * @param 	string 	$nome_id 	CamelCase
+	 * @return 	array 
+	 */
+	protected function _findChild($nome_id) {
+		$children = $this->getTipo()->getInterAdminsChildren();
+		if (!$children[$nome_id]) {
+			$nome_id = explode('_', Jp7_Inflector::underscore($nome_id));
+			$nome_id[0] = Jp7_Inflector::plural($nome_id[0]);
+			$nome_id = Jp7_Inflector::camelize(implode('_', $nome_id));
+		}
+		return $children[$nome_id];
+	}
+	/**
 	 * Magic method calls
 	 * 
 	 * Available magic methods:
@@ -119,39 +134,39 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return mixed
 	 */
 	public function __call($methodName, $args) {
-		$children = $this->getTipo()->getInterAdminsChildren();
-		// get*
+		// get{ChildName}, getFirst{ChildName} and get{ChildName}ById
 		if (strpos($methodName, 'get') === 0) {
-			// getFirst*
+			// getFirst{ChildName}
 			if (strpos($methodName, 'getFirst') === 0) {
-				$nome_id = Jp7_Inflector::tableize(substr($methodName, 8));
-				if ($child = $children[$nome_id]) {
+				$nome_id = substr($methodName, strlen('getFirst'));
+				if ($child = $this->_findChild($nome_id)) {
 					return $this->getFirstChild($child['id_tipo'], (array) $args[0]);
 				}
-			// get*ById
+			// get{ChildName}ById
 			} elseif (substr($methodName, -4) == 'ById') {
-				$nome_id = Jp7_Inflector::tableize(substr($methodName, 3, -4));
-				if ($child = $children[$nome_id]) {
+				$nome_id = substr($methodName, strlen('get'), -strlen('ById'));
+				if ($child = $this->_findChild($nome_id)) {
 					$options = (array) $args[1];
 					$options['where'][] = "id = " . intval($args[0]);
 					return $this->getFirstChild($child['id_tipo'], $options);
 				}
+			// get{ChildName}
 			} else {
-				$nome_id = Jp7_Inflector::underscore(substr($methodName, 3)); 
-				if ($child = $children[$nome_id]) {
+				$nome_id = substr($methodName, strlen('get'));
+				if ($child = $this->_findChild($nome_id)) {
 					return $this->getChildren($child['id_tipo'], (array) $args[0]);
 				}
-			} 
-		// create*
+			}
+		// create{ChildName}
 		} elseif (strpos($methodName, 'create') === 0) {
-			$nome_id = Jp7_Inflector::tableize(substr($methodName, strlen('create'))); 
-			if ($child = $children[$nome_id]) {
+			$nome_id = substr($methodName, strlen('create')); 
+			if ($child = $this->_findChild($nome_id)) {
 				return $this->createChild($child['id_tipo'], (array) $args[0]);
 			}
-		// delete *
+		// delete{ChildName}
 		} elseif (strpos($methodName, 'delete') === 0) {
-			$nome_id = Jp7_Inflector::underscore(substr($methodName, strlen('delete')));
-			if ($child = $children[$nome_id]) {
+			$nome_id = substr($methodName, strlen('delete'));
+			if ($child = $this->_findChild($nome_id)) {
 				return $this->deleteChildren($child['id_tipo'], (array) $args[0]);
 			}
 		} 
