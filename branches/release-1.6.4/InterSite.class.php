@@ -80,7 +80,29 @@ class InterSite {
 		}
 		return false;
 	}
-		
+	
+	/**
+	 * Checks if the server type is PRODUCAO.
+	 * @return bool
+	 */
+	public function isProducao() {
+		return $this->server->type === self::PRODUCAO;
+	}
+	/**
+	 * Checks if the server type is QA.
+	 * @return bool
+	 */
+	public function isQa() {
+		return $this->server->type === self::QA;
+	}
+	/**
+	 * Checks if the server type is DESENVOLVIMENTO.
+	 * @return bool
+	 */
+	public function isDesenvolvimento() {
+		return $this->server->type === self::DESENVOLVIMENTO;
+	}
+	
 	/**
 	 * Returns the first server which has a given type.
 	 * 
