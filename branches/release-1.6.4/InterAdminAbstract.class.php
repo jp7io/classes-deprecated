@@ -369,7 +369,7 @@ abstract class InterAdminAbstract {
 					} elseif (strpos($table, 'children_') === 0) {
 						$joinNome = substr($table, 9);
 						$childrenArr = $this->getInterAdminsChildren();
-						if (!$childrenArr[Jp7_Inflector::underscore($joinNome)]) {
+						if (!$childrenArr[Jp7_Inflector::camelize($joinNome)]) {
 							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.');
 						}
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo']);
