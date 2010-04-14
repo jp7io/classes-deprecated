@@ -414,6 +414,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	protected function _getCampoTipo($campo) {
 		if (is_object($campo['nome'])) {
 			return $campo['nome'];
+		} elseif ($campo['nome'] == 'all') {
+			return new InterAdminTipo();
 		}
 	}	
 	/**

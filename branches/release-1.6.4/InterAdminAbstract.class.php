@@ -481,7 +481,7 @@ abstract class InterAdminAbstract {
 			die(jp7_debug('The field "' . $alias . '" cannot be used as a join.'));
 		}		
 		$options['from_alias'][] = $alias; // Used as cache when resolving Where
-		if ($campo['xtra'] == 'S') { // @todo testar
+		if (in_array($campo['xtra'], array('S', 'ajax_tipos', 'radio_tipos', 'tipos', 'tipos_multi'))) { // @todo testar
             $options['from'][] = $joinTipo->getTableName() . 
                 ' AS ' . $alias . ' ON '  . $table . '.' . $campo['tipo'] . ' = ' . $alias . '.id_tipo';
         } else {
