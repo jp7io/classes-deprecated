@@ -600,13 +600,10 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $table . '_arquivos';
 	}
 	protected function _setMetadata($varname, $value) {
-		self::$_metadata[$this->id_tipo][$varname] = $value;
+		self::$_metadata[$this->db_prefix][$this->id_tipo][$varname] = $value;
 	}
 	protected function _getMetadata($varname) {
-		global $db_prefix;
-		if ($db_prefix == $this->db_prefix) {
-			return self::$_metadata[$this->id_tipo][$varname];
-		}
+		return self::$_metadata[$this->db_prefix][$this->id_tipo][$varname];
 	}
 	/**
 	 * @return array
