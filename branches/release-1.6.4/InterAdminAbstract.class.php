@@ -222,7 +222,7 @@ abstract class InterAdminAbstract {
 			$isTipo = in_array($campo['xtra'], array('S', 'ajax_tipos', 'radio_tipos'));
 		} elseif (strpos($field, 'special_') === 0 && $campo['xtra']) {
 			$isMulti = in_array($campo['xtra'], array('registros_multi', 'tipos_multi'));
-			$isTipo = ($campo['xtra'] == 'multi_tipos' || $campo['xtra'] == 'tipos');
+			$isTipo = ($campo['xtra'] == 'tipos_multi' || $campo['xtra'] == 'tipos');
 		} elseif (strpos($field, 'file_') === 0 && strpos($field, '_text') === false && $value) {
 			$class_name = $interAdminClass . 'FieldFile';
 			if (!class_exists($class_name)) {
