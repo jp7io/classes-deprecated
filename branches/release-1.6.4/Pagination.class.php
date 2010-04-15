@@ -88,8 +88,11 @@ class Pagination {
 			$this->records = $row->records;
 			$rs->Close();
 		} else {
-			if ($records) $this->records = $records;
-			else return '[aa]';
+			if (isset($records)) {
+				$this->records = $records;
+			} else {
+			 	return '[aa]';	
+			}
 		}
 		
 		$this->total = ceil($this->records / $limit); // Total de Paginas
@@ -99,6 +102,7 @@ class Pagination {
 		
 		$this->init = (($this->page - 1) * $limit); // Item inicial
 		$this->limit = $limit; // Itens por pagina
+		
 		$this->sql_limit = " LIMIT " . $this->init . "," . $this->limit;
 		
 		// HTM
