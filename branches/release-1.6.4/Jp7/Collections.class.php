@@ -51,8 +51,10 @@ class Jp7_Collections {
 		}
 		$clause = preg_replace('/([^=!])(=)([^=])/', '\1\2=\3', $clause);
 		$clause = preg_replace('/(?<!\')(\b[a-zA-Z_][a-zA-Z0-9_.]+\b)/', '$a->\1', $clause);
+		// FIXME Fazer um parser melhor depois
+		$clause = str_replace('.', '->', $clause);
+		$clause = str_replace(' $a->OR ', ' OR ', $clause);
 		$fnBody = 'return ' . $clause . ';';
-		
 		return array_filter($array, create_function('$a', $fnBody));
 	}
 	/**
