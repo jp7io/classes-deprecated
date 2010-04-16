@@ -81,7 +81,7 @@ class InterAdmin extends InterAdminAbstract {
 		if (!$options['default_class']) {
 			$options['default_class'] = 'InterAdmin';
 		}
-		// Classe não foi forçada
+		// Classe não foi forçada, descobrir a classe do Tipo
 		if (!$options['class']) {
 			if (!$tipo) {
 				$instance = new $options['default_class']($id, $optionsWithoutFields);
@@ -97,7 +97,9 @@ class InterAdmin extends InterAdminAbstract {
 			// Classe é outra
 			$class_name = class_exists($options['class']) ? $options['class'] : $options['default_class'];
 			$finalInstance = new $class_name($id, $optionsWithoutFields);
-			$finalInstance->setTipo($tipo);
+			if ($tipo) {
+				$finalInstance->setTipo($tipo);
+			}
 		}
 		// Fields		
 		if ($options['fields']) {

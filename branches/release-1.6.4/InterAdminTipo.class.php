@@ -240,11 +240,6 @@ class InterAdminTipo extends InterAdminAbstract {
 			$options['where'][] =  "parent_id = " . intval($this->_parent->id);
 		}
 		
-		$optionsInstance = array(
-			'class' => $options['class'],
-			'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin'
-		);
-		
 		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
 		$rs = $this->_executeQuery($options);
@@ -674,48 +669,45 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $this->getInterAdmins($options);
 	}
 	
-	protected function _getIdTiposUsingThisModel() {
+	/**
+	 * Returns all InterAdminTipo's using this InterAdminTipo as a model (model_id_tipo).
+	 * 
+	 * @param array $options [optional]
+	 * @return InterAdminTipo[] Array of Tipos indexed by their id_tipo.
+	 */
+	public function getTiposUsingThisModel($options = array()) {
 		// cache
-		static $id_tipos;		
-		if (!isset($id_tipos)) {
-			$options = array(
+		static $tipos;		
+		if (!isset($tipos)) {
+			$rs = $this->_executeQuery(array(
 				'fields' => 'id_tipo',
 				'from' => $this->getTableName() . ' AS main',
 				'where' => array(
 					'model_id_tipo = ' . $this->id_tipo
 				)
-			);
+			));
 			
-			$rs = $this->_executeQuery($options);
-			$id_tipos = array();
+			$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo';		
+			$tipos = array();
 			while ($row = $rs->FetchNextObj()) {
-				$id_tipos[] = $row->id_tipo;
+				$tipos[$row->id_tipo] = InterAdminTipo::getInstance($row->id_tipo, $options);;
 			}
-			$id_tipos[] = $this->id_tipo;
+			$tipos[$this->id_tipo] = $this;
 		}
-		return $id_tipos;
-	}
-	/**
-	 * Returns all InterAdminTipo's using this InterAdminTipo as a model (model_id_tipo).
-	 * 
-	 * @param array $options [optional]
-	 * @return InterAdminTipo[]
-	 */
-	public function getTiposUsingThisModel($options = array()) {
-		$tipos = array();
-		$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo';
-		$id_tipos = $this->_getIdTiposUsingThisModel();
-		foreach ($id_tipos as $key => $id_tipo) {
-			$tipos[] = InterAdminTipo::getInstance($id_tipo, $options);
-		}		
 		return $tipos;
 	}
 	
-	protected function _prepareInterAdminsOptions(&$options, $optionsInstance) {
+	protected function _prepareInterAdminsOptions(&$options, &$optionsInstance) {
+		$optionsInstance = array(
+			'class' => $options['class'],
+			'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin'
+		);
+		
 		$recordModel = InterAdmin::getInstance(0, $optionsInstance, $this);
+		
 		$this->_resolveWildcard($options['fields'], $recordModel);
 		if (count($options['fields']) != 1 || strpos($options['fields'][0], 'COUNT(') === false) {
-			$options['fields'] = array_merge(array('id'), (array) $options['fields']);
+			$options['fields'] = array_merge(array('id', 'id_tipo'), (array) $options['fields']);
 		}
 		$options['from'] = $recordModel->getTableName() . " AS main";
 		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . $this->getInterAdminsOrder();
@@ -732,20 +724,15 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdmin[]
 	 */
 	public function getInterAdminsUsingThisModel($options = array()) {
-		$id_tipos = $this->_getIdTiposUsingThisModel();
-		$options['where'][] = "id_tipo IN (" . implode(',', $id_tipos) . ')';
-		
-		$optionsInstance = array(
-			'class' => $options['class'],
-			'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin'
-		);
+		$tipos = $this->getTiposUsingThisModel();
+		$options['where'][] = "id_tipo IN (" . implode(',', $tipos) . ')';
 		
 		$this->_prepareInterAdminsOptions($options, $optionsInstance);
 		
 		$rs = $this->_executeQuery($options);
 		$records = array();
 		while ($row = $rs->FetchNextObj()) {
-			$record = InterAdmin::getInstance($row->id, $optionsInstance);
+			$record = InterAdmin::getInstance($row->id, $optionsInstance, $tipos[$row->id_tipo]);
 			$this->_getAttributesFromRow($row, $record, $options);
 			$records[] = $record;
 		}
