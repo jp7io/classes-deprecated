@@ -317,7 +317,6 @@ class InterAdminTipo extends InterAdminAbstract {
 		if (!$A = $this->_getMetadata('campos')) {
 			$model = $this->getModel();
 			
-			
 			$campos = $model->getFieldsValues('campos');
 			unset($model->campos);
 			$campos_parameters = array(
@@ -607,8 +606,10 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function getInterAdminsChildren() {
 		if (!$children = $this->_getMetadata('children')) {
+			$model = $this->getModel();
+			
 			$children = array();
-			$childrenArr = explode("{;}", $this->getFieldsValues('children'));
+			$childrenArr = explode("{;}", $model->getFieldsValues('children'));
 			for ($i = 0; $i < count($childrenArr) - 1; $i++) {
 				$child = array_combine(array('id_tipo', 'nome', 'ajuda', 'netos'), explode('{,}', $childrenArr[$i]));
 				$nome_id = Jp7_Inflector::camelize($child['nome']);
