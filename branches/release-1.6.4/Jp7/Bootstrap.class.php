@@ -3,6 +3,8 @@
 class Jp7_Bootstrap {
 	
 	public static function run() {
+		global $config;
+		
 		include_once APPLICATION_PATH . '/../interadmin/config.php';
 		
 		Zend_Registry::set('config', $config);
