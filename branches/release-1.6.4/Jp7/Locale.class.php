@@ -17,9 +17,9 @@ class Jp7_Locale
 		$config = Zend_Registry::get('config');
 		
 		$this->lang = $language;
-		$this->path = '/' . $language . '/';
 		
 		if ($language != $config->lang_default) {
+			$this->path = $language . '/';
 			$this->prefix = '_' . $language;
 		}
 	}
