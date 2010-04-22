@@ -120,6 +120,9 @@ class InterAdmin extends InterAdminAbstract {
 			$nome_id[0] = Jp7_Inflector::plural($nome_id[0]);
 			$nome_id = Jp7_Inflector::camelize(implode('_', $nome_id));
 		}
+		if (!$children[$nome_id]) {
+			$nome_id = Jp7_Inflector::plural($nome_id);
+		}
 		return $children[$nome_id];
 	}
 	/**
