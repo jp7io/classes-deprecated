@@ -542,26 +542,31 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function getTableName() {
 		return $this->db_prefix . '_tipos';
 	}
-	public function getInterAdminsOrder() {
+	public function getInterAdminsOrder($order = '') {
 		if (!$interadminsOrderBy = $this->_getMetadata('interadmins_order')) {
+			$interadminsOrderBy = array();
 			$campos = $this->getCampos();
 			if ($campos) {
 				foreach ($campos as $key => $row) {
 					if ($row['orderby']) {
-						if ($row['orderby'] < 0) $key .= " DESC";
-						$tipo_orderby[$row['orderby']] = $key;
+						if ($row['orderby'] < 0) {
+							$key .= " DESC";
+						}
+						$interadminsOrderBy[$row['orderby']] = $key;
 					}
 				}
-				if ($tipo_orderby) {
-					ksort($tipo_orderby);
-					$tipo_orderby = implode(",", $tipo_orderby);
+				if ($interadminsOrderBy) {
+					ksort($interadminsOrderBy);
 				}
-				$interadminsOrderBy = $tipo_orderby;
 			}
-			$interadminsOrderBy .= (($interadminsOrderBy) ? ',' : '') . 'date_publish DESC';
+			$interadminsOrderBy[] = 'date_publish DESC';
 			$this->_setMetadata('interadmins_order', $interadminsOrderBy);
 		}
-		return $interadminsOrderBy;
+		if ($order) {
+			$order = explode(',', $order);
+			$interadminsOrderBy = array_unique(array_merge($order, $interadminsOrderBy));
+		}
+		return implode(',', $interadminsOrderBy);
 	}
 	/**
 	 * Returns the table name for the InterAdmins.
@@ -711,7 +716,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$options['fields'] = array_merge(array('id', 'id_tipo'), (array) $options['fields']);
 		}
 		$options['from'] = $recordModel->getTableName() . " AS main";
-		$options['order'] = (($options['order']) ? $options['order'] . ',' : '') . $this->getInterAdminsOrder();
+		$options['order'] = $this->getInterAdminsOrder($options['order']);
 		// Internal use
 		$options['aliases'] = $recordModel->getAttributesAliases();
 		$options['campos'] = $recordModel->getAttributesCampos();
