@@ -534,15 +534,17 @@ class InterAdmin extends InterAdminAbstract {
 				$camposCombo[] = $campo['tipo'];
 			}
 		}
-		$valoresCombo = $this->getFieldsValues($camposCombo);
-		$stringValue = array();
-		foreach ($valoresCombo as $key => $value) {
-			if (is_object($value)) {
-				 $value = $value->getStringValue();
+		if ($camposCombo) {
+			$valoresCombo = $this->getFieldsValues($camposCombo);
+			$stringValue = array();
+			foreach ($valoresCombo as $key => $value) {
+				if (is_object($value)) {
+					 $value = $value->getStringValue();
+				}
+				$stringValue[] = $value;
 			}
-			$stringValue[] = $value;
+			return implode(' - ', $stringValue);
 		}
-		return implode(' - ', $stringValue);
 	}
 	/**
 	 * Saves this record and updates date_modify.
@@ -625,6 +627,9 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return array 			Array of $options properly merged.
 	 */
 	public static function mergeOptions($initial, $extended) {
+		if (!$extended) {
+			return $initial;
+		}		
 		if ($initial['fields'] && $extended['fields']) {
 			$extended['fields'] = array_merge($extended['fields'], $initial['fields']);
 		}

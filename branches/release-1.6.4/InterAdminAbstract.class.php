@@ -309,9 +309,13 @@ abstract class InterAdminAbstract {
 		// Debug
 		if ($debugger) {
 			$debugger->showSql($sql, $options['debug']);
+			$debugger->startTime();
 		}
 		// Run SQL
 		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+		if ($debugger) {
+			$debugger->getTime($options['debug']);
+		}
 		return $rs;
 	}
 	/**
