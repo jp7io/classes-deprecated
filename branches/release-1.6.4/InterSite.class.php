@@ -171,7 +171,7 @@ class InterSite {
 			foreach($this->server->vars as $var => $value) {
 				$this->$var = $value;
 			}
-			$this->url = 'http://' . $this->server->host . '/' . $this->server->path . '/';
+			$this->url = 'http://' . $this->server->host . '/' . jp7_path($this->server->path);
 			
 			foreach($this->langs as $sigla => $lang) {
 				if ($lang->default) {
