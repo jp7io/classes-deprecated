@@ -32,7 +32,7 @@ class Jp7_Date extends DateTime {
 	 * @return string
 	 */
 	public function humanDiff($timeStamp = false) {
-		if (isset($this)) {
+		if (isset($this) && $this instanceof self) {
 			$timeStamp = $this;
 		}
 		$timeStamp = self::_toTime($timeStamp);
@@ -70,7 +70,7 @@ class Jp7_Date extends DateTime {
 	 * @return int Age in years.
 	 */
 	public function yearsDiff($to = false) {
-		if (isset($this)) {
+		if (isset($this) && $this instanceof self) {
 			$from = $this;
 		} else {
 			$from = $to; 
@@ -102,7 +102,7 @@ class Jp7_Date extends DateTime {
 	 * @return int
 	 */
 	public function daysDiff($to = false) {
-		if (isset($this)) {
+		if (isset($this) && $this instanceof self) {
 			$from = $this;
 		} else {
 			$from = $to; 
