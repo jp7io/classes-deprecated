@@ -44,6 +44,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	
 	// @todo Remove this
 	protected $_loadedfrommodel;
+	protected $_tiposUsingThisModel;
 	
 	/**
 	 * Public Constructor. If $options['fields'] is passed the method $this->getFieldsValues() is called.
@@ -682,9 +683,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdminTipo[] Array of Tipos indexed by their id_tipo.
 	 */
 	public function getTiposUsingThisModel($options = array()) {
-		// cache
-		static $tipos;		
-		if (!isset($tipos)) {
+		if (!isset($this->_tiposUsingThisModel)) {
 			$rs = $this->_executeQuery(array(
 				'fields' => 'id_tipo',
 				'from' => $this->getTableName() . ' AS main',
@@ -694,13 +693,13 @@ class InterAdminTipo extends InterAdminAbstract {
 			));
 			
 			$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo';		
-			$tipos = array();
+			$this->_tiposUsingThisModel = array();
 			while ($row = $rs->FetchNextObj()) {
-				$tipos[$row->id_tipo] = InterAdminTipo::getInstance($row->id_tipo, $options);;
+				$this->_tiposUsingThisModel[$row->id_tipo] = InterAdminTipo::getInstance($row->id_tipo, $options);;
 			}
-			$tipos[$this->id_tipo] = $this;
+			$this->_tiposUsingThisModel[$this->id_tipo] = $this;
 		}
-		return $tipos;
+		return $this->_tiposUsingThisModel;
 	}
 	
 	protected function _prepareInterAdminsOptions(&$options, &$optionsInstance) {
