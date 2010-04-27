@@ -609,14 +609,16 @@ class InterAdmin extends InterAdminAbstract {
 		return self::$log_user;
     }
     /**
-     * Sets $log_user.
+     * Sets $log_user and returns the old value.
      *
      * @see InterAdmin::$log_user
      * @param object $log_user
      * @return void
      */
     public static function setLogUser($log_user) {
-        self::$log_user = $log_user;
+        $old_user = self::$log_user;
+		self::$log_user = $log_user;
+		return $old_user;
     }
 	/**
 	 * Merges two option arrays.
