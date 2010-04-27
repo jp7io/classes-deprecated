@@ -116,10 +116,12 @@ class Jp7_Collections {
 			// Checagem de string para usar collate correto
 			$attr = explode('->', $k);
 			$valor = reset($array)->{$attr[0]};
-			if ($attr[1]) {
+			if ($attr[2]) {
+				$valor = $valor->{$attr[1]}->{$attr[2]};
+			} elseif ($attr[1]) {
 				$valor = $valor->{$attr[1]};
 			}
-			if (is_string($valor)) {
+			if (is_string($valor) && !is_numeric($valor)) {
 				 $fnBody = '$cmp = strcoll(' . $aStr . ', ' . $bStr . ');' .
 				 	' if ($cmp == 0) {' .
 						$retorno .

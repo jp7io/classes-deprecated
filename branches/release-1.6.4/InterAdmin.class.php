@@ -97,9 +97,10 @@ class InterAdmin extends InterAdminAbstract {
 			// Classe é outra
 			$class_name = class_exists($options['class']) ? $options['class'] : $options['default_class'];
 			$finalInstance = new $class_name($id, $optionsWithoutFields);
-			if ($tipo) {
-				$finalInstance->setTipo($tipo);
-			}
+		}
+		if ($tipo) {
+			$finalInstance->setTipo($tipo);
+			$finalInstance->db_prefix = $tipo->db_prefix;
 		}
 		// Fields		
 		if ($options['fields']) {

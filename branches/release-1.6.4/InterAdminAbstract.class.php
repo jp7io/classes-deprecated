@@ -243,10 +243,15 @@ abstract class InterAdminAbstract {
 				$value_arr = explode(',', $value);
 				if (!$value_arr[0]) $value_arr = array();
 				foreach ($value_arr as $key2 => $value2) {
-					if ($isTipo) {
-						$value_arr[$key2] = InterAdminTipo::getInstance($value2, $options);
+					if ($value2 && is_numeric($value2)) {
+						if ($isTipo) {
+							$value_arr[$key2] = InterAdminTipo::getInstance($value2, $options);
+						} else {
+							$value_arr[$key2] = InterAdmin::getInstance($value2, $options, $tipo);
+						}
 					} else {
-						$value_arr[$key2] = InterAdmin::getInstance($value2, $options, $tipo);
+						//FIXME Retirar quando 7.form.lib parar de salvar N no special
+						unset($value_arr[$key2]);
 					}
 				}
 				$value = $value_arr;
