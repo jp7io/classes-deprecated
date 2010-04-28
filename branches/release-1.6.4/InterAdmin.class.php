@@ -48,6 +48,11 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	protected static $log_user = null;
 	/**
+	 * If TRUE the records will be filtered using the method getPublishedFilters()
+	 * @var bool
+	 */
+	protected static $publish_filters_enabled = true;
+	/**
 	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
 	 * @param int $id This record's 'id'.
 	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias.
@@ -609,7 +614,7 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		return self::$log_user;
     }
-    /**
+  	/**
      * Sets $log_user and returns the old value.
      *
      * @see InterAdmin::$log_user
@@ -621,6 +626,25 @@ class InterAdmin extends InterAdminAbstract {
 		self::$log_user = $log_user;
 		return $old_user;
     }
+	/**
+	 * Enables or disables published filters.
+	 * 
+	 * @param bool $bool
+	 * @return bool Returns the previous value.
+	 */
+	public static function setPublishedFiltersEnabled($bool) {
+		$oldValue = self::$publish_filters_enabled;
+		self::$publish_filters_enabled = (bool) $bool;
+		return $oldValue;
+	}
+	/**
+	 * Returns TRUE if published filters are enabled.
+	 * 
+	 * @return bool $bool
+	 */
+	public static function isPublishedFiltersEnabled() {
+		return self::$publish_filters_enabled;
+	}
 	/**
 	 * Merges two option arrays.
 	 * 

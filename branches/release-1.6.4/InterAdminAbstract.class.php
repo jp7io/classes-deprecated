@@ -273,7 +273,7 @@ abstract class InterAdminAbstract {
 	 * @return ADORecordSet
 	 */
 	protected function _executeQuery($options) {
-		global $jp7_app, $db, $debugger;
+		global $db, $debugger;
 		// Type casting 
 		if (!is_array($options['from'])) {
     		$options['from'] = (array) $options['from'];
@@ -295,7 +295,12 @@ abstract class InterAdminAbstract {
 		// Resolve Alias and Joins for 'where', 'group' and 'order';
 		$clauses = $this->_resolveSqlClausesAlias($options);
 		
-		if (!$options['all'] && !$jp7_app) {
+		if (array_key_exists('use_published_filters', $options)) {
+			$use_published_filters = $options['use_published_filters'];
+		} else {
+			$use_published_filters = InterAdmin::isPublishedFiltersEnabled();
+		}
+		if ($use_published_filters) {
 			foreach ($options['from'] as $key => $from) {
 				list($table, $alias) = explode(' AS ', $from);
 				if ($alias == 'main') {
@@ -306,6 +311,7 @@ abstract class InterAdminAbstract {
 				}
 			}
 		}
+		
 		// Sql
 		$sql = "SELECT " . implode(',', $options['fields']) .
 			" FROM " . implode(' LEFT JOIN ', $options['from']) .
