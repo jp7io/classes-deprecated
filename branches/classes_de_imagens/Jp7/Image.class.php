@@ -46,6 +46,7 @@ class Jp7_Image
 		// Parser/Replace no command para compatibilidade Linux/Windows
 		if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
 			$command = str_replace('(', '\(', $command);
+			$command = str_replace(')', '\)', $command);
 		}
 		passthru($command, $return);
 		$image = file_get_contents($this->dst);
