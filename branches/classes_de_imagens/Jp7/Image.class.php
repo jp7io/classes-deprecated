@@ -6,6 +6,8 @@ class Jp7_Image
 	public $src = '';
 	public $dst = '';
 	public $image = '';
+	public $compression = null;
+	public $imageCompressionQuality = null;
 	
 	public function __construct($file)
 	{
@@ -14,6 +16,45 @@ class Jp7_Image
 		$this->image = file_get_contents($this->file);
 		$this->src = $this->dirname . 'image_src.tmp';
 		$this->dst = $this->dirname . 'image_dst.png';
+	}
+	
+	public function __toString()
+	{
+		return $this->image;	
+	}
+	
+	public function __call($name, $arguments = '')
+	{
+		$method = '';
+		if (strpos($name ,'set') === 0) {
+			$method = 'set';
+		}
+		if (strpos($name ,'get') === 0) {
+			$method = 'get';
+		}
+		if ($method) {
+			$property = strtolower(substr($name, 3, 1)) . substr($name, 4);
+			if ($method == 'set') {
+				$this->$property = $arguments[0];
+			} else {
+				return $this->$property;
+			}
+		}
+	}
+	
+	public function writeImage($dst)
+	{
+		if ($this->compression == 'JPEG') {
+			$command = "convert " . $this->src . " -compress JPEG -quality " . $this->imageCompressionQuality . " " . $dst . '.jpg';
+			$this->command($command);
+			copy($dst . '.jpg', $dst);
+			unlink($dst . '.jpg');
+		} else {
+			$fp = fopen($dst, 'w+');
+			fwrite($fp, $this->image);
+			fseek($fp, 0);
+			fclose($fp);
+		}
 	}
 	
 	private function createTempFiles()
