@@ -12,10 +12,9 @@ class Jp7_Image
 	public function __construct($file)
 	{
 		$this->file = $file;
-		$this->dirname = dirname($file);
 		$this->image = file_get_contents($this->file);
-		$this->src = $this->dirname . 'image_src.tmp';
-		$this->dst = $this->dirname . 'image_dst.png';
+		$this->src = $this->file . '_src.tmp';
+		$this->dst = $this->file . '_dst.png';
 	}
 	
 	public function __toString()
