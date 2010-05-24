@@ -23,14 +23,18 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGet {
 	 * @return array
 	 */
 	public function getParameters() {
-		return array(new Jp7_InterAdmin_Soap_ReflectionParameter());
+		return array(
+			new Jp7_InterAdmin_Soap_ReflectionParameter('fields', 'string'),
+			new Jp7_InterAdmin_Soap_ReflectionParameter('where', 'string'),
+			new Jp7_InterAdmin_Soap_ReflectionParameter('limit', 'string')
+		);
 	}
 	
 	/**
 	 * @return string 
 	 */
 	public function getName() {
-		return 'get' . Jp7_Inflector::plural($this->secao->class);
+		return 'get' . $this->secao->class;
 	}
 	
 	/**
