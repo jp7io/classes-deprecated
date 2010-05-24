@@ -22,8 +22,11 @@ class Jp7_InterAdmin_Soap_Reflection {
 	public function getMethods() {
 		$methods = array();
 		
+		$methods[] = new Jp7_InterAdmin_Soap_ReflectionMethodLogin();
+		
 		foreach ($this->usuario->secoes as $secao) {
 			$methods[] = new Jp7_InterAdmin_Soap_ReflectionMethodGet($secao);
+			$methods[] = new Jp7_InterAdmin_Soap_ReflectionMethodGetAll($secao);
 			$methods[] = new Jp7_InterAdmin_Soap_ReflectionMethodGetFirst($secao);
 		}
 		

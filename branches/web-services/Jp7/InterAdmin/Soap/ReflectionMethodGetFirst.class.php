@@ -17,6 +17,7 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGetFirst extends Jp7_InterAdmin_Soap_R
 	 */
 	public function getParameters() {
 		return array(
+			new Jp7_InterAdmin_Soap_ReflectionParameter('token', 'string'),
 			new Jp7_InterAdmin_Soap_ReflectionParameter('fields', 'string'),
 			new Jp7_InterAdmin_Soap_ReflectionParameter('where', 'string')
 		);
@@ -30,6 +31,6 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGetFirst extends Jp7_InterAdmin_Soap_R
 	}
 	
 	public function getDescription() {
-		return utf8_encode('Retorna o primeiro registro da seção ' . $this->secao->nome);
+		return utf8_encode('Retorna o primeiro registro da secao ' . $this->secao->nome . '.');
 	}
 }

@@ -24,6 +24,7 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGet {
 	 */
 	public function getParameters() {
 		return array(
+			new Jp7_InterAdmin_Soap_ReflectionParameter('token', 'string'),
 			new Jp7_InterAdmin_Soap_ReflectionParameter('fields', 'string'),
 			new Jp7_InterAdmin_Soap_ReflectionParameter('where', 'string'),
 			new Jp7_InterAdmin_Soap_ReflectionParameter('limit', 'string')
@@ -45,6 +46,6 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGet {
 	}
 	
 	public function getDescription() {
-		return utf8_encode('Retorna todos os registros da seção ' . $this->secao->nome);
+		return utf8_encode('Retorna os registros publicados e nao deletados da secao ' . $this->secao->nome . '.');
 	}
 }

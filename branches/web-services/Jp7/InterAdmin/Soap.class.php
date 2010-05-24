@@ -2,7 +2,7 @@
 
 class Jp7_InterAdmin_Soap {
 	/**
-	 * Returns an array of records.
+	 * Returna todos os registros publicados.
 	 * 
 	 * @param string $className
 	 * @param array $options
@@ -38,10 +38,39 @@ class Jp7_InterAdmin_Soap {
 	 */
 	protected function getFirst($className, $options = array()) {
 		$options['limit'] = 1;
-		$records = $this->get($className, $options);
-		return reset($records);
+		return reset($this->get($className, $options));
 	}
 	
+	/**
+	 * Returna todos os registros, incluindo os deletados e os não publicados.
+	 * 
+	 * @param string $className
+	 * @param array $options
+	 * @return mixed
+	 */
+	protected function getAll($className, $options = array()) {
+		$options['use_published_filters'] = false;
+		return $this->get($className, $options);
+	}
+	
+	public function login($loginData) {
+		$usuarioWsTipo = new Jp7_InterAdmin_Soap_UsuarioTipo();
+		$usuarioWs = $usuarioWsTipo->login($loginData->username, $loginData->password);
+		if ($usuarioWs) {
+			$token = jp7_encrypt($loginData->username . '{:}' . $loginData->password . '{:}' . time());
+		} else {
+			throw new Jp7_InterAdmin_Soap_Exception('Invalid username/password combination.');	
+		}
+		return array('loginResult' => $token);
+	}
+	
+	/**
+	 * Função que age como proxy entre a chamada e o método real.
+	 * 
+	 * @param string $methodName
+	 * @param array $args
+	 * @return mixed
+	 */
 	public function __call($methodName, $args) {
 		if (strpos($methodName, 'get') === 0) {
 			if ($args[0]) {
@@ -50,12 +79,25 @@ class Jp7_InterAdmin_Soap {
 					'where' => jp7_explode(',', $args[0]->where),
 					'limit' => $args[0]->limit
 				);
+				
+				foreach ($options['fields'] as $key => $field) {
+					if (strpos($field, '.')) {
+						list($join, $joinField) = explode('.', $field);
+						$options['fields'][$join][] = $joinField;
+						$options['fields'][$key] = $join;
+					}
+				}
 			}
+			// Por padrão só pega os publicados
+			$options['use_published_filters'] = true;
 			
 			if (strpos($methodName, 'getFirst') === 0) {
 				$className = substr($methodName, strlen('getFirst'));
 				$result = $this->getFirst($className, $options);
-			} else {
+			} elseif (strpos($methodName, 'getAll') === 0) {
+				$className = substr($methodName, strlen('getAll'));
+				$result = $this->getAll($className, $options);
+			} else { 
 				$className = substr($methodName, strlen('get'));
 				$result = $this->get($className, $options);
 			}
