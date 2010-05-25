@@ -21,11 +21,16 @@ class Jp7_InterAdmin_Soap {
 			foreach ($record->attributes as $key2 => $value) {
 				if ($value instanceof InterAdminAbstract) {
 					$record->attributes[$key2] = $value->attributes;
+				} elseif ($value instanceof Jp7_Date) {
+					if ($value->isValid()) {
+						$record->attributes[$key2] = $value->format('c');
+					} else {
+						$record->attributes[$key2] = null;
+					}
 				}
 			}
 			$records[$key] = $record->attributes;
 		}
-		
 		return $records;
 	}
 	
