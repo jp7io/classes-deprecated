@@ -53,6 +53,21 @@ class Jp7_InterAdmin_Soap {
 		return $this->get($className, $options);
 	}
 	
+	public static function tokenError() {
+		// Não consegui usar o erro padrão
+		header('Content-type: text/xml');
+		?>
+		<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+			<SOAP-ENV:Body>
+			  <SOAP-ENV:Fault>
+			     <faultcode>Receiver</faultcode>
+			     <faultstring>Invalid token. You need to login() before calling this method.</faultstring>
+			  </SOAP-ENV:Fault>
+			</SOAP-ENV:Body>
+		</SOAP-ENV:Envelope>
+		<?php
+	}
+	
 	public function login($loginData) {
 		$usuarioWsTipo = new Jp7_InterAdmin_Soap_UsuarioTipo();
 		$usuarioWs = $usuarioWsTipo->login($loginData->username, $loginData->password);
