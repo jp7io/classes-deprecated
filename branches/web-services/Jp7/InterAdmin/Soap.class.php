@@ -102,9 +102,13 @@ class Jp7_InterAdmin_Soap {
 	public function __call($methodName, $args) {
 		if (strpos($methodName, 'get') === 0) {
 			if ($args[0]) {
+				if ($args[0]->where) {
+					$where = '(' . $args[0]->where . ')';
+				}
+				
 				$options = array(
 					'fields' => jp7_explode(',', $args[0]->fields),
-					'where' => jp7_explode(',', $args[0]->where),
+					'where' => jp7_explode(',', $where),
 					'limit' => $args[0]->limit
 				);
 				
