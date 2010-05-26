@@ -365,20 +365,20 @@ abstract class InterAdminAbstract {
 		$offset = 0;
 		while(preg_match('/(' . $quoted . '|' . $keyword . ')/', $clause, $matches, PREG_OFFSET_CAPTURE, $offset)) {
 			list($termo, $pos) = $matches[1];
-			
+			// Resolvendo true e false para char
 			if (strtolower($termo) == 'true' || strtolower($termo) == 'false') {
 				$negativas = array('', '!');
 				if (strtolower($termo) == 'false') {
 					$negativas = array_reverse($negativas);
 				}
 				$inicio = substr($clause, 0, $pos + strlen($termo));
-				$inicioRep = preg_replace('/!=([ ]*)' . $termo . '$/i', $negativas[0] . "=$1''", $inicio, 1, $count);
+				$inicioRep = preg_replace('/(<>|!=)([ ]*)' . $termo . '$/i', $negativas[0] . "=$2''", $inicio, 1, $count);
 				if (!$count) {
 					$inicioRep = preg_replace('/=([ ]*)' . $termo . '/i', $negativas[1] . "=$1''", $inicio, 1);
 				}
 				$clause = $inicioRep . substr($clause, $pos + strlen($termo));
 				$offset = strlen($inicioRep);
-				continue;	
+				continue;
 			}
 			
 			if (!is_numeric($termo) && !in_array($termo, $reserved) && $termo[0] != "'") {

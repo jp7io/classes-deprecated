@@ -105,9 +105,21 @@ class Jp7_InterAdmin_Soap {
 				if ($args[0]->where) {
 					$where = '(' . $args[0]->where . ')';
 				}
+				$fields = array();
+				if ($args[0]->fields) {
+					$fields = jp7_explode(',', $args[0]->fields);
+				}
+				$fields = array_merge($fields, array(
+					'parent_id',
+					'date_insert',
+					'date_modify',
+					'date_publish',
+					'deleted',
+					'publish'
+				));
 				
 				$options = array(
-					'fields' => jp7_explode(',', $args[0]->fields),
+					'fields' => $fields,
 					'where' => jp7_explode(',', $where),
 					'limit' => $args[0]->limit
 				);

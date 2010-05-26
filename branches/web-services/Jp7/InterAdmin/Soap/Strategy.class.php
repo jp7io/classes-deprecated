@@ -44,6 +44,7 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 			foreach ($campos as $campo) {
 				if (strpos($campo['tipo'], 'tit_') === false &&  strpos($campo['tipo'], 'func_') === false) {
 		    		$element = $dom->createElement('xsd:element');
+					$element->setAttribute('minOccurs', '0');
 					$element->setAttribute('name', $campo['nome_id']);
 					$element->setAttribute('nillable', 'true');
 					$element->setAttribute('type', $this->_getCampoTipo($campo));
