@@ -54,6 +54,8 @@ class Jp7_Bootstrap {
 		
 		$config = Zend_Registry::get('config');
 		$frontController = Zend_Controller_Front::getInstance();
+		// Alterando o router para que $this->url() funcione corretamente na View
+		$frontController->setRouter(new Jp7_Controller_Router());
 		// Roteando o idioma na URL
 		$request = new Zend_Controller_Request_Http();
 		foreach ($config->langs as $language) {
@@ -68,7 +70,7 @@ class Jp7_Bootstrap {
 				break;
 			}
 		}
-				
+			
 		if (!$lang) {
 			$lang = new Jp7_Locale($config->lang_default);
 		}

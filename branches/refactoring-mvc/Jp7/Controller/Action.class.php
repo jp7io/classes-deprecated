@@ -14,6 +14,12 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	 */
 	protected static $tipo;
 	
+	public function init() {
+		if (!Zend_Registry::isRegistered('originalRequest')) {
+			Zend_Registry::set('originalRequest', clone $this->getRequest());
+		}
+	}
+	
     public function preDispatch() {
     	if (!$this->actionExists()) {
 			$this->forwardToTemplate();
@@ -62,9 +68,6 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		foreach ($links as $file) {
 			$this->view->headLink()->appendStylesheet($file);
 		}
-		// Alterando o router para que $this->url() funcione corretamente na View
-		$frontController = $this->getFrontController();
-		$router = $frontController->setRouter(new Jp7_Controller_Router());
 	}
 	/**
 	 * Trata as actions que não tem a função definida e passa para o template

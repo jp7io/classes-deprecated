@@ -1,11 +1,6 @@
 <?php
 
-class Jp7_Controller_Router extends Zend_Controller_Router_Abstract {
-	
-	public function route(Zend_Controller_Request_Abstract $dispatcher) {
-		// Classe criada somente para forçar o assemble, por isso o route não foi implementado
-	}
-	
+class Jp7_Controller_Router extends Zend_Controller_Router_Rewrite {
 	
     /**
      * Generates a URL path that can be used in URL creation, redirection, etc.
@@ -33,17 +28,17 @@ class Jp7_Controller_Router extends Zend_Controller_Router_Abstract {
     	 $config = Zend_Registry::get('config');
 		 $lang = Zend_Registry::get('lang');
 		 
-		 $request = $this->getFrontController()->getRequest();
+		 $request = Zend_Registry::get('originalRequest');
 		 
-		 $default = array(
+		 $current = array(
 		 	'lang' => $lang->lang,
 		 	'module' => $request->getModuleName(),
 			'controller' => $request->getControllerName(),
 			'action' => $request->getActionName()
 		 );
 		 
-		 $userParams = $userParams + $default;
-		 		 
+		 $userParams = $userParams + $current;
+		 
 		 $url = array();
 		 
 		 if ($config->server->path) {
