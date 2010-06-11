@@ -54,6 +54,7 @@ class Jp7_Bootstrap {
 		
 		$config = Zend_Registry::get('config');
 		$frontController = Zend_Controller_Front::getInstance();
+		// Roteando o idioma na URL
 		$request = new Zend_Controller_Request_Http();
 		foreach ($config->langs as $language) {
 			if ($language->lang == $config->lang_default) {
@@ -67,12 +68,16 @@ class Jp7_Bootstrap {
 				break;
 			}
 		}
+				
 		if (!$lang) {
 			$lang = new Jp7_Locale($config->lang_default);
 		}
 		
 		$config->lang = $config->langs[$lang->lang];
 		Zend_Registry::set('lang', $lang);
+		
+		$translate = new Zend_Translate('array', APPLICATION_PATH . '/languages/' . $lang->lang . '.php', $lang->lang);
+		Zend_Registry::set('Zend_Translate', $translate);
 	}	
 	
 	public static function initLayout() {
