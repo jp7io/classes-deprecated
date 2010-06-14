@@ -41,15 +41,21 @@ class Jp7_Bootstrap {
 	public static function initFrontController() {
 		$frontController = Zend_Controller_Front::getInstance();
 		$frontController->setControllerDirectory(APPLICATION_PATH . '/controllers');
-		
-		$frontController->addModuleDirectory(APPLICATION_PATH . '/modules');
-		
+		if (is_dir(APPLICATION_PATH . '/modules')) {
+			$frontController->addModuleDirectory(APPLICATION_PATH . '/modules');
+		}
 		$frontController->throwExceptions(true); // @todo Usar config para determinar ambiente
 		$frontController->setParam('env', 'development');
 	}
 	
 	public static function initLanguage() {
-		// TODO Retirar língua das variáveis globais
+		/**
+		 * É utilizada pela InterAdmin para gerar URL com SEO, que é o padrão no MVC.
+		 * @var bool
+		 */
+		global $seo;
+		$seo = true;
+		// TODO Retirada de $lang das variáveis globais, alterando a InterAdmin
 		global $lang;
 		
 		$config = Zend_Registry::get('config');
@@ -70,16 +76,19 @@ class Jp7_Bootstrap {
 				break;
 			}
 		}
-			
+		// Lang da JP7			
 		if (!$lang) {
 			$lang = new Jp7_Locale($config->lang_default);
 		}
-		
 		$config->lang = $config->langs[$lang->lang];
 		Zend_Registry::set('lang', $lang);
 		
-		$translate = new Zend_Translate('array', APPLICATION_PATH . '/languages/' . $lang->lang . '.php', $lang->lang);
-		Zend_Registry::set('Zend_Translate', $translate);
+		// Zend Translate
+		$language_file = APPLICATION_PATH . '/languages/' . $lang->lang . '.php';
+		if (is_file($language_file)) {
+			$translate = new Zend_Translate('array', $language_file, $lang->lang);
+			Zend_Registry::set('Zend_Translate', $translate);
+		}
 	}	
 	
 	public static function initLayout() {
@@ -101,7 +110,9 @@ class Jp7_Bootstrap {
 			'author' => 'JP7 - http://jp7.com.br',
 			'generator' => 'JP7 InterAdmin'
 		);
-		
+		if ($config->google_site_verification) { 
+			$metas['google-site-verification'] = $config->google_site_verification;
+ 		}
 		$scripts = array(
 			'/_default/js/interdyn.js',
 			'/_default/js/interdyn_checkflash.js',

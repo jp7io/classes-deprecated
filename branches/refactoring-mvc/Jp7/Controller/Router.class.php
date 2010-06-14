@@ -27,7 +27,6 @@ class Jp7_Controller_Router extends Zend_Controller_Router_Rewrite {
     public function assemble($userParams, $name = null, $reset = false, $encode = true){
     	 $config = Zend_Registry::get('config');
 		 $lang = Zend_Registry::get('lang');
-		 
 		 $request = Zend_Registry::get('originalRequest');
 		 
 		 $current = array(
@@ -37,29 +36,31 @@ class Jp7_Controller_Router extends Zend_Controller_Router_Rewrite {
 			'action' => $request->getActionName()
 		 );
 		 
+		 $extraParams = array_diff_key($userParams, $current);
 		 $userParams = $userParams + $current;
 		 
 		 $url = array();
-		 
-		 if ($config->server->path) {
-		 	$url[] = $config->server->path;
+		 foreach ($extraParams as $key => $value) {
+			$url[] = $value;
+			$url[] = $key;
+		 }
+		 if ($userParams['action'] != 'index' || $url) {
+		 	$url[] = $userParams['action'];
+		 }
+		 if ($userParams['controller'] != 'index' || $url) {
+		 	$url[] = $userParams['controller'];
+		 }
+		 if ($userParams['module'] != 'default') {
+			 $url[] = $userParams['module'];
 		 }
 		 if ($userParams['lang'] != $config->lang_default) {
 		 	$url[] = $userParams['lang'];
 		 }
-		 if ($userParams['module'] != 'default') {
-		 $url[] = $userParams['module'];
+		 if ($config->server->path) {
+		 	$url[] = $config->server->path;
 		 }
-		 if ($userParams['controller'] != 'index' || $userParams['action'] != 'index') {
-		 	$url[] = $userParams['controller'];
-		 }
-		 if ($userParams['action'] != 'index') {
-		 	$url[] = $userParams['action'];
-		 }
+		 krsort($url);
 		 $url = '/' . jp7_implode('/', $url);
-		 
 		 return $url;
 	}
-
-
 }
