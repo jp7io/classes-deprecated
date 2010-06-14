@@ -82,6 +82,7 @@ class Jp7_Bootstrap {
 		}
 		$config->lang = $config->langs[$lang->lang];
 		Zend_Registry::set('lang', $lang);
+		$request->setParam('lang', $lang->lang);
 		
 		// Zend Translate
 		$language_file = APPLICATION_PATH . '/languages/' . $lang->lang . '.php';
@@ -128,7 +129,7 @@ class Jp7_Bootstrap {
 			'/_default/css/7_w3c.css',
 			'css/main.css'
 		);
-				
+		
 		Zend_Registry::set('metas', $metas);
 		Zend_Registry::set('scripts', $scripts);
 		Zend_Registry::set('links', $links);
