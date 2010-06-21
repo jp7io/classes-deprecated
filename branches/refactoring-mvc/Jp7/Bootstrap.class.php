@@ -95,6 +95,9 @@ class Jp7_Bootstrap {
 	public static function initLayout() {
 		Zend_Layout::startMvc(APPLICATION_PATH . '/layouts/scripts');
 		$view = Zend_Layout::getMvcInstance()->getView();
+		if (is_dir(APPLICATION_PATH . '/modules/default')) {
+			$view->setScriptPath(APPLICATION_PATH . '/modules/default/views/scripts');
+		}
 		$view->doctype('XHTML1_STRICT');
 	}
 	

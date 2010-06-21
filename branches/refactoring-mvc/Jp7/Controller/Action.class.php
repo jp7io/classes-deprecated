@@ -108,7 +108,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	public static function getTipo() {
 		if (!isset(self::$tipo)) {
 			$config = Zend_Registry::get('config');
-			
+						
 			$customTipo = ucfirst($config->name_id) . '_InterAdminTipo';
 			if (class_exists($customTipo)) {
 				$rootTipo = new $customTipo();
@@ -118,25 +118,28 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 			
 			$request = Zend_Controller_Front::getInstance()->getRequest();
 			
-			$options = array(
-				'fields' => array('template')
-			);
-			
-			$controllerName = $request->getControllerName();
-			if ($controllerName == 'index') {
-				$controllerName = 'home';
+			$tipos = array();
+			if ($request->getModuleName() != 'default') {
+				$tipos[] = toId($request->getModuleName());
 			}
-			$options['where'] = array("id_tipo_string = '" . toId($controllerName) . "'");
-			$controllerTipo = $rootTipo->getFirstChild($options);
-			
-			if ($controllerTipo) {
-				if ($request->getActionName() == 'index') {
-					self::$tipo = $controllerTipo;
-				} else {
-					$options['where'] = array("id_tipo_string = '" . toId($request->getActionName()) . "'");
-					self::$tipo = $controllerTipo->getFirstChild($options);
-				}
+			if ($request->getControllerName() != 'index') {
+				$tipos[] = toId($request->getControllerName());
 			}
+			if ($request->getActionName() != 'index') {
+				$tipos[] = toId($request->getActionName());
+			}
+			if (!$tipos) {
+				$tipos[] = 'home';
+			}
+						
+			foreach ($tipos as $id_tipo_string) {
+				$tipo = $rootTipo->getFirstChild(array(
+					'fields' => array('template'),
+					'where' => array("id_tipo_string = '" . $id_tipo_string . "'")
+				));
+				$rootTipo = $tipo;
+			}
+			self::$tipo = $tipo;
 		}
 		return self::$tipo;
 	}
