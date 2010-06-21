@@ -131,8 +131,11 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 			if (!$tipos) {
 				$tipos[] = 'home';
 			}
-						
+			
 			foreach ($tipos as $id_tipo_string) {
+				if (!$rootTipo) {
+					break;
+				}
 				$tipo = $rootTipo->getFirstChild(array(
 					'fields' => array('template'),
 					'where' => array("id_tipo_string = '" . $id_tipo_string . "'")
@@ -149,7 +152,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	 * @param InterAdminTipo $tipo
 	 * @return void
 	 */
-	public static function setTipo(InterAdminTipo $tipo) {
+	public static function setTipo(InterAdminTipo $tipo = null) {
 		self::$tipo = $tipo;
 	}
 	/**
