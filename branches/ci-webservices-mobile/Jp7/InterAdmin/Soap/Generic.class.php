@@ -2,7 +2,7 @@
 
 class Jp7_InterAdmin_Soap_Generic {
 	/**
-	 * Returna todos os registros publicados.
+	 * Retorna todos os registros publicados.
 	 * 
 	 * @param string $className
 	 * @param array $options
