@@ -7,7 +7,7 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 	protected function _appendElements($dom, $container, $elements) {
 		foreach ($elements as $name => $type) {
 			$element = $dom->createElement('xsd:element');
-			$element->setAttribute('minOccurs', '0');
+			//$element->setAttribute('minOccurs', '0');
 			$element->setAttribute('name', $name);
 			$element->setAttribute('nillable', 'true');
 			$element->setAttribute('type', $type);
@@ -142,4 +142,37 @@ class Jp7_InterAdmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 		}
 		return $retorno;
 	}
+
+	/**
+     * Append the complex type definition to the WSDL via the context access
+     *
+     * @param  string $arrayType
+     * @param  string $childTypeName
+     * @return void
+     */
+     protected function _addElementFromWsdlAndChildTypes($arrayType, $childTypeName)
+    {
+    	/* Código da ZEND - Não Alterar */
+        if (!in_array($arrayType, $this->getContext()->getTypes())) {
+            $dom = $this->getContext()->toDomDocument();
+
+            $complexType = $dom->createElement('xsd:complexType');
+            $complexType->setAttribute('name', $arrayType);
+
+            $sequence = $dom->createElement('xsd:sequence');
+
+            $element = $dom->createElement('xsd:element');
+            $element->setAttribute('name',      'itens'); /* LINHA ALTERADA PELA Jp7*/
+            $element->setAttribute('type',      $childTypeName);
+            $element->setAttribute('minOccurs', 0);
+            $element->setAttribute('maxOccurs', 'unbounded');
+            $sequence->appendChild($element);
+
+            $complexType->appendChild($sequence);
+
+            $this->getContext()->getSchema()->appendChild($complexType);
+            $this->getContext()->addType($arrayType);
+        }
+    }
+
 }
