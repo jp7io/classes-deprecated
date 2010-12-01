@@ -127,10 +127,13 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 					list($controller, $action) = $templateArr;
 				}
 				
-				static $loop_count;
-				if (!$loop_count) {
-					$loop_count++;
+				static $loop_count = 0;
+				$loop_count++;
+				if ($loop_count === 1) {
 					$this->_forward($action, $controller, $module);
+					return true;
+				} elseif ($loop_count === 2) {
+					$this->_forward($action, $controller, '_default');
 					return true;
 				}
 			}

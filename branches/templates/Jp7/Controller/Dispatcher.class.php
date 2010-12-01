@@ -67,4 +67,21 @@ class Jp7_Controller_Dispatcher extends Zend_Controller_Dispatcher_Standard {
         }
 		return $className;
 	}
+	
+	/**
+	 * Evals a file as a child class of the current default parent class.
+	 * Ok, I know it's evil, but it's needed.
+	 * 
+	 * @param string $filename
+	 * @return void
+	 */
+	public static function evalAsAController($filename) {
+		if (strpos($filename, 'eval') === false) {
+			$parentClassName = get_parent_class('IndexController');
+			
+			$class_contents = file_get_contents($filename);
+			$class_contents = str_replace('_Controller_Action', $parentClassName, $class_contents);
+			eval('?>' . $class_contents);
+		}
+	}
 }
