@@ -80,7 +80,7 @@ class Jp7_Controller_Dispatcher extends Zend_Controller_Dispatcher_Standard {
 			$parentClassName = get_parent_class('IndexController');
 			
 			$class_contents = file_get_contents($filename);
-			$class_contents = str_replace('_Controller_Action', $parentClassName, $class_contents);
+			$class_contents = str_replace('__Controller_Action', $parentClassName, $class_contents);
 			eval('?>' . $class_contents);
 		}
 	}

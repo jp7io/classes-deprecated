@@ -133,7 +133,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 					$this->_forward($action, $controller, $module);
 					return true;
 				} elseif ($loop_count === 2) {
-					$this->_forward($action, $controller, '_default');
+					$this->_forward($action, $controller, 'jp7');
 					return true;
 				}
 			}

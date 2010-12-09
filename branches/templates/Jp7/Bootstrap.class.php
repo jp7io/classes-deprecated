@@ -48,10 +48,8 @@ class Jp7_Bootstrap {
 		$frontController->setDispatcher(new Jp7_Controller_Dispatcher());
 		// Alterando o router para que $this->url() funcione corretamente na View
 		$frontController->setRouter(new Jp7_Controller_Router());
-				
 		$frontController->setControllerDirectory(APPLICATION_PATH . '/controllers');
-		
-		$frontController->addControllerDirectory($c_doc_root . '_default/application/controllers', '_default');
+		$frontController->addControllerDirectory($c_doc_root . 'classes/Jp7', 'jp7');
 		
 		if (is_dir(APPLICATION_PATH . '/modules')) {
 			$frontController->addModuleDirectory(APPLICATION_PATH . '/modules');
