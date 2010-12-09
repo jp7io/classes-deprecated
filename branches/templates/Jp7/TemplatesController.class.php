@@ -11,7 +11,7 @@ class Jp7_TemplatesController extends __Controller_Action {
 			$this->record = $newsTipo->getInterAdminById($id,array(
 				'fields' => array('*', 'date_publish')
 			));
-			$this->view->record = $this->getBla($this->record);
+			$this->view->record = $this->record;
 		} else {
 			$news = $newsTipo->getInterAdmins(array(
 				'fields' => array('titulo', 'date_publish')
@@ -20,8 +20,4 @@ class Jp7_TemplatesController extends __Controller_Action {
 			$this->view->news = $news;
 		}
 	}
-	
-	public function getBla($record) {
-		return $record;
-	}	
 }

@@ -77,7 +77,8 @@ class Jp7_Controller_Dispatcher extends Zend_Controller_Dispatcher_Standard {
 	 */
 	public static function evalAsAController($filename) {
 		if (strpos($filename, 'eval') === false) {
-			$parentClassName = get_parent_class('IndexController');
+			$config = Zend_Registry::get('config');
+			$parentClassName = ucfirst($config->name_id) . '_Controller_Action';
 			
 			$class_contents = file_get_contents($filename);
 			$class_contents = str_replace('__Controller_Action', $parentClassName, $class_contents);
