@@ -136,7 +136,7 @@ class InterAdminTipo extends InterAdminAbstract {
 						$this->_loadedfrommodel[$var] = true;
 						break;
 					}
-					if (is_numeric($modelo->model_id_tipo) || is_null($modelo->model_id_tipo)) {
+					if (is_numeric($modelo->model_id_tipo) || !$modelo->model_id_tipo) {
 						$modelo = new InterAdminTipo($modelo->model_id_tipo);
 					} else {
 						$className = 'Jp7_Model_' . $modelo->model_id_tipo . 'Tipo';
