@@ -7,7 +7,7 @@ class Jp7_Bootstrap {
 		
 		$debugger->setExceptionsEnabled(true);
 		
-		include_once APPLICATION_PATH . '/../interadmin/config.php';
+		include_once jp7_absolute_path(APPLICATION_PATH . '/../interadmin/config.php');
 		
 		Zend_Registry::set('config', $config);
 		Zend_Registry::set('session', new Zend_Session_Namespace());
