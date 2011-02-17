@@ -3,17 +3,14 @@
 class Jp7_Bootstrap {
 	
 	public static function run() {
-		global $config, $debugger;
-		
+		global $debugger;
 		$debugger->setExceptionsEnabled(true);
 		
-		include_once jp7_absolute_path(APPLICATION_PATH . '/../interadmin/config.php');
-		
-		Zend_Registry::set('config', $config);
 		Zend_Registry::set('session', new Zend_Session_Namespace());
 		Zend_Registry::set('post', new Zend_Filter_Input(null, null, $_POST));
 		Zend_Registry::set('get', new Zend_Filter_Input(null, null, $_GET));
 		
+		self::initConfig();
 		self::initDataBase();
 		self::initFrontController();
 		self::initLanguage();
@@ -21,6 +18,12 @@ class Jp7_Bootstrap {
 		self::preDispatch();
 		self::dispatch();
 		self::postDispatch();		
+	}
+	
+	public static function initConfig() {
+		global $config;
+		include_once jp7_absolute_path(APPLICATION_PATH . '/../interadmin/config.php');
+		Zend_Registry::set('config', $config);
 	}
 	
 	public static function initDataBase() {
@@ -156,6 +159,8 @@ class Jp7_Bootstrap {
 		Zend_Registry::set('metas', $metas);
 		Zend_Registry::set('scripts', $scripts);
 		Zend_Registry::set('links', $links);
+		
+		Jp7_Box_Manager::set('facebook', 'Jp7_Box_Facebook');
 	}
 	
 	public static function dispatch() {

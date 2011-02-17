@@ -34,7 +34,11 @@ class Jp7_Box_Manager {    /**
 		return self::$array[$id];
 	}
 	
-	public static function createBoxes($records) {
+	public static function remove($id) {
+		unset(self::$array[$id]);
+	}
+	
+	public static function buildBoxes($records) {
 		$cols = array();
 		$i = 0;
 		foreach ($records as $record) {

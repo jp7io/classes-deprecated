@@ -51,27 +51,39 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		 * @var array $links Arquivos de CSS
 		 */
     	$links = Zend_Registry::get('links');
+		// TODO Late Static Binding static::getTipo()
+		$tipo = $this->getTipo();
 		
 		// View
 		$this->view->config = $config;
 		$this->view->lang = $lang;
-		$this->view->tipo = $this->getTipo(); // TODO Late Static Binding
+		$this->view->tipo = $tipo; 
 		$this->view->record = $this->record;
 		
+		// Boxes editáveis pelo InterAdmin
+		$boxesTipo = $tipo->getFirstChildByModel('Boxes');
+		if ($boxesTipo) {
+			$boxes = $boxesTipo->getInterAdmins(array(
+				'fields' => array('*'),
+				'where' => array($this->record ? "records_page <> ''" : "records_page = ''")
+			));
+			$this->view->boxes = Jp7_Box_Manager::buildBoxes($boxes);
+		}
+		
 		// Layout
-		// - Title
+		// Title
 		$this->_prepareTitle();
 		$this->view->headTitle($config->lang->title);
-		// - Metas
+		// Metas
 		$this->view->headMeta()->appendHttpEquiv('Content-Type', 'text/html; charset=ISO-8859-1');
 		foreach ($metas as $key => $value) {
 			$this->view->headMeta()->appendName($key, $value);
 		}
-		// - Javascripts
+		// Javascripts
 		foreach ($scripts as $file) {
 			$this->view->headScript()->appendFile($file);
 		}
-		// - CSS
+		// CSS
 		foreach ($links as $file) {
 			$this->view->headLink()->appendStylesheet($file);
 		}
