@@ -117,8 +117,8 @@ class Jp7_Bootstrap {
 			array($c_doc_root . '_default/application/views/scripts'),
 			$view->getScriptPaths()
 		));
-						
 		$view->doctype('XHTML1_STRICT');
+		$view->setEncoding('ISO-8859-1');
 	}
 	
 	public static function preDispatch() {
@@ -131,7 +131,7 @@ class Jp7_Bootstrap {
 			'keywords' => $config->lang->keywords,
 			'copyright' => date('Y') . ' ' . $config->copyright,
 			'robots' => 'all',
-			'author' => 'JP7 - http://jp7.com.br',
+			'author' => 'JP7 - http://www.jp7.com.br',
 			'generator' => 'JP7 InterAdmin'
 		);
 		if ($config->google_site_verification) { 

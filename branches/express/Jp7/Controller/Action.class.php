@@ -56,7 +56,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		$this->view->config = $config;
 		$this->view->lang = $lang;
 		$this->view->tipo = $this->getTipo(); // TODO Late Static Binding
-		
+		$this->view->record = $this->record;
 		
 		// Layout
 		// - Title
@@ -76,16 +76,20 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 			$this->view->headLink()->appendStylesheet($file);
 		}
 	}
-	
+	/**
+	 * Função responsável por montar o título da página.
+	 * Permite que se altere o título sem sobrescrever o método postDispatch().
+	 * @return string
+	 */
 	protected function _prepareTitle() {
 		$this->view->headTitle()->setSeparator(' | ');
-		
+		// Adiciona o nome do registro atual ao título
 		if ($this->record) {
 			if ($titulo = $this->record->getFieldsValues('varchar_key')) {
 				$this->view->headTitle($titulo);
 			}
 		}
-		
+		// Adiciona breadcrumb to tipo
 		if ($secao = $this->getTipo()) { // TODO Late static Binding
 			if ($secao->getFieldsValues('nome') == 'Home' && !$secao->getParent()->id_tipo) {
 				return; // Home
@@ -94,7 +98,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 				$this->view->headTitle($secao->getFieldsValues('nome'));
 				$secao = $secao->getParent();
 			}
-		}	
+		}
 	}
 	
 	/**

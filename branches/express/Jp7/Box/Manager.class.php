@@ -33,4 +33,24 @@ class Jp7_Box_Manager {    /**
 	public static function get($id) {
 		return self::$array[$id];
 	}
+	
+	public static function createBoxes($records) {
+		$cols = array();
+		$i = 0;
+		foreach ($records as $record) {
+			if ($classe = self::get($record->id_box)) {
+				$box = new $classe($record);
+				if (!$box instanceof Jp7_Box_BoxAbstract) {
+					throw new Exception('Expected an instance of Jp7_Box_BoxAbstract, received a ' . get_class($box) . '.');
+				}
+				$box->prepareData();
+				
+				$cols[$i][] = $box;
+				if ($record->separator) {
+					$i++;
+				}
+			}
+		}
+		return $cols;
+	}
 }
