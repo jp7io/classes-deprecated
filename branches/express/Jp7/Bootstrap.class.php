@@ -159,8 +159,6 @@ class Jp7_Bootstrap {
 		Zend_Registry::set('metas', $metas);
 		Zend_Registry::set('scripts', $scripts);
 		Zend_Registry::set('links', $links);
-		
-		Jp7_Box_Manager::set('facebook', 'Jp7_Box_Facebook');
 	}
 	
 	public static function dispatch() {
