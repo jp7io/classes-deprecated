@@ -20,11 +20,38 @@ abstract class Jp7_Box_BoxAbstract {
 	}
 	
 	public function getEditorHtml() {
+		$fields = $this->_getEditorFields();
+		
+		ob_start();
 		?>
 		<div class="box box-<?php echo $this->record->id_box; ?>">
-			<?php echo ucwords(str_replace('-', ' ', $this->record->id_box)); ?>
+			<?php echo $this->_getEditorTitle(); ?>
+			<?php echo $this->_getEditorIcons((bool) $fields); ?>
+			<div style="clear:both;"></div>
+			<?php echo $fields; ?>
 			<input type="hidden" name="box[]" value="<?php echo $this->record->id_box; ?>" />
 		</div>
 		<?php
+		return ob_get_clean();
+	}
+	protected function _getEditorTitle() {
+		return ucwords(str_replace('-', ' ', $this->record->id_box));
+	}
+	protected function _getEditorIcons($hasFields = true) {
+		?>
+		<div class="icons">
+			<?php if ($hasFields) { ?>
+				<img class="icon-cog" src="/_default/img/cog.png" onclick="toggleConfig(this);" />
+			<?php } ?>
+			<img class="icon-delete" src="/_default/img/delete.png" onclick="deleteBox(this);" />
+		</div>		
+		<?php
+	}
+	/**
+	 * Prepara o HTML dos campos.
+	 * @return string
+	 */
+	protected function _getEditorFields() {
+		return '';
 	}
 }
