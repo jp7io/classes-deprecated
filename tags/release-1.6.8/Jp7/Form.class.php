@@ -1,0 +1,221 @@
+<?php
+/**
+ * 
+ * @author JP7
+ */
+class Jp7_Form extends Zend_Form {
+	/**
+     * Constructor
+     *
+     * Registers form view helper as decorator
+     *
+     * @param mixed $options
+     * @return void
+     */
+    public function __construct($options = null)
+    {
+        parent::__construct($options);
+		$this->addPrefixPath('Jp7_Form', 'Jp7/Form/');
+    }
+	
+	/**
+	 * Creates a Jp7_Mail with the data sent from the form.
+	 * 
+	 * @param 	InterAdmin 	$record
+	 * @param 	string 		$template	Path to the view to be used as a template.
+	 * @return Jp7_Mail
+	 */
+	public function createMail(InterAdmin $record, $options = array()) {
+		// Configuração
+		$config = Zend_Registry::get('config');
+		
+		$default = array(
+			'template' => 'templates/email.phtml',
+			'title' => '',
+			'subject' => '',
+			'config' => $config
+		);
+		$options = $options + $default;
+		
+		// Layout
+		$html = $this->prepareMailHtml($record, $options);
+		$text = strip_tags($html);
+		$view = Zend_Layout::getMvcInstance()->getView();
+		$html = $view->partial($options['template'], $options + array('message' => $html));
+		
+		// Email
+		$mail = new Jp7_Mail();
+		$mail->setSubject($options['subject']);
+		$mail->setBodyHtml($html);
+		$mail->setBodyText($text);
+		
+		return $mail;
+	}
+	
+	public function prepareMailHtml(InterAdmin $record, $options = array()) {
+		global $lang;
+		
+		$linebreak = '<br />' . "\r\n";
+		
+		if ($options['subject']) {
+			$html = '<b>' . $options['subject'] . '</b><br />
+				<hr size=1 color="#666666"><br />';
+		}
+		
+		foreach ($record->getAttributesCampos() as $type => $field) {
+			if (!$field['form']) {
+				continue;
+			}
+			$html .= '<b>' . $this->_getMailLabel($field) . '</b>: ' . $this->_getMailValue($record, $field) . $linebreak;
+			if ($field['separador']) {
+				$html .= $linebreak;			
+			}
+		}
+		
+		$html .= '<br />
+			<hr size="1" color="#666666">
+			<font size="1" color="#333333">
+				<b>Idioma:</b> ' . $lang->lang . '<br />
+				<b>Data - Hora de Envio:</b> ' . date('d/m/Y - H:i:s') . '<br />
+				<b>IP:</b> ' . $_SERVER['REMOTE_ADDR'] . '<br />
+				<br />
+			</font>';
+		return $html;
+	}
+	
+	/**
+	 * FIXME temporário
+	 */
+	protected function _getMailLabel($field) {
+		if ($field['label']) {
+			return $field['label'];
+		} elseif ($field['nome'] instanceof InterAdminTipo) {
+			return $field['nome']->getFieldsValues('nome');
+		} else {
+			return $field['nome'];
+		}
+	}
+	
+	/**
+	 * FIXME temporário
+	 */
+	protected function _getMailValue($record, $field) {
+		$value = $record->{$field['nome_id']};
+		
+		// @todo Falta select_multi
+		// Relacionamentos
+		if ($field['nome'] instanceof InterAdminTipo) {
+			$tipo = $field['nome'];
+			
+			if (is_numeric($value)) {
+				$value = $tipo->getInterAdminById($value);
+			}
+			if ($value instanceof InterAdminAbstract) {
+				return $value->getStringValue();
+			}
+		// Texto
+		} elseif (strpos($field['tipo'], 'text_') === 0) {
+			$value = '<div style="background:#F2F2F2;margin-top:3px;padding:5px;border:1px solid #CCC">
+				<font face="verdana" size="2" color="#000000" style="font-size:13px">' . toHtml($value) . '</font>
+			</div>';
+			return $value;
+		// String
+		} else {
+			return $value;
+		}
+	}
+	
+	/**
+	 * Create an array of elements from an InterAdminTipo.
+	 * 
+	 * @param InterAdminTipo $tipo
+	 * @return array
+	 */
+	public function createElements(InterAdminTipo $tipo, $prefix = '', array $options = array()) {
+		$options = $options + array(
+			'label_suffix' => ':',
+			'required_suffix' => '*'
+		);
+		
+		$elements = array();
+		foreach ($tipo->getCampos() as $campo) {
+			if ($campo['form']) {
+				$element = $this->createElementFromCampo($campo, $prefix, $options);
+				$elements[$element->getId()] = $element;
+			}
+		}
+		return $elements;
+	}
+	
+	public function createElementFromCampo($campo, $prefix, $options) {
+		list($tipo, $subTipo) = explode('_', $campo['tipo']);
+		
+		$name = $prefix . $campo['nome_id'];
+		$label_suffix = $options['label_suffix'] . (($campo['obrigatorio']) ? $options['required_suffix'] : ''); 
+		
+		$options = array(
+			'label' => $campo['nome'] . $label_suffix,
+			'description' => $campo['ajuda'],
+			'required' => (bool) $campo['obrigatorio']
+		);
+		
+		switch ($tipo) {
+			case 'varchar':
+				$element = $this->createElement('text', $name, $options);
+				break;
+			case 'text':
+				$element = $this->createElement('textarea', $name, $options);
+				break;
+			case 'select':
+				$registros = $campo['nome']->getInterAdmins();
+				$multiOptions = array();
+				foreach ($registros as $registro) {
+					$multiOptions[$registro->__toString()] = $registro->getStringValue();
+				}
+				$options['multiOptions'] = $multiOptions;
+				// Label não é o $campo['nome'] como nos outros elementos
+				$options['label'] = $campo['label'] . $label_suffix;
+								
+				$element = $this->createElement('select', $name, $options);
+				break;
+			case 'date':
+				$element = $this->createElement('date', $name, $options);
+				break;
+			default:
+				$element = $this->createElement('text', $name, $options);
+				break;
+		}
+		return $element;
+	}
+	
+	public function populate($values, $prefix = '') {
+		if ($values instanceof InterAdmin) {
+			$values = $values->attributes;
+			foreach ($values as $key => $value) {
+				if ($value instanceof InterAdmin) {
+					$values[$key] = $value->id;
+				}
+			}
+		}
+		if ($prefix) {
+			foreach ($values as $key => $value) {
+				$values[$prefix . $key] = $value;
+				unset($values[$key]);
+			}
+		}
+		parent::populate($values);
+	}
+}
+
+
+/*
+$usuarioTipo = new Ciintranet_UsuarioTipo();
+$form = new Jp7_Form();
+$elements = $form->createElements($usuarioTipo);
+$form->addElements($elements);
+
+$form->populate($usuarioLogado->attributes);
+
+$form->setAction('atualizar_ok.php');
+echo $form->render(new Zend_View());
+*/
