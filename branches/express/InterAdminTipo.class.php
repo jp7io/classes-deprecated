@@ -740,7 +740,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				'fields' => 'id_tipo',
 				'from' => $this->getTableName() . ' AS main',
 				'where' => array(
-					'model_id_tipo = ' . $this->id_tipo
+					"model_id_tipo = '" . $this->id_tipo . "'"
 				)
 			));
 			
@@ -752,6 +752,36 @@ class InterAdminTipo extends InterAdminAbstract {
 			$this->_tiposUsingThisModel[$this->id_tipo] = $this;
 		}
 		return $this->_tiposUsingThisModel;
+	}
+	
+	public static function findTipos($options = array()) {
+		$instance = new self(); // TODO colocar new static() no php 5.3
+		
+		$options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
+		$options['from'] = $instance->getTableName() . " AS main";
+		if (!$options['where']) {
+			$options['where'][] = '1 = 1';
+		}
+	 	if (!$options['order']) {
+	 		$options['order'] = 'ordem, nome';
+		}
+		// Internal use
+		$options['aliases'] = $instance->getAttributesAliases();
+		$options['campos'] = $instance->getAttributesCampos();
+		
+		$rs = $instance->_executeQuery($options);
+		$tipos = array();
+		
+		while ($row = $rs->FetchNextObj()) {
+			$tipo = InterAdminTipo::getInstance($row->id_tipo, array(
+				'db_prefix' => $instance->db_prefix,
+				'class' => $options['class'],
+				'default_class' => $instance->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
+			));
+			$instance->_getAttributesFromRow($row, $tipo, $options);
+			$tipos[] = $tipo;
+		}
+		return $tipos;
 	}
 	
 	protected function _prepareInterAdminsOptions(&$options, &$optionsInstance) {

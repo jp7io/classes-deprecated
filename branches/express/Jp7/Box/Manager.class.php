@@ -40,23 +40,27 @@ class Jp7_Box_Manager {    /**
 		unset(self::$array[$id]);
 	}
 	
-	public static function buildBoxes($records) {
-		$cols = array();
-		foreach ($records as $record) {
-			if ($classe = self::get($record->id_box)) {
-				$box = new $classe($record);
-				if (!$box instanceof Jp7_Box_BoxAbstract) {
-					throw new Exception('Expected an instance of Jp7_Box_BoxAbstract, received a ' . get_class($box) . '.');
+	public static function buildBoxes($columns, $prepareData = true) {
+		foreach ($columns as $column) {
+			$records = $column->getBoxes(array(
+				'fields' => array('*'),
+				'fields_alias' => true,
+				'use_published_filters' => true
+			));
+			$column->boxes = array();
+			foreach ($records as $record) {
+				if ($classe = self::get($record->id_box)) {
+					$box = new $classe($record);
+					if (!$box instanceof Jp7_Box_BoxAbstract) {
+						throw new Exception('Expected an instance of Jp7_Box_BoxAbstract, received a ' . get_class($box) . '.');
+					}
+					if ($prepareData) {
+						$box->prepareData();
+					}
+					$column->boxes[] = $box;
 				}
-				$box->prepareData();
-				$cols[$record->column][] = $box;
 			}
 		}
-		//ksort($cols);
-		end($cols);
-		$mask = array_fill(0, key($cols) + 1, array());
-		$cols += $mask;
-		ksort($cols);
-		return $cols;
+		return $columns;
 	}
 }
