@@ -7,6 +7,10 @@ class Jp7_Box_Manager {    /**
 		'facebook' => 'Jp7_Box_Facebook'		
 	);
 	
+	private static $config = array(
+		110 => array(2)
+	);
+		
 	/**
 	 * Private constructor.
 	 */
@@ -62,5 +66,9 @@ class Jp7_Box_Manager {    /**
 			}
 		}
 		return $columns;
+	}
+	
+	public static function setConfig($config) {
+		self::$config = $config;
 	}
 }
