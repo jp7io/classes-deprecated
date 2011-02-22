@@ -8,7 +8,7 @@ class Jp7_Model_BoxesTipo extends Jp7_Model_TipoAbstract {
 		'arquivos_ajuda' => '',
 		'arquivos' => '',
 		'template' => '',
-		//'editpage' => 'boxes.php',
+		'editpage' => 'boxes.php',
 		'class' => '',
 		'class_tipo' => '',
 		'model_id_tipo' => 0,

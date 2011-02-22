@@ -1,12 +1,14 @@
 <?php
 
 abstract class Jp7_Box_BoxAbstract {
-	public $record;
-	
 	public function __construct(InterAdmin $record = null) {
-		$this->record = $record;
-		if ($this->record->params) {
-			$this->record->params = unserialize($this->record->params);
+		if ($record) {
+			foreach ($record->attributes as $key => $value) {
+				$this->$key = $value;
+			}
+			if ($record->params) {
+				$this->params = unserialize($record->params);
+			}
 		}
 	}
 	/**
@@ -24,18 +26,18 @@ abstract class Jp7_Box_BoxAbstract {
 		
 		ob_start();
 		?>
-		<div class="box box-<?php echo $this->record->id_box; ?>">
+		<div class="box box-<?php echo $this->id_box; ?>">
 			<?php echo $this->_getEditorTitle(); ?>
 			<?php echo $this->_getEditorIcons((bool) $fields); ?>
 			<div style="clear:both;"></div>
 			<?php echo $fields; ?>
-			<input type="hidden" name="box[]" value="<?php echo $this->record->id_box; ?>" />
+			<input type="hidden" name="box[]" value="<?php echo $this->id_box; ?>" />
 		</div>
 		<?php
 		return ob_get_clean();
 	}
 	protected function _getEditorTitle() {
-		return ucwords(str_replace('-', ' ', $this->record->id_box));
+		return ucwords(str_replace('-', ' ', $this->id_box));
 	}
 	protected function _getEditorIcons($hasFields = true) {
 		?>
