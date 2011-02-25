@@ -126,7 +126,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return mixed
 	 */
 	public function &__get($var) {
-		if ($var == 'class' || $var == 'class_tipo' || $var == 'tabela' || $var == 'template') {
+		$inheritArr = array('class', 'class_tipo', 'tabela', 'template', 'layout', 'layout_registros');
+		if (in_array($var, $inheritArr)) {
 			if (!isset($this->attributes[$var]) || !isset($this->_loadedfrommodel[$var])) {
 				$modelo = $this;
 				while ($modelo->id_tipo) {

@@ -63,11 +63,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 		// Boxes editáveis pelo InterAdmin
 		$boxTipo = $tipo->getFirstChildByModel('Boxes');
 		if ($boxTipo) {
-			$boxes = $boxTipo->getInterAdmins(array(
-				'fields' => array('*'),
-				'where' => array($this->record ? "records_page <> ''" : "records_page = ''")
-			));
-			$this->view->boxes = Jp7_Box_Manager::buildBoxes($boxes);
+			$this->view->boxes = Jp7_Box_Manager::buildBoxes($boxTipo, $this->record);
 		}
 		
 		// Layout
