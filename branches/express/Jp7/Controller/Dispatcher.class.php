@@ -1,7 +1,9 @@
 <?php
 
 class Jp7_Controller_Dispatcher extends Zend_Controller_Dispatcher_Standard {
-
+	
+	protected static $default_parent_class = 'Jp7_Controller_Action';
+	
     /**
      * Dispatch to a controller/action
      *
@@ -19,11 +21,9 @@ class Jp7_Controller_Dispatcher extends Zend_Controller_Dispatcher_Standard {
     	if (!$this->isDispatchable($request)) {
             $controller = $request->getControllerName();
             if (!$this->getParam('useDefaultControllerAlways') && !empty($controller)) {
-            	// Abrir template
-				$indexController = $this->loadClass('IndexController');
-				$parentClassName = get_parent_class($indexController);
+            	// Abrir template dentro do mesmo cliente
 				$className = $this->_getControllerClassWithModelPrefix($request);
-				eval('class ' . $className . ' extends ' . $parentClassName . ' {};');
+				eval('class ' . $className . ' extends ' . self::getDefaultParentClass() . ' {};');
             }
         }
 		return parent::dispatch($request, $response);
@@ -49,7 +49,7 @@ class Jp7_Controller_Dispatcher extends Zend_Controller_Dispatcher_Standard {
 			$className = $this->_getControllerClassWithModelPrefix($request);
 	        if (class_exists($className, false)) {
 	            return true;
-	        }			
+	        }
 		}
         return $retornoOriginal;
     }
@@ -77,12 +77,28 @@ class Jp7_Controller_Dispatcher extends Zend_Controller_Dispatcher_Standard {
 	 */
 	public static function evalAsAController($filename) {
 		if (strpos($filename, 'eval') === false) {
-			$config = Zend_Registry::get('config');
-			$parentClassName = ucfirst($config->name_id) . '_Controller_Action';
-			
 			$class_contents = file_get_contents($filename);
-			$class_contents = str_replace('__Controller_Action', $parentClassName, $class_contents);
+			$class_contents = str_replace('__Controller_Action', self::getDefaultParentClass(), $class_contents);
 			eval('?>' . $class_contents);
 		}
 	}
+    
+    /**
+     * Returns $default_parent_class.
+     *
+     * @see Jp7_Controller_Dispatcher::$default_parent_class
+     */
+    public static function getDefaultParentClass() {
+        return self::$default_parent_class;
+    }
+    
+    /**
+     * Sets $default_parent_class.
+     *
+     * @param object $default_parent_class
+     * @see Jp7_Controller_Dispatcher::$default_parent_class
+     */
+    public static function setDefaultParentClass($default_parent_class) {
+        self::$default_parent_class = $default_parent_class;
+    }
 }
