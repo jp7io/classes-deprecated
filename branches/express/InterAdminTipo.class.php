@@ -213,7 +213,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdminTipo
 	 */
 	public function getFirstChild($options = array()) {
-		return reset($this->getChildren($options + array('limit' => 1)));
+		return reset($this->getChildren(array('limit' => 1) + $options));
 	}
 	/**
 	 * Retrieves the first child of this InterAdminTipo with the given "model_id_tipo".
@@ -222,8 +222,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return InterAdminTipo
 	 */
 	public function getFirstChildByModel($model_id_tipo, $options = array()) {
-		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
-		return $this->getFirstChild($options);
+		return reset($this->getChildrenByModel($model_id_tipo, array('limit' => 1) + $options));
 	}
 	/**
 	 * Retrieves the first child of this InterAdminTipo with the given "nome"
@@ -243,6 +242,8 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public function getChildrenByModel($model_id_tipo, $options = array()) {
 		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
+		// Necessário enquanto algumas tabelas ainda tem esse campo numérico
+		$options['where'][] = "model_id_tipo != '0'"; 
 		return $this->getChildren($options);
 	}
 	/**
