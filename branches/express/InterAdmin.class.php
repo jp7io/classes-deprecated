@@ -593,13 +593,15 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		// log
 		if ($this->id && !isset($this->log)) {
+			$old_value = InterAdmin::setPublishedFiltersEnabled(false);
 			$this->getFieldsValues('log');
+			InterAdmin::setPublishedFiltersEnabled($old_value);
 		}
 		$this->log = date('d/m/Y H:i') . ' - ' . self::getLogUser() . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13) . $this->log;
 		// date_modify
 		$this->date_modify = date('c');
 		
-		return $this->_update($this->attributes, 'id_tipo = ' . $this->id_tipo . ' AND ');
+		return parent::save();
 	}
 	public function getAttributesNames() {
 		return $this->getTipo()->getCamposNames();
