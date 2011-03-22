@@ -756,9 +756,13 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $this->_tiposUsingThisModel;
 	}
 	
-	public static function findTipos($options = array()) {
-		$instance = new self(); // TODO colocar new static() no php 5.3
-		
+	public function findTipos($options = array()) {
+		// TODO Substituir esse IF por new static() no php 5.3, método deve ser static
+		if ($this instanceof self) {
+			$instance = $this;
+		} else {
+			$instance = new self();
+		}
 		$options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
 		$options['from'] = $instance->getTableName() . " AS main";
 		if (!$options['where']) {

@@ -6,7 +6,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 	 * @return 
 	 */
 	public function __construct() {
-		
+		$this->db_prefix = $GLOBALS['db_prefix'];
 	}
 	
 	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {

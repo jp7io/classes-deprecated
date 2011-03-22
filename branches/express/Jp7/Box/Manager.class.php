@@ -38,7 +38,8 @@ class Jp7_Box_Manager {    const COL_1_LEFT = 1;
      * @var array
      */
 	private static $array = array(
-		'facebook' => 'Jp7_Box_Facebook'		
+		'facebook' => 'Jp7_Box_Facebook',
+		'news' => 'Jp7_Box_News'
 	);
 	
 	/**
