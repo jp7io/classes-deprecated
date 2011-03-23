@@ -24,6 +24,25 @@ class Jp7_Bootstrap {
 		global $config;
 		include_once jp7_absolute_path(APPLICATION_PATH . '/../interadmin/config.php');
 		Zend_Registry::set('config', $config);
+		
+		// Iniciando $s_session. Compatibilidade
+		if (is_null($GLOBALS['s_session'])) {
+			if (!is_array($_SESSION[$config->name_id]['interadmin'])) {
+				$_SESSION[$config->name_id]['interadmin'] = array();
+			}
+			$GLOBALS['s_session'] = &$_SESSION[$config->name_id]['interadmin'];
+			$GLOBALS['s_user'] = &$GLOBALS['s_session']['user'];
+		}
+		
+		// Classes padrão
+		$prefix = ucfirst($config->name_id);
+		
+		if (InterAdminTipo::getDefaultClass() == 'InterAdminTipo' && class_exists($prefix . '_InterAdminTipo')) {
+			InterAdminTipo::setDefaultClass($prefix . '_InterAdminTipo');
+		}
+		if (Jp7_Controller_Dispatcher::getDefaultParentClass() == 'Jp7_Controller_Action' && class_exists($prefix . '_Controller_Action')) {
+        	Jp7_Controller_Dispatcher::setDefaultParentClass($prefix . '_Controller_Action');
+		}
 	}
 	
 	public static function initDataBase() {

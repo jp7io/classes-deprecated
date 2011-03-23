@@ -220,16 +220,8 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 	}
 	
 	public static function getRootTipo() {
-		$config = Zend_Registry::get('config');
-		
-		$customTipo = ucfirst($config->name_id) . '_InterAdminTipo';
-		if (class_exists($customTipo)) {
-			$rootTipo = new $customTipo();
-		} else {
-			$rootTipo = new InterAdminTipo();
-		}
-		
-		return $rootTipo;
+		$defaultClassName = InterAdminTipo::getDefaultClass();
+		return new $defaultClassName();
 	}
 	
 	/**

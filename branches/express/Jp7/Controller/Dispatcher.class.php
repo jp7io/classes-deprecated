@@ -2,7 +2,7 @@
 
 class Jp7_Controller_Dispatcher extends Zend_Controller_Dispatcher_Standard {
 	
-	protected static $default_parent_class = null;
+	protected static $default_parent_class = 'Jp7_Controller_Action';
 	
     /**
      * Dispatch to a controller/action
@@ -87,12 +87,7 @@ class Jp7_Controller_Dispatcher extends Zend_Controller_Dispatcher_Standard {
      * @see Jp7_Controller_Dispatcher::$default_parent_class
      */
     public static function getDefaultParentClass() {
-    	if (is_null(self::$default_parent_class)) {
-        	$config = Zend_Registry::get('config');
-        	return ucfirst($config->name_id) . '_Controller_Action';
-		} else {
-			return self::$default_parent_class;
-		}
+    	return self::$default_parent_class;
     }
     
     /**

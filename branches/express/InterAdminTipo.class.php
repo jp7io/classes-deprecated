@@ -25,6 +25,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @var array 
 	 */
 	protected static $_metadata;
+	
+	protected static $_defaultClass = 'InterAdminTipo';
+	
 	protected $_primary_key = 'id_tipo';
 	/**
 	 * Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
@@ -84,7 +87,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	public static function getInstance($id_tipo, $options = array()) {
 		if (!$options['default_class']) {
-			$options['default_class'] = 'InterAdminTipo';
+			$options['default_class'] = self::$_defaultClass;
 		}
 		if ($options['class']) {
 			// Classe foi forçada
@@ -756,15 +759,11 @@ class InterAdminTipo extends InterAdminAbstract {
 		return $this->_tiposUsingThisModel;
 	}
 	
-	public function findTipos($options = array()) {
-		// TODO Substituir esse IF por new static() no php 5.3, método deve ser static
-		if ($this instanceof self) {
-			$instance = $this;
-		} else {
-			$instance = new self();
-		}
+	public static function findTipos($options = array()) {
+		$instance = new self();
+		
 		$options['fields'] = array_merge(array('id_tipo'), (array) $options['fields']);
-		$options['from'] = $instance->getTableName() . " AS main";
+		$options['from'] = $instance->getTableName() . ' AS main';
 		if (!$options['where']) {
 			$options['where'][] = '1 = 1';
 		}
@@ -781,8 +780,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		while ($row = $rs->FetchNextObj()) {
 			$tipo = InterAdminTipo::getInstance($row->id_tipo, array(
 				'db_prefix' => $instance->db_prefix,
-				'class' => $options['class'],
-				'default_class' => $instance->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
+				'class' => $options['class']
 			));
 			$instance->_getAttributesFromRow($row, $tipo, $options);
 			$tipos[] = $tipo;
@@ -835,4 +833,23 @@ class InterAdminTipo extends InterAdminAbstract {
 	public function getTagFilters() {
 		return "(tags.id_tipo = " . $this->id_tipo . " AND tags.id = 0)";
 	}
+	
+    /**
+     * Returns $_defaultClass.
+     * 
+     * @see InterAdminTipo::$_defaultClass
+     */
+    public static function getDefaultClass() {
+        return self::$_defaultClass;
+    }
+    
+    /**
+     * Sets $_defaultClass.
+     * 
+     * @param object $_defaultClass
+     * @see InterAdminTipo::$_defaultClass
+     */
+    public static function setDefaultClass($defaultClass) {
+        self::$_defaultClass = $defaultClass;
+    }
 }
