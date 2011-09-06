@@ -9,7 +9,7 @@ class Jp7_InterAdmin_JSTree {
 		
 		if (!$options['static']) {
 			$options = InterAdmin::mergeOptions(array(
-				'fields' => array('nome', 'parent_id_tipo', 'model_id_tipo', 'admin'),
+				'fields' => array('nome', 'parent_id_tipo', 'model_id_tipo', 'admin', 'icone'),
 				'use_published_filters' => true,
 				'class' => 'InterAdminTipo'	
 			), $options);
@@ -50,7 +50,9 @@ class Jp7_InterAdmin_JSTree {
 		
 		$nome_lang = ($lang->prefix && $tipo->{'nome' . $lang->prefix}) ? $tipo->{'nome' . $lang->prefix} : $tipo->nome;
 		$node = (object) array(
-			'data' => utf8_encode($nome_lang),
+			'data' => array(
+				'title' => utf8_encode($nome_lang)
+			),
 			'attr' => array(
 				'id' => $tipo->id_tipo
 			),
@@ -60,6 +62,10 @@ class Jp7_InterAdmin_JSTree {
 			),
 			'children' => array()
 		);
+		
+		if ($tipo->icone) {
+			$node->data['icon'] = $this->getIconeUrl($tipo->icone);
+		}
 		
 		$children = $this->tipos[$tipo->id_tipo];
 		if ($children) {
@@ -89,18 +95,28 @@ class Jp7_InterAdmin_JSTree {
 		return json_encode($this->createTree());	
 	}
 	
-	public function addNode($label, $callback = array()) {
-		$node = $this->createNode($label, $callback);
+	public function addNode($label, $callback = array(), $icone = '') {
+		$node = $this->createNode($label, $callback, $icone);
 		$this->tree[] = $node;
 		return $node;
 	}
 	
-	public function createNode($label, $callback = array()) {
-		return (object) array(
-			'data' => Jp7_Utf8::encode($label),
+	public function createNode($label, $callback = array(), $icone = '') {
+		$node = (object) array(
+			'data' => array(
+				'title' => Jp7_Utf8::encode($label)
+			),
 			'metadata' => array(
 				'callback' => utf8_encode($callback)
 			)
 		);
+		if ($icone) {
+			$node->data['icon'] = $this->getIconeUrl($icone);
+		}
+		return $node;
+	}
+	
+	public function getIconeUrl($icone) {
+		return '/_default/img/icons/' . $icone . '.png';
 	}
 }

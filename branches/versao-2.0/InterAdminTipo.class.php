@@ -131,15 +131,15 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return mixed
 	 */
 	public function &__get($var) {
-		$inheritArr = array('class', 'class_tipo', 'tabela', 'template', 'layout', 'layout_registros');
-		if (in_array($var, $inheritArr)) {
-			if (!isset($this->attributes[$var]) || !isset($this->_loadedfrommodel[$var])) {
+		if (!$this->attributes[$var]) {
+			$inheritArr = array('class', 'class_tipo', 'tabela', 'template', 'layout', 'layout_registros', 'icone');
+			if (in_array($var, $inheritArr) && !isset($this->_loadedfrommodel[$var])) {
+				$this->_loadedfrommodel[$var] = true;
 				$modelo = $this;
 				while ($modelo->id_tipo) {
 					$modelo->getFieldsValues(array($var, 'model_id_tipo'));
 					if ($modelo->attributes[$var]) {
 						$this->$var = $modelo->attributes[$var];
-						$this->_loadedfrommodel[$var] = true;
 						break;
 					}
 					if (is_numeric($modelo->model_id_tipo) || !$modelo->model_id_tipo) {
