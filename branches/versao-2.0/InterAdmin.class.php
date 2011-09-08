@@ -606,13 +606,14 @@ class InterAdmin extends InterAdminAbstract {
 		if (isset($this->varchar_key)) {
 			$this->id_string = toId($this->varchar_key);
 		} else {
-			$alias_varchar_key = ($this->getTipo()->getCamposAlias('varchar_key'));
+			$alias_varchar_key = $this->getTipo()->getCamposAlias('varchar_key');
 			if (isset($this->$alias_varchar_key)) {
 				$this->id_string = toId($this->$alias_varchar_key);
 			}
 		}
 		// log
 		if ($this->id && !isset($this->log)) {
+			// Evita bug em que um registro despublicado tem seu log zerado
 			$old_value = InterAdmin::setPublishedFiltersEnabled(false);
 			$this->getFieldsValues('log');
 			InterAdmin::setPublishedFiltersEnabled($old_value);

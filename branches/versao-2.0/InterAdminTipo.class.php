@@ -20,6 +20,8 @@
 class InterAdminTipo extends InterAdminAbstract {
 	const ID_TIPO = 0;
 	
+	private static $inheritedFields = array('class', 'class_tipo', 'icone', 'layout', 'layout_registros', 'tabela', 'template', 'children', 'campos');
+	
 	/**
 	 * Stores metadata to be shared by instances with the same $id_tipo.
 	 * @var array 
@@ -130,6 +132,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @param string $var Magic property 'interadminsOrderby' or 'class'.
 	 * @return mixed
 	 */
+	/*
 	public function &__get($var) {
 		if (!$this->attributes[$var]) {
 			$inheritArr = array('class', 'class_tipo', 'tabela', 'template', 'layout', 'layout_registros', 'icone');
@@ -153,6 +156,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		return parent::__get($var);
 	}
+	*/
 	/**
 	 * Gets the parent InterAdminTipo object for this record, which is then cached on the $_parent property.
 	 * 
@@ -568,8 +572,60 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return void
 	 */
 	public function save() {
-		$this->id_tipo_string = toId($this->nome);
+		// id_tipo_string
+		if (isset($this->nome)) {
+			$this->id_tipo_string = toId($this->nome);
+		}
+		// log
+		if ($this->id_tipo && !isset($this->log)) {
+			// Evita bug em que um tipo despublicado tem seu log zerado
+			$old_value = InterAdmin::setPublishedFiltersEnabled(false);
+			$this->getFieldsValues('log');
+			InterAdmin::setPublishedFiltersEnabled($old_value);
+		}
+		$this->log = date('d/m/Y H:i') . ' - ' . InterAdmin::getLogUser() . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13) . $this->log;
+		
+		// Inheritance
+		$this->syncInheritance();
+		// Inheritance - Tipos inheriting from this Tipo
+		if ($this->id_tipo) {
+			$inheritingTipos = InterAdminTipo::findTipos(array(
+				'where' => array(
+					"model_id_tipo = '" . $this->id_tipo . "'",
+					"model_id_tipo != '0'"
+				),
+				'class' => 'InterAdminTipo'
+			));
+			foreach ($inheritingTipos as $tipo) {
+				$tipo->syncInheritance();
+				$tipo->updateAttributes($tipo->attributes);
+			}
+		}
 		return parent::save();
+	}
+	
+	public function syncInheritance() {
+		// cache dos atributos herdados
+		$this->getFieldsValues(array_merge(array('model_id_tipo', 'inherited'), self::$inheritedFields));
+		
+		// Retornando ao valor real
+		foreach (jp7_explode(',', $this->inherited) as $inherited_var) {
+			$this->attributes[$inherited_var] = '';
+		}
+		$this->inherited = array();
+		// Atualizando cache com dados do modelo
+		
+		if ($this->model_id_tipo && is_numeric($this->model_id_tipo)) {
+			$modelo = new InterAdminTipo($this->model_id_tipo);
+			$modelo->getFieldsValues(self::$inheritedFields);
+			foreach (self::$inheritedFields as $field) {
+				if (!$this->$field && $modelo->$field) {
+					$this->inherited[] = $field;
+					$this->$field = $modelo->$field;
+				}
+			}
+		}
+		$this->inherited = implode(',', $this->inherited);
 	}
 	/**
 	 * Sets this row as deleted as saves it.
