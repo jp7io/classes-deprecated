@@ -21,6 +21,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	const ID_TIPO = 0;
 	
 	private static $inheritedFields = array('class', 'class_tipo', 'icone', 'layout', 'layout_registros', 'tabela', 'template', 'children', 'campos');
+	private static $privateFields = array('children', 'campos');
 	
 	/**
 	 * Stores metadata to be shared by instances with the same $id_tipo.
@@ -554,6 +555,8 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		// Inheritance
 		$this->syncInheritance();
+		$retorno = parent::save();
+		
 		// Inheritance - Tipos inheriting from this Tipo
 		if ($this->id_tipo) {
 			$inheritingTipos = InterAdminTipo::findTipos(array(
@@ -568,7 +571,7 @@ class InterAdminTipo extends InterAdminAbstract {
 				$tipo->updateAttributes($tipo->attributes);
 			}
 		}
-		return parent::save();
+		return $retorno;
 	}
 	
 	public function syncInheritance() {
@@ -581,14 +584,26 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		$this->inherited = array();
 		// Atualizando cache com dados do modelo
-		
-		if ($this->model_id_tipo && is_numeric($this->model_id_tipo)) {
-			$modelo = new InterAdminTipo($this->model_id_tipo);
-			$modelo->getFieldsValues(self::$inheritedFields);
-			foreach (self::$inheritedFields as $field) {
-				if (!$this->$field && $modelo->$field) {
-					$this->inherited[] = $field;
-					$this->$field = $modelo->$field;
+		if ($this->model_id_tipo) {
+			if (is_numeric($this->model_id_tipo)) {
+				$modelo = new InterAdminTipo($this->model_id_tipo);
+				$modelo->getFieldsValues(self::$inheritedFields);
+			} else {
+				$className = 'Jp7_Model_' . $this->model_id_tipo . 'Tipo';
+				if (class_exists($className)) {
+					$modelo = new $className();
+				} else {
+					echo 'Erro: Class ' . $className . ' not found';
+				}
+			}
+			if ($modelo) {
+				foreach (self::$inheritedFields as $field) {
+					if ($modelo->$field) {
+						if (!$this->$field || in_array($field, self::$privateFields)) {
+							$this->inherited[] = $field;
+							$this->$field = $modelo->$field;
+						}
+					}
 				}
 			}
 		}
