@@ -47,8 +47,6 @@ class InterAdminTipo extends InterAdminAbstract {
 	 */
 	protected $_parent;
 	
-	// @todo Remove this
-	protected $_loadedfrommodel;
 	protected $_tiposUsingThisModel;
 	
 	/**
@@ -126,37 +124,6 @@ class InterAdminTipo extends InterAdminAbstract {
 		}
 		return parent::getFieldsValues($fields);
 	}
-	/**
-	 * Retrieves magic properties.
-	 *
-	 * @param string $var Magic property 'interadminsOrderby' or 'class'.
-	 * @return mixed
-	 */
-	/*
-	public function &__get($var) {
-		if (!$this->attributes[$var]) {
-			$inheritArr = array('class', 'class_tipo', 'tabela', 'template', 'layout', 'layout_registros', 'icone');
-			if (in_array($var, $inheritArr) && !isset($this->_loadedfrommodel[$var])) {
-				$this->_loadedfrommodel[$var] = true;
-				$modelo = $this;
-				while ($modelo->id_tipo) {
-					$modelo->getFieldsValues(array($var, 'model_id_tipo'));
-					if ($modelo->attributes[$var]) {
-						$this->$var = $modelo->attributes[$var];
-						break;
-					}
-					if (is_numeric($modelo->model_id_tipo) || !$modelo->model_id_tipo) {
-						$modelo = new InterAdminTipo($modelo->model_id_tipo);
-					} else {
-						$className = 'Jp7_Model_' . $modelo->model_id_tipo . 'Tipo';
-						$modelo = new $className();	
-					}
-				}
-			}
-		}
-		return parent::__get($var);
-	}
-	*/
 	/**
 	 * Gets the parent InterAdminTipo object for this record, which is then cached on the $_parent property.
 	 * 
