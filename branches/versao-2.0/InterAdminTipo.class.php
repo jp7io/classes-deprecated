@@ -557,11 +557,7 @@ class InterAdminTipo extends InterAdminAbstract {
 		
 		// Inheritance - Tipos inheriting from this Tipo
 		if ($this->id_tipo) {
-			$inheritingTipos = InterAdminTipo::findTipos(array(
-				'where' => array(
-					"model_id_tipo = '" . $this->id_tipo . "'",
-					"model_id_tipo != '0'"
-				),
+			$inheritingTipos = InterAdminTipo::findTiposByModel($this->id_tipo, array(
 				'class' => 'InterAdminTipo'
 			));
 			foreach ($inheritingTipos as $tipo) {
@@ -882,9 +878,21 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return	InterAdminTipo
 	 */
 	public static function findFirstTipoByModel($model_id_tipo, $options = array()) {
+		return reset(self::findTiposByModel($model_id_tipo, array('limit' => 1) + $options));
+	}
+	/**
+	 * Retrieves all the InterAdminTipo with the given "model_id_tipo".
+	 * @param string|int 	$model_id_tipo
+	 * @param array			$options [optional]
+	 * @return array
+	 */
+	public static function findTiposByModel($model_id_tipo, $options = array()) {
 		$options['where'][] = "model_id_tipo = '" . $model_id_tipo . "'";
-		$options['where'][] = "model_id_tipo != '0'";
-		return self::findFirstTipo($options); 
+		if ($model_id_tipo != '0') {
+			// Devido à mudança de int para string do campo model_id_tipo, essa linha é necessária
+			$options['where'][] = "model_id_tipo != '0'";
+		}
+		return self::findTipos($options); 
 	}
 	/**
 	 * Retrieves multiple InterAdminTipo's from the database.
