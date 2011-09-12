@@ -63,7 +63,8 @@ class Jp7_Bootstrap {
 		$db = ADONewConnection($dsn);
 		
 		if (!$db) {
-			throw new Exception('Unable to connect to the database ' . $dsn);
+			$db->pass = '{pass}';
+			throw new Exception('Unable to connect to the database ' . jp7_formatDsn($db));
 		}
 		/* /DB Connection */
 	}
