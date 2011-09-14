@@ -77,10 +77,7 @@ class InterSite {
 		if ($_SERVER['HTTP_HOST'] == 'localhost') {
 			return true;
 		} elseif ($_SERVER['SERVER_ADDR'] == '127.0.0.1' || strpos($_SERVER['SERVER_ADDR'], '192.168.0.') === 0) {
-			// Has no dots
-			if (strpos($_SERVER['HTTP_HOST'], '.') === false || $_SERVER['SERVER_ADDR'] == $_SERVER['HTTP_HOST']) {
-				return true;
-			}
+			return true;
 		}
 		return false;
 	}
@@ -220,9 +217,13 @@ class InterSite {
 		}
 		
 		$host = $_SERVER['HTTP_HOST'];
-		if (strpos($host, ':80') !== false) {
-			// O browser não envia a porta junto com o host, mas alguns bots enviam
-			$host = preg_replace('/:80$/', '', $host);
+		// O browser não envia a porta junto com o host, mas alguns bots enviam
+		$host = preg_replace('/:80$/', '', $host);
+		if ($host != trim($host, '. ')) {
+			// Corrigindo hosts inválidos, com . no final
+			header($_SERVER['SERVER_PROTOCOL'] . ' 301 Moved Permanently');
+			header('Location: http://' . trim($host, '. ') . $_SERVER['REQUEST_URI']);
+			exit;
 		}
 		$this->init($host);
 		
