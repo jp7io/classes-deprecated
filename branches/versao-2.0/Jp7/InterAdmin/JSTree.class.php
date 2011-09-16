@@ -95,13 +95,13 @@ class Jp7_InterAdmin_JSTree {
 		return json_encode($this->createTree());	
 	}
 	
-	public function addNode($label, $callback = array(), $icone = '') {
+	public function addNode($label, $callback = '', $icone = '') {
 		$node = $this->createNode($label, $callback, $icone);
 		$this->tree[] = $node;
 		return $node;
 	}
 	
-	public function createNode($label, $callback = array(), $icone = '') {
+	public function createNode($label, $callback = '', $icone = '') {
 		$node = (object) array(
 			'data' => array(
 				'title' => Jp7_Utf8::encode($label)
