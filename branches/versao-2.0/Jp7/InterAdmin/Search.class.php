@@ -1,0 +1,111 @@
+<?php
+
+//ALTER TABLE `teste`.`interadmin_teste` DROP INDEX `search` ,
+//ADD FULLTEXT `search` (
+//`varchar_key` ,
+//`text_1` ,
+//`text_2`
+//)
+
+class Jp7_InterAdmin_Search {
+	public function search($search, $limit = false) {
+		global $db;
+		
+		$sql = $this->getSql($search);
+		krumo($sql);
+		
+		$rs = $db->Execute($sql) or jp7_debug($db->ErrorMsg(), $sql);
+		
+		$rows = array();
+		while ($row = $rs->FetchNextObj()) {
+			$rows[] = $row;
+		}
+		return $rows;
+	}
+		
+	public function getSql($search) {
+		global $db;
+		
+		$search = $db->qstr($search);
+		
+		$tables = $this->getTables();
+		$sqls = array();
+		foreach ($tables as $table) {
+			$tableSql = $this->getTableSql($table, $search);
+			if ($tableSql) {
+				$sqls[] = $tableSql;
+			}
+		}
+		return '(' . implode("\n) UNION ALL (\n", $sqls) . ') ORDER BY relevance DESC';
+	}
+	
+	public function getTables() {
+		global $db_prefix;
+		
+		$options = array(
+			'fields' => 'tabela',
+			'group' => 'tabela',
+			'where' => $this->getTipoFilter(),
+			'class' => 'InterAdminTipo'
+		);
+		
+		$tables = array();
+		$tipos = InterAdminTipo::findTipos($options);
+		foreach ($tipos as $tipo) {
+			$tables[] = $db_prefix . ($tipo->tabela ? '_' . $tipo->tabela : '');
+		}
+		$tables[] = $db_prefix . '_tipos';
+		return $tables;
+	}
+	
+	/**
+	 * SQL de uma tabela apenas
+	 * @param string $table
+	 * @param string $search
+	 * @param bool $count
+	 * @return string
+	 */ 
+	public function getTableSql($table, $search) {
+		global $db;
+		
+		$columns = $db->MetaColumnNames($table);
+		if (!$columns) {
+			return false;
+		}		
+		$textColumns = array_filter($columns, array($this, 'isText'));
+		if (!$textColumns) {
+			return false;
+		}
+		$fields = array();		
+		$fields[] = in_array('id', $columns) ? 'id' : '0 AS id';
+		$fields[] = in_array('id_tipo', $columns) ? 'id_tipo' : '0 AS id_tipo';
+		$fields[] = in_array('varchar_key', $columns) ? 'varchar_key' : reset($textColumns) . " AS varchar_key";
+		$fields[] = in_array('text_1', $columns) ? 'text_1' : "'' AS text_1";
+				
+		$sql = "SELECT " . implode(',', $fields) . ", MATCH (" . implode(',', $textColumns) . ") AGAINST (" . $search . " IN BOOLEAN MODE) AS relevance " .
+			"FROM `" . $table . "` " .
+			"WHERE " . $this->getTipoFilter() . " " .
+			"HAVING relevance > 0";
+		return $sql;
+	}
+	/**
+	 * SQL de permissões dos tipos.
+	 * @return string
+	 */
+	public function getTipoFilter() {
+		global $s_allowed_tipos;
+		if (is_array($s_allowed_tipos)) {
+			if ($s_allowed_tipos) {
+				return "id_tipo IN (" . implode(',', $s_allowed_tipos) . ")";
+			} else {
+				return '0=1';
+			}
+		} else {
+			return '1=1';
+		}
+	}
+	
+	public function isText($column) {
+		return strpos($column, 'text') === 0 || strpos($column, 'varchar_') === 0 || strpos($column, 'nome') === 0;
+	}
+}
