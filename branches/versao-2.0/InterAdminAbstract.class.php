@@ -146,6 +146,7 @@ abstract class InterAdminAbstract implements Serializable {
 			} elseif ($row = $rs->FetchNextObj()) {
 				$this->_getAttributesFromRow($row, $this, $options); 
 			}
+			$rs->Close();
 		}
 		if (is_array($fields)) {
 			// returns only the fields requested on $fields

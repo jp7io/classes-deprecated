@@ -204,6 +204,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$this->_getAttributesFromRow($row, $tipo, $options);
 			$tipos[] = $tipo;
 		}
+		$rs->Close();
 		return $tipos;
 	}
 	/**
@@ -273,6 +274,7 @@ class InterAdminTipo extends InterAdminAbstract {
 			$this->_getAttributesFromRow($row, $record, $options);
 			$records[] = $record;
 		}
+		$rs->Close();
 		return $records;
 	}
 	/**
