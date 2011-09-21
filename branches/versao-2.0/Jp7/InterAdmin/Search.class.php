@@ -8,21 +8,50 @@
 //)
 
 class Jp7_InterAdmin_Search {
-	public function search($search, $limit = false) {
+	private $booleanMode = false;
+	
+	public function search($search) {
 		global $db;
 		
 		$sql = $this->getSql($search);
-		krumo($sql);
 		
-		$rs = $db->Execute($sql) or jp7_debug($db->ErrorMsg(), $sql);
+		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		
 		$rows = array();
 		while ($row = $rs->FetchNextObj()) {
 			$rows[] = $row;
 		}
+		
+		$rs->Close();
 		return $rows;
 	}
-		
+	
+	public function checkIndexes() {
+		global $db;
+		$tables = $this->getTables();
+		foreach ($tables as $table) {
+			$indexes = $db->MetaIndexes($table);
+			if ($indexes !== false) { // false = não existe
+				$columns = $db->MetaColumnNames($table);
+				$textColumns = array_filter($columns, array($this, 'isText'));
+				if ($textColumns) {
+					$index = $indexes['interadmin_search'];
+					if (!$index || array_full_diff($index['columns'], $textColumns)) {
+						$sql = $this->getIndexSql($table, $textColumns, $index);
+						$db->Execute($sql);
+					}
+				}
+			}
+		}
+	}
+	
+	public function getIndexSql($table, $columns, $drop = false) {
+		$sql = 'ALTER TABLE ' . $table . ' ' .
+			($drop ? 'DROP INDEX `interadmin_search` ,' : '') .
+			'ADD FULLTEXT `interadmin_search` (' . implode(',', $columns) . ')';
+		return $sql;
+	}
+	
 	public function getSql($search) {
 		global $db;
 		
@@ -82,7 +111,7 @@ class Jp7_InterAdmin_Search {
 		$fields[] = in_array('varchar_key', $columns) ? 'varchar_key' : reset($textColumns) . " AS varchar_key";
 		$fields[] = in_array('text_1', $columns) ? 'text_1' : "'' AS text_1";
 				
-		$sql = "SELECT " . implode(',', $fields) . ", MATCH (" . implode(',', $textColumns) . ") AGAINST (" . $search . " IN BOOLEAN MODE) AS relevance " .
+		$sql = "SELECT " . implode(',', $fields) . ", MATCH (" . implode(',', $textColumns) . ") AGAINST (" . $search . ($this->booleanMode ? ' IN BOOLEAN MODE' : '') . ") AS relevance " .
 			"FROM `" . $table . "` " .
 			"WHERE " . $this->getTipoFilter() . " " .
 			"HAVING relevance > 0";
