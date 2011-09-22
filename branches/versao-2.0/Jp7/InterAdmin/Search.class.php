@@ -14,9 +14,9 @@ class Jp7_InterAdmin_Search {
 		global $db;
 		
 		$sql = $this->getSql($search);
-		
 		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		//krumo($sql);
+		
 		$rows = array();
 		while ($row = $rs->FetchNextObj()) {
 			$rows[] = $row;
@@ -95,7 +95,7 @@ class Jp7_InterAdmin_Search {
 	 * @return string
 	 */ 
 	public function getTableSql($table, $search) {
-		global $db;
+		global $db, $s_session;
 		
 		$columns = $db->MetaColumnNames($table);
 		if (!$columns) {
@@ -127,12 +127,42 @@ class Jp7_InterAdmin_Search {
 				unset($words[$key]);
 			}
 		}
-		$words = array_unique($words);
+		if ($words) {
+			$words = array_unique($words);
+			
+			$weight = round(3 / count($words), 1);
+			foreach ($words as $word) {
+				$match .= " + (" . reset($textColumns) . " LIKE '%" . $word . "%') * " . $weight;
+			}
+		}
 		
-		$weight = round(3 / count($words), 1);
-		$where = array($this->getTipoFilter());
-		foreach ($words as $word) {
-			$match .= " + (" . reset($textColumns) . " LIKE '%" . $word . "%') * " . $weight;
+		$where = array();
+		$where[] = $this->getTipoFilter();
+		$where[] = 'id_tipo > 0';
+		
+		if (!$s_session['deleted']) {
+			$deleted_column = in_array('deleted', $columns) ? 'deleted' : '';
+			if (!$deleted_column && in_array('deleted_tipo', $columns)) {
+				$deleted_column = 'deleted_tipo';
+			}
+			if ($deleted_column) {
+				$where[] = $deleted_column . " = ''";
+			}
+		}
+		
+		if ($s_session['filter_publish']) {
+			if (in_array('char_key', $columns)) {
+				$where[] = "char_key <> ''";			
+			}
+			if (in_array('mostrar', $columns)) {
+				$where[] = "mostrar <> ''";			
+			}
+			if (in_array('publish', $columns)) {
+				$where[] = "publish <> ''";			
+			}
+			if (in_array('date_expire', $columns)) {
+				$where[] = "(date_expire > '" . date('c') . "' OR date_expire = '0000-00-00 00:00:00')";			
+			}
 		}
 		
 		$sql = "SELECT " . implode(',', $fields) . ", "  . $match . " AS relevance " .
