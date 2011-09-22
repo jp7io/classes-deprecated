@@ -16,7 +16,7 @@ class Jp7_InterAdmin_Search {
 		$sql = $this->getSql($search);
 		
 		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
-		
+		//krumo($sql);
 		$rows = array();
 		while ($row = $rs->FetchNextObj()) {
 			$rows[] = $row;
@@ -110,10 +110,34 @@ class Jp7_InterAdmin_Search {
 		$fields[] = in_array('id_tipo', $columns) ? 'id_tipo' : '0 AS id_tipo';
 		$fields[] = in_array('varchar_key', $columns) ? 'varchar_key' : reset($textColumns) . " AS varchar_key";
 		$fields[] = in_array('text_1', $columns) ? 'text_1' : "'' AS text_1";
-				
-		$sql = "SELECT " . implode(',', $fields) . ", MATCH (" . implode(',', $textColumns) . ") AGAINST (" . $search . ($this->booleanMode ? ' IN BOOLEAN MODE' : '') . ") AS relevance " .
+		
+		$match = "MATCH (" . implode(',', $textColumns) . ") AGAINST (" . $search . ($this->booleanMode ? " IN BOOLEAN MODE" : "") . ")";
+		
+		$short_words = array('de', 'do', 'da', 'ao', 'em', 'no', 'na');
+		
+		$oriSearch = stripslashes(trim($search, "'"));
+		Krumo::$open = true;
+		
+		// Trata as aspas como uma palavra só
+		preg_match_all('/"(?:\\\\.|[^\\\\"])*"|\S+/', $oriSearch, $matches);
+		$words = $matches[0];
+		foreach ($words as $key => $word) {
+			$words[$key] = $word = trim($word, '"');
+			if (strlen($word) < 2 || in_array($word, $short_words)) {
+				unset($words[$key]);
+			}
+		}
+		$words = array_unique($words);
+		
+		$weight = round(3 / count($words), 1);
+		$where = array($this->getTipoFilter());
+		foreach ($words as $word) {
+			$match .= " + (" . reset($textColumns) . " LIKE '%" . $word . "%') * " . $weight;
+		}
+		
+		$sql = "SELECT " . implode(',', $fields) . ", "  . $match . " AS relevance " .
 			"FROM `" . $table . "` " .
-			"WHERE " . $this->getTipoFilter() . " " .
+			"WHERE " . implode(' AND ', $where) . " " .
 			"HAVING relevance > 0";
 		return $sql;
 	}
