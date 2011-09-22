@@ -109,7 +109,13 @@ class Jp7_InterAdmin_Search {
 		$fields[] = in_array('id', $columns) ? 'id' : '0 AS id';
 		$fields[] = in_array('id_tipo', $columns) ? 'id_tipo' : '0 AS id_tipo';
 		$fields[] = in_array('varchar_key', $columns) ? 'varchar_key' : reset($textColumns) . " AS varchar_key";
-		$fields[] = in_array('text_1', $columns) ? 'text_1' : "'' AS text_1";
+		if (in_array('text_1', $columns)) {
+			$fields[] = 'text_1';
+		} elseif (in_array('texto', $columns))  {
+			$fields[] = 'texto AS text_1';
+		} else {
+			$fields[] = "'' AS text_1";
+		}
 		
 		$match = "MATCH (" . implode(',', $textColumns) . ") AGAINST (" . $search . ($this->booleanMode ? " IN BOOLEAN MODE" : "") . ")";
 		
