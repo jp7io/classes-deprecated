@@ -55,8 +55,6 @@ class Jp7_InterAdmin_Search {
 	public function getSql($search) {
 		global $db;
 		
-		$search = $db->qstr($search);
-		
 		$tables = $this->getTables();
 		$sqls = array();
 		foreach ($tables as $table) {
@@ -117,22 +115,34 @@ class Jp7_InterAdmin_Search {
 			$fields[] = "'' AS text_1";
 		}
 		
-		$match = "MATCH (" . implode(',', $textColumns) . ") AGAINST (" . $search . ($this->booleanMode ? " IN BOOLEAN MODE" : "") . ")";
-		
 		$short_words = array('de', 'do', 'da', 'ao', 'em', 'no', 'na');
-		
-		$oriSearch = stripslashes(trim($search, "'"));
-		Krumo::$open = true;
-		
+						
+		$where = array();
 		// Trata as aspas como uma palavra só
-		preg_match_all('/"(?:\\\\.|[^\\\\"])*"|\S+/', $oriSearch, $matches);
+		preg_match_all('/"(?:\\\\.|[^\\\\"])*"|\S+/', $search, $matches);
 		$words = $matches[0];
+		
 		foreach ($words as $key => $word) {
+			$isQuoted = strpos($word, '"') === 0;
+			$isNegative = strpos($word, '-') === 0;
 			$words[$key] = $word = trim($word, '"');
+			
+			if ($isQuoted) {
+				$where[] = "CONCAT(" . implode(',', $textColumns) . ") LIKE '%" . $word . "%'";
+			}
+			if ($isNegative) {
+				$where[] = "CONCAT(" . implode(',', $textColumns) . ") NOT LIKE '%" . substr($word, 1) . "%'";
+				$search = preg_replace('/(^|[ ])' . preg_quote($word) . '([ ]|$)/', '\1\2', $search);
+				unset($words[$key]);
+				continue;	
+			}
 			if (strlen($word) < 2 || in_array($word, $short_words)) {
 				unset($words[$key]);
 			}
 		}
+		$search = trim($search);
+		$match = "MATCH (" . implode(',', $textColumns) . ") AGAINST ('" . addslashes($search) . "'" . ($this->booleanMode ? " IN BOOLEAN MODE" : "") . ")";
+		
 		if ($words) {
 			$words = array_unique($words);
 			
@@ -140,9 +150,9 @@ class Jp7_InterAdmin_Search {
 			foreach ($words as $word) {
 				$match .= " + (" . reset($textColumns) . " LIKE '%" . $word . "%') * " . $weight;
 			}
+			$match .= " + (CONCAT(" . implode(',', $textColumns) . ") LIKE '%" . addslashes($search) . "%') * 5";
 		}
 		
-		$where = array();
 		$where[] = $this->getTipoFilter();
 		$where[] = 'id_tipo > 0';
 		
@@ -155,7 +165,7 @@ class Jp7_InterAdmin_Search {
 				$where[] = $deleted_column . " = ''";
 			}
 		}
-		
+		//"CONCAT(" . implode(',', $textColumns) . ") LIKE '%" . $word . "%'"
 		if ($s_session['filter_publish']) {
 			if (in_array('char_key', $columns)) {
 				$where[] = "char_key <> ''";			
