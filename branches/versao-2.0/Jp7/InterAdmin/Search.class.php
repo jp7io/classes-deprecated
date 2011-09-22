@@ -136,7 +136,7 @@ class Jp7_InterAdmin_Search {
 		if ($words) {
 			$words = array_unique($words);
 			
-			$weight = round(3 / count($words), 1);
+			$weight = round(5 / count($words), 1);
 			foreach ($words as $word) {
 				$match .= " + (" . reset($textColumns) . " LIKE '%" . $word . "%') * " . $weight;
 			}
