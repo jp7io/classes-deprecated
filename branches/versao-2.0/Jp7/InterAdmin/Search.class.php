@@ -63,7 +63,7 @@ class Jp7_InterAdmin_Search {
 				$sqls[] = $tableSql;
 			}
 		}
-		return '(' . implode("\n) UNION ALL (\n", $sqls) . ') ORDER BY relevance DESC';
+		return '(' . implode("\n) UNION ALL (\n", $sqls) . ') ORDER BY relevance DESC LIMIT 10000';
 	}
 	
 	public function getTables() {
@@ -119,22 +119,26 @@ class Jp7_InterAdmin_Search {
 						
 		$where = array();
 		// Trata as aspas como uma palavra só
-		preg_match_all('/"(?:\\\\.|[^\\\\"])*"|\S+/', $search, $matches);
+		preg_match_all('/-?"(?:\\\\.|[^\\\\"])*"|[^" ]+/', $search, $matches);
 		$words = $matches[0];
 		
 		foreach ($words as $key => $word) {
-			$isQuoted = strpos($word, '"') === 0;
 			$isNegative = strpos($word, '-') === 0;
+			$words[$key] = $word = ltrim($word, '-');
+			
+			$isQuoted = strpos($word, '"') === 0;
 			$words[$key] = $word = trim($word, '"');
 			
-			if ($isQuoted) {
-				$where[] = "CONCAT(" . implode(',', $textColumns) . ") LIKE '%" . $word . "%'";
-			}
 			if ($isNegative) {
-				$where[] = "CONCAT(" . implode(',', $textColumns) . ") NOT LIKE '%" . substr($word, 1) . "%'";
-				$search = preg_replace('/(^|[ ])' . preg_quote($word) . '([ ]|$)/', '\1\2', $search);
+				$where[] = "CONCAT(" . implode(',', $textColumns) . ") NOT LIKE '%" . $word . "%'";
+				if ($isQuoted) {
+					$word = '"' . $word . '"';
+				}
+				$search = preg_replace('/(^|[ ])-' . preg_quote($word) . '([ ]|$)/', '\1\2', $search);
 				unset($words[$key]);
 				continue;	
+			} elseif ($isQuoted) {
+				$where[] = "CONCAT(" . implode(',', $textColumns) . ") LIKE '%" . $word . "%'";
 			}
 			if (strlen($word) < 2 || in_array($word, $short_words)) {
 				unset($words[$key]);
@@ -145,12 +149,16 @@ class Jp7_InterAdmin_Search {
 		
 		if ($words) {
 			$words = array_unique($words);
-			
 			$weight = round(5 / count($words), 1);
 			foreach ($words as $word) {
-				$match .= " + (" . reset($textColumns) . " LIKE '%" . $word . "%') * " . $weight;
+				$regex = array();
+				$regex[] = $word;
+				$regex[] = Jp7_Inflector::plural($word);
+				$regex = array_unique($regex);
+				//$match .= " + (" . reset($textColumns) . " LIKE '%" . $word . "%') * " . $weight;
+				$match .= " + (" . reset($textColumns) . " REGEXP '(^|[^a-zA-Z])(" . addcslashes(implode('|', $regex), '[]()+?.') . ")([^a-zA-Z]|$)') * " . $weight;
 			}
-			$match .= " + (CONCAT(" . implode(',', $textColumns) . ") LIKE '%" . addslashes($search) . "%') * 5";
+			//$match .= " + (CONCAT(" . implode(',', $textColumns) . ") LIKE '%" . addslashes($search) . "%') * 5";
 		}
 		
 		$where[] = $this->getTipoFilter();
