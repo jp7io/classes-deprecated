@@ -10,10 +10,10 @@
 class Jp7_InterAdmin_Search {
 	private $booleanMode = false;
 	
-	public function search($search) {
+	public function search($search, $date_filter = false) {
 		global $db;
 		
-		$sql = $this->getSql($search);
+		$sql = $this->getSql($search, $date_filter);
 		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		//krumo($sql);
 		
@@ -52,13 +52,13 @@ class Jp7_InterAdmin_Search {
 		return $sql;
 	}
 	
-	public function getSql($search) {
+	public function getSql($search, $date_filter) {
 		global $db;
 		
 		$tables = $this->getTables();
 		$sqls = array();
 		foreach ($tables as $table) {
-			$tableSql = $this->getTableSql($table, $search);
+			$tableSql = $this->getTableSql($table, $search, $date_filter);
 			if ($tableSql) {
 				$sqls[] = $tableSql;
 			}
@@ -92,7 +92,7 @@ class Jp7_InterAdmin_Search {
 	 * @param bool $count
 	 * @return string
 	 */ 
-	public function getTableSql($table, $search) {
+	public function getTableSql($table, $search, $date_filter) {
 		global $db, $s_session;
 		
 		$columns = $db->MetaColumnNames($table);
@@ -151,18 +151,44 @@ class Jp7_InterAdmin_Search {
 			$words = array_unique($words);
 			$weight = round(5 / count($words), 1);
 			foreach ($words as $word) {
-				$regex = array();
-				$regex[] = $word;
-				$regex[] = Jp7_Inflector::plural($word);
-				$regex = array_unique($regex);
-				//$match .= " + (" . reset($textColumns) . " LIKE '%" . $word . "%') * " . $weight;
-				$match .= " + (" . reset($textColumns) . " REGEXP '(^|[^a-zA-Z])(" . addcslashes(implode('|', $regex), '[]()+?.') . ")([^a-zA-Z]|$)') * " . $weight;
+				$plural = array();
+				$plural[] = $word;
+				if (!endsWith('*', $word)) {
+					$plural[] = Jp7_Inflector::plural($word);
+				}
+				$plural = array_unique($plural);
+				if (strlen($word) > 4) {
+					$like = array();
+					foreach ($plural as $word) {
+						$like[] = reset($textColumns) . " LIKE '%" . str_replace('*', '%', $word) . "%'";
+					}
+					$match .= " + (" . implode(' OR ', $like) . ") * " . $weight;
+				} else {
+					$regex = implode('|', $plural);
+					$regex = addcslashes($regex, '[]()+?.');
+					$regex = $this->regexDiacritics($regex);
+					$regex = str_replace('*', '[[:alnum:]]*', $regex);
+					$match .= " + (" . reset($textColumns) . " REGEXP '(^|[^a-zA-Z])(" . $regex . ")([^a-zA-Z]|$)') * " . $weight;
+				}
 			}
 			//$match .= " + (CONCAT(" . implode(',', $textColumns) . ") LIKE '%" . addslashes($search) . "%') * 5";
 		}
 		
 		$where[] = $this->getTipoFilter();
 		$where[] = 'id_tipo > 0';
+		
+		if ($date_filter && (in_array('date_publish', $columns))) {
+			$date_filters = array(
+				'day' => "date_publish >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
+				'week' => "date_publish >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)",
+				'month' => "date_publish >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)",
+				'year' => "date_publish >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)"
+			);
+			
+			if ($date_filters[$date_filter]) {
+				$where[] = $date_filters[$date_filter];	
+			}
+		}
 		
 		if (!$s_session['deleted']) {
 			$deleted_column = in_array('deleted', $columns) ? 'deleted' : '';
@@ -214,5 +240,16 @@ class Jp7_InterAdmin_Search {
 	
 	public function isText($column) {
 		return strpos($column, 'text') === 0 || strpos($column, 'varchar_') === 0 || strpos($column, 'nome') === 0;
+	}
+	
+	public function regexDiacritics($word) {
+		$word = str_replace('a', '[áàãâäªa]', $word);
+		$word = str_replace('e','[éèêë&e]', $word);
+		$word = str_replace('i','[íìîïi]', $word);
+		$word = str_replace('o','[óòõôöºo]', $word);
+		$word = str_replace('u','[úùûüu]', $word);
+		$word = str_replace('c','[çc]', $word);
+		$word = str_replace('n','[ñn]', $word);
+		return $word;
 	}
 }
