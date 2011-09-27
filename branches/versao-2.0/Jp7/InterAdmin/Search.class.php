@@ -129,6 +129,10 @@ class Jp7_InterAdmin_Search {
 			$isQuoted = strpos($word, '"') === 0;
 			$words[$key] = $word = trim($word, '"');
 			
+			if (!$word) {
+				continue;	
+			}
+			
 			if ($isNegative) {
 				$where[] = "CONCAT(" . implode(',', $textColumns) . ") NOT LIKE '%" . $word . "%'";
 				if ($isQuoted) {
@@ -168,7 +172,9 @@ class Jp7_InterAdmin_Search {
 					$regex = addcslashes($regex, '[]()+?.');
 					$regex = $this->regexDiacritics($regex);
 					$regex = str_replace('*', '[[:alnum:]]*', $regex);
-					$match .= " + (" . reset($textColumns) . " REGEXP '(^|[^a-zA-Z])(" . $regex . ")([^a-zA-Z]|$)') * " . $weight;
+					//$match .= " + (" . reset($textColumns) . " REGEXP '(^|[^a-zA-Z])(" . $regex . ")([^a-zA-Z]|$)') * " . $weight;
+					// [[:<:]] é igual \b - Início e fim de uma palavra
+					$match .= " + (" . reset($textColumns) . " REGEXP '[[:<:]]" . $regex . "[[:>:]]') * " . $weight;
 				}
 			}
 			//$match .= " + (CONCAT(" . implode(',', $textColumns) . ") LIKE '%" . addslashes($search) . "%') * 5";
