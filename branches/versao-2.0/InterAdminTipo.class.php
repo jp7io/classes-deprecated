@@ -20,8 +20,8 @@
 class InterAdminTipo extends InterAdminAbstract {
 	const ID_TIPO = 0;
 	
-	private static $inheritedFields = array('class', 'class_tipo', 'icone', 'layout', 'layout_registros', 'tabela', 'template', 'children', 'campos');
-	private static $privateFields = array('children', 'campos');
+	private static $inheritedFields = array('class', 'class_tipo', 'icone', 'layout', 'layout_registros', 'tabela', 'template', 'children', 'campos', 'language');
+	private static $privateFields = array('children', 'campos', 'language');
 	
 	/**
 	 * Stores metadata to be shared by instances with the same $id_tipo.
@@ -82,11 +82,11 @@ class InterAdminTipo extends InterAdminAbstract {
 		if (isset($this->attributes[$attributeName])) {
 			return $this->attributes[$attributeName];
 		} else {
-			$inheritArr = array('class', 'class_tipo', 'tabela', 'template', 'layout', 'layout_registros');
+			$inheritArr = array('class', 'class_tipo', 'tabela', 'template', 'language', 'layout', 'layout_registros');
 			if (in_array($attributeName, $inheritArr)) {
 				$this->getFieldsValues($attributeName);
 				return $this->attributes[$attributeName];
-			} else {			
+			} else {
 				return null;
 			}
 		}
@@ -722,15 +722,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return string
 	 */
 	public function getInterAdminsTableName() {
-		global $lang;
-		$table = $this->db_prefix .	(($this->tabela) ? '_' . $this->tabela : '');
-		if (!isset($this->language)) {
-			$this->getFieldsValues('language');
-		}
-		if ($this->language) {
-			$table .= $lang->prefix;
-		}
-		return $table;
+		return $this->_getTableLang() . (($this->tabela) ? '_' . $this->tabela : '');
 	}
 	/**
 	 * Returns the table name for the files.
@@ -738,6 +730,13 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return string
 	 */
 	public function getArquivosTableName() {
+		return $this->_getTableLang() . '_arquivos';
+	}
+	/**
+	 * Returns $db_prefix OR $db_prefix + $lang->prefix.
+	 * @return string
+	 */	
+	protected function _getTableLang() {
 		global $lang;
 		$table = $this->db_prefix;
 		if (!isset($this->language)) {
@@ -746,8 +745,8 @@ class InterAdminTipo extends InterAdminAbstract {
 		if ($this->language) {
 			$table .= $lang->prefix;
 		}
-		return $table . '_arquivos';
-	}
+		return $table;
+	}	
 	protected function _setMetadata($varname, $value) {
 		self::$_metadata[$this->_db->host . '/' . $this->_db->database . '/' . $this->db_prefix][$this->id_tipo][$varname] = $value;
 	}

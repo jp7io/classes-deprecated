@@ -415,6 +415,14 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		return count($arquivos);
 	}
+	
+	public function createLog(array $attributes = array()) {
+		$log = InterAdminLog::create($attributes);
+		$log->setParent($this);
+		$log->setTipo($this->getTipo());
+		return $log;
+	}
+	
 	/**
 	 * Returns the full url for this record.
 	 * 
