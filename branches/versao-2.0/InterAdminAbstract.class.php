@@ -624,9 +624,9 @@ abstract class InterAdminAbstract implements Serializable {
 	 */
 	protected function _addJoinAlias(&$options = array(), $alias, $campo, $table = 'main') {
 		$joinTipo = $this->getCampoTipo($campo);
-		if (!$joinTipo) {
+		if (!$joinTipo || strpos($campo['tipo'], 'select_multi_') === 0) {
 			die(jp7_debug('The field "' . $alias . '" cannot be used as a join.'));
-		}		
+		}
 		$options['from_alias'][] = $alias; // Used as cache when resolving Where
 		// @todo testar
 		if (in_array($campo['xtra'], InterAdminField::getSelectTipoXtras()) || in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras())) {

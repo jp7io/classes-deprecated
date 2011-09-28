@@ -61,7 +61,7 @@ class InterAdminLog extends InterAdminAbstract {
 	public function getTipo($options = array()) {
 		if (!$this->_tipo) {
 			if (!$this->id_tipo) {
-				$this->id_tipo = jp7_fields_values($this->db_prefix . $this->table, 'id', $this->id, 'id_tipo');
+				$this->id_tipo = jp7_fields_values($this->getTableName(), 'id_log', $this->id_log, 'id_tipo');
 			}
 			$this->_tipo = InterAdminTipo::getInstance($this->id_tipo, array(
 				'db_prefix' => $this->db_prefix,
@@ -88,10 +88,13 @@ class InterAdminLog extends InterAdminAbstract {
 	 * @return InterAdmin
 	 */
 	public function getParent($options = array()) {
-		if ($this->_parent) return $this->_parent;
-		if ($this->id || $this->getFieldsValues('id')) {
-			return $this->_parent = InterAdmin::getInstance($this->id, $options);
+		if (!$this->_parent) {
+			$tipo = $this->getTipo();
+			if ($this->id || $this->getFieldsValues('id')) {
+				$this->_parent = InterAdmin::getInstance($this->id, $options, $tipo);
+			}
 		}
+		return $this->_parent;
 	}
 	/**
 	 * Sets the parent InterAdmin object for this record, changing the $_parent property.
@@ -142,5 +145,41 @@ class InterAdminLog extends InterAdminAbstract {
 		
 		$log->setAttributes($attributes);
 		return $log;	
+	}
+	
+	public static function findLogs($options = array()) {
+		$instance = new self();
+		if ($options['db']) {
+			$instance->setDb($options['db']);
+		}
+		if ($options['db_prefix']) {
+			$instance->db_prefix = $options['db_prefix'];
+		}
+		
+		$options['fields'] = array_merge(array('id_log'), (array) $options['fields']);
+		$options['from'] = $instance->getTableName() . ' AS main';
+		
+		if (!$options['where']) {
+			$options['where'][] = '1 = 1';
+		}
+	 	if (!$options['order']) {
+	 		$options['order'] = 'date_insert DESC';
+		}
+		// Internal use
+		$options['aliases'] = $instance->getAttributesAliases();
+		$options['campos'] = $instance->getAttributesCampos();
+		
+		$rs = $instance->_executeQuery($options);
+		$logs = array();
+		
+		while ($row = $rs->FetchNextObj()) {
+			$log = new InterAdminLog($row->id_tipo, array(
+				'db_prefix' => $instance->db_prefix,
+				'db' => $instance->getDb()
+			));
+			$instance->_getAttributesFromRow($row, $log, $options);
+			$logs[] = $log;
+		}
+		return $logs;
 	}
 }
