@@ -114,7 +114,7 @@ class InterAdminLog extends InterAdminAbstract {
 		return array();
     }
     function getAttributesNames() {
-		return array('id_log', 'id', 'id_tipo', 'lang', 'action', 'ip', 'select_user', 'date_insert');
+		return array('id_log', 'id', 'id_tipo', 'lang', 'action', 'ip', 'data', 'select_user', 'date_insert');
     }
 	function getTableName() {
     	return $this->db_prefix . '_logs';

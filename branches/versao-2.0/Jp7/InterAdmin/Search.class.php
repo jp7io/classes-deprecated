@@ -245,7 +245,17 @@ class Jp7_InterAdmin_Search {
 	}
 	
 	public function isText($column) {
-		return strpos($column, 'text') === 0 || strpos($column, 'varchar_') === 0 || strpos($column, 'nome') === 0;
+		if (strpos($column, 'varchar_') === 0 || strpos($column, 'text_') === 0) {
+			$sufixo = end(explode('_', $column));
+			if (!is_numeric($sufixo)) {
+				return true;
+			} elseif($sufixo < 4) {
+				return true;
+			}
+		} elseif (strpos($column, 'text') === 0 || strpos($column, 'nome') === 0) {
+			return true;
+		}
+		return false;
 	}
 	
 	public function regexDiacritics($word) {
