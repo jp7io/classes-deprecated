@@ -114,6 +114,7 @@ class Jp7_InterAdmin_Search {
 		} else {
 			$fields[] = "'' AS text_1";
 		}
+		//$fields[] = "'$table' AS tablename";
 		
 		$short_words = array('de', 'do', 'da', 'ao', 'em', 'no', 'na');
 						
