@@ -597,8 +597,10 @@ abstract class InterAdminAbstract implements Serializable {
 					$options['order'] .= ($options['order'] ? "," : "") . $aggrCampo;
 				}
 				// @todo Implementar mesma busca do _resolveClauseAlias()
-				$fields[$join] = preg_replace('/([\(,][ ]*)(DISTINCT )?(\b[a-zA-Z_][a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1\2' . $aggrTable . '\3', $campo) .
+				$_tmp = preg_replace('/([\(,][ ]*)(DISTINCT )?(\b[a-zA-Z_][a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1\2' . $aggrTable . '\3', $campo) .
 				 	' AS `' . $table . $aggregateAlias . '`';
+				$_tmp = str_replace('main.NULL', 'NULL', $_tmp);
+				$fields[$join] = $_tmp;
 			// Sem join
 			} else {
 				$nome = ($aliases[$campo]) ? $aliases[$campo] : $campo;
