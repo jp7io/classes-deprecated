@@ -147,6 +147,13 @@ class InterAdminLog extends InterAdminAbstract {
 		return $log;	
 	}
 	
+	public static function countLogs($options = array()) {
+		$logs = InterAdminLog::findLogs(array(
+			'fields' => 'count(id)'
+		) + $options);
+		return $logs[0]->count_id;
+	}
+	
 	public static function findLogs($options = array()) {
 		$instance = new self();
 		if ($options['db']) {
