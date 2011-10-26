@@ -34,6 +34,20 @@ class Jp7_Bootstrap {
 			$GLOBALS['s_user'] = &$GLOBALS['s_session']['user'];
 		}
 		
+		// Dados da admin bar
+		if ($GLOBALS['s_user']) {
+			$admin_bar_data = array(
+				'server' => $config->server->interadmin_remote ? reset($config->server->interadmin_remote) : $_SERVER['HTTP_HOST'],
+				'cliente' => $config->name_id,
+				'preview' => (bool) $GLOBALS['s_session']['preview'],
+				'hook' => (bool) $GLOBALS['s_session']['no_hook']
+			);
+			
+			setcookie('ia_admin_bar', implode(';', $admin_bar_data), 0, '/');
+		} elseif ($_COOKIE['ia_admin_bar']) {
+			setcookie('ia_admin_bar', '', 1, '/');
+		}
+		
 		// Classes padrão
 		$prefix = ucfirst($config->name_id);
 		
@@ -172,12 +186,12 @@ class Jp7_Bootstrap {
 		
 		// JS
 		$scripts = array(
+			DEFAULT_PATH . 'js/jquery/jquery-1.3.2.min.js',
 			DEFAULT_PATH . 'js/interdyn.js',
 			DEFAULT_PATH . 'js/interdyn_checkflash.js',
 			DEFAULT_PATH . 'js/interdyn_form.js',
 			DEFAULT_PATH . 'js/interdyn_form_lang_' . $lang->lang . '.js',
-			DEFAULT_PATH . 'js/swfobject.js',
-			DEFAULT_PATH . 'js/jquery/jquery-1.3.2.min.js',
+			DEFAULT_PATH . 'js/swfobject.js',			
 			DEFAULT_PATH . 'js/interdyn_menu.js',
 			'js/functions.js'
 		);
