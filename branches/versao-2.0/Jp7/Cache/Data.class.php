@@ -21,7 +21,7 @@ class Jp7_Cache_Data {
 	}
 	
 	public function load() {
-		if (is_file($this->getFilename())) {
+		if (is_file($this->getFilename()) && $this->_checkLog()) {
 			return unserialize(file_get_contents($this->getFilename()));
 		}
 	}
@@ -39,17 +39,23 @@ class Jp7_Cache_Data {
 	 * 
 	 * @return bool 
 	 */
-	protected function _checkLog()
-	{
-		// Verificação do log
-	 	$logTime = @filemtime(self::$_logdir . 'interadmin.log');
-		$lastLogTime = @filemtime($this->getFilename());
+	protected function _checkLog() {
+		$lifetime = $this->options['lifetime'];
 		
-	 	// Grava último log, se necessário
-	 	if ($logTime != $lastLogTime && $logTime < time()) {
-	 		return false; // Está inválido
-	 	}
-	 	
-	 	return true; // Está válido
+		$cache_time = @filemtime($this->getFilename());
+		if ($lifetime) {
+			if ($cache_time && ($cache_time > (time() - $lifetime))) {
+				return true; // Está válido
+			}
+		} else {
+			// Verificação do log
+			$log_time = @filemtime(self::$_logdir . 'interadmin.log');
+			// Outro dia é atualizado o cache
+			if (($log_time < $cache_time) && date('d', $cache_time) == date('d')) {
+				return true; // TRUE = Cache is ok, no need to refresh
+			}
+		}
+		// FALSE = Atualizar cache
+		return false;
 	}
 }
