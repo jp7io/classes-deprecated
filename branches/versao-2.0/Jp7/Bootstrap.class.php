@@ -11,6 +11,7 @@ class Jp7_Bootstrap {
 		Zend_Registry::set('get', new Zend_Filter_Input(null, null, $_GET));
 		
 		self::initConfig();
+		self::initAdminBar();
 		self::initDataBase();
 		self::initFrontController();
 		self::initLanguage();
@@ -34,20 +35,6 @@ class Jp7_Bootstrap {
 			$GLOBALS['s_user'] = &$GLOBALS['s_session']['user'];
 		}
 		
-		// Dados da admin bar
-		if ($GLOBALS['s_user']) {
-			$admin_bar_data = array(
-				'server' => $config->server->interadmin_remote ? reset($config->server->interadmin_remote) : $_SERVER['HTTP_HOST'],
-				'cliente' => $config->name_id,
-				'preview' => (bool) $GLOBALS['s_session']['preview'],
-				'hook' => (bool) $GLOBALS['s_session']['no_hook']
-			);
-			
-			setcookie('ia_admin_bar', implode(';', $admin_bar_data), 0, '/');
-		} elseif ($_COOKIE['ia_admin_bar']) {
-			setcookie('ia_admin_bar', '', 1, '/');
-		}
-		
 		// Classes padrão
 		$prefix = ucfirst($config->name_id);
 		
@@ -59,6 +46,31 @@ class Jp7_Bootstrap {
 		}
 		
 		$config->build = interadmin_get_version($config->name_id, '{build}');
+	}
+	
+	public static function initAdminBar() {
+		$config = Zend_Registry::get('config');
+		
+		// Dados da admin bar - Somente se estiver logado
+		if ($GLOBALS['s_user']) {
+			if (isset($_GET['ia_hook'])) {
+				$GLOBALS['s_session']['no_hook'] = !$_GET['ia_hook'];
+			}
+			if (isset($_GET['ia_preview'])) {
+				$GLOBALS['s_session']['preview'] = (bool) $_GET['ia_preview'];
+			}			
+			
+			$admin_bar_data = array(
+				'server' => $config->server->interadmin_remote ? reset($config->server->interadmin_remote) : $_SERVER['HTTP_HOST'],
+				'cliente' => $config->name_id,
+				'preview' => (bool) $GLOBALS['s_session']['preview'],
+				'no_hook' => (bool) $GLOBALS['s_session']['no_hook']
+			);
+			
+			setcookie('ia_admin_bar', implode(';', $admin_bar_data), 0, '/');
+		} elseif ($_COOKIE['ia_admin_bar']) {
+			setcookie('ia_admin_bar', '', 1, '/');
+		}	
 	}
 	
 	public static function initDataBase() {
