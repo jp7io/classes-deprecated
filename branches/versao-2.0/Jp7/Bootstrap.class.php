@@ -236,5 +236,7 @@ class Jp7_Bootstrap {
 		}
 		
 		//$GLOBALS['debugger']->getTime(true, 'Página inteira');
+		//echo memory_get_usage() . ' de Memória<br />';
+		//echo memory_get_peak_usage() . ' de pico de Memória<br />';
 	}
 }
