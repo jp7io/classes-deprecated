@@ -12,20 +12,23 @@ class Jp7_NewsController extends __Controller_Action {
 		$newsTipo = self::getTipo();
 		
 		if ($id) {
-			$this->record = $newsTipo->getInterAdminById($id,array(
+			$record = $newsTipo->getInterAdminById($id,array(
 				'fields' => array('*', 'date_publish')
 			));
-			if (!$this->record) {
+			if (!$record) {
 				$this->_redirect($newsTipo->getUrl());
 			}
-			$this->record->subitens = $this->record->getSubitens(array(
+			$record->subitens = $record->getSubitens(array(
 				'fields' => array('*')
 			));
+			
 			/*
-			$this->record->files = $this->record->getArquivosParaDownload(array(
+			$record->files = $record->getArquivosParaDownload(array(
 				'fields' => array('name', 'file')
 			));
 			*/
+			
+			self::setRecord($record);
 		} else {
 			$options = array(
 				'fields' => array('*', 'date_publish')
