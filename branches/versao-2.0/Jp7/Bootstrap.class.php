@@ -165,7 +165,10 @@ class Jp7_Bootstrap {
 	public static function initLayout() {
 		Zend_Layout::startMvc(APPLICATION_PATH . '/layouts/scripts');
 		//Zend_Layout::startMvc(ROOT_PATH . '/institucional/application/layouts/scripts');
+		$viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer');
+		$viewRenderer->setView(new Jp7_View());
 		$view = Zend_Layout::getMvcInstance()->getView();
+		
 		if (is_dir(APPLICATION_PATH . '/modules/default')) {
 			$view->setBasePath(APPLICATION_PATH . '/modules/default/views');
 		}

@@ -444,7 +444,8 @@ abstract class InterAdminAbstract implements Serializable {
 						$joinNome = Jp7_Inflector::camelize(substr($table, 9));
 						$childrenArr = $this->getInterAdminsChildren();
 						if (!$childrenArr[$joinNome]) {
-							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.');
+							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.' . 
+								'Expected a child named "' . $joinNome . '". Found: ' . implode(', ', array_keys($childrenArr)));
 						}
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
 							'db_prefix' => $this->db_prefix,

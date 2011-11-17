@@ -241,7 +241,7 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function getParent($options = array()) {
 		if (!$this->parent_id) {
-			$this->getFieldsValues('parent_id');
+			$this->getFieldsValues(array('parent_id', 'parent_id_tipo'));
 		}
 		$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
 		if ($this->parent_id) {
@@ -267,7 +267,11 @@ class InterAdmin extends InterAdminAbstract {
 		if (!isset($parent->id)) {
 			$parent->id = 0; // Necessário para que a referência funcione
 		}
+		if (!isset($parent->id_tipo)) {
+			$parent->id_tipo = 0; // Necessário para que a referência funcione
+		}
 		$this->attributes['parent_id'] = &$parent->id;
+		$this->attributes['parent_id_tipo'] = &$parent->id_tipo;
 		$this->_parent = $parent;
 	}
 	/**

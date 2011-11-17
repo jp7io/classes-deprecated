@@ -78,7 +78,7 @@ class Jp7_Inflector {
 	 * @return string
 	 */
 	public static function underscore($camelCasedWord) {
-		return strtolower(preg_replace('/([a-z])([A-Z])/', '\1_\2', $camelCasedWord));
+		return strtolower(trim(preg_replace('/([A-Z])/', '_\1', $camelCasedWord), '_'));
 	}
 	
 	/**

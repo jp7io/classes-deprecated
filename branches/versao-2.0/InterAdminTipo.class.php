@@ -765,7 +765,12 @@ class InterAdminTipo extends InterAdminAbstract {
 			$children = array();
 			$childrenArr = explode("{;}", $this->getFieldsValues('children'));
 			for ($i = 0; $i < count($childrenArr) - 1; $i++) {
-				$child = array_combine(array('id_tipo', 'nome', 'ajuda', 'netos'), explode('{,}', $childrenArr[$i]));
+				$childrenArrParts = explode('{,}', $childrenArr[$i]);
+				if (count($childrenArrParts) < 4) { // 4 = 'id_tipo', 'nome', 'ajuda', 'netos'
+					// Fix para tipos com estrutura antiga e desatualizada
+					$childrenArrParts = array_pad($childrenArrParts, 4, '');
+				}
+				$child = array_combine(array('id_tipo', 'nome', 'ajuda', 'netos'), $childrenArrParts);
 				$nome_id = Jp7_Inflector::camelize($child['nome']);
 				$children[$nome_id] = $child;
 			}
