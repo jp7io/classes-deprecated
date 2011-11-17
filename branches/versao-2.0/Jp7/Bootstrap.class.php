@@ -7,7 +7,7 @@ class Jp7_Bootstrap {
 				
 		global $debugger;
 		$debugger->setExceptionsEnabled(true);
-		//$debugger->setSafePoint(true);
+		$debugger->setSafePoint(true);
 		
 		Zend_Registry::set('session', new Zend_Session_Namespace());
 		Zend_Registry::set('post', new Zend_Filter_Input(null, null, $_POST));
@@ -180,8 +180,6 @@ class Jp7_Bootstrap {
 		));
 		// Permite o uso de Helpers customizados da Jp7
 		$view->addHelperPath('Jp7/View/Helper', 'Jp7_View_Helper');
-		$view->doctype('XHTML1_STRICT');
-		$view->setEncoding('ISO-8859-1');
 		
 		// Adicionando JS e CSS padrão
 		$config = Zend_Registry::get('config');

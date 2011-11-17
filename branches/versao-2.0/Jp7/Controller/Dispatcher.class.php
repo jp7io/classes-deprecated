@@ -99,4 +99,40 @@ class Jp7_Controller_Dispatcher extends Zend_Controller_Dispatcher_Standard {
     public static function setDefaultParentClass($default_parent_class) {
         self::$default_parent_class = $default_parent_class;
     }
+	
+	// NAO MODIFICAR ABAIXO
+	public function loadClass($className)
+    {
+        $finalClass  = $className;
+        if (($this->_defaultModule != $this->_curModule)
+            || $this->getParam('prefixDefaultModule'))
+        {
+            $finalClass = $this->formatClassName($this->_curModule, $className);
+        }
+        if (class_exists($finalClass, false)) {
+            return $finalClass;
+        }
+
+        $dispatchDir = $this->getDispatchDirectory();
+        $loadFile    = $dispatchDir . DIRECTORY_SEPARATOR . $this->classToFilename($className);
+		
+		/* Linhas da Jp7 */
+		global $debugger; 
+		$debugger->showFilename($loadFile);
+		/* End: Linhas da Jp7 */
+	
+        if (Zend_Loader::isReadable($loadFile)) {
+            include_once $loadFile;
+        } else {
+            require_once 'Zend/Controller/Dispatcher/Exception.php';
+            throw new Zend_Controller_Dispatcher_Exception('Cannot load controller class "' . $className . '" from file "' . $loadFile . "'");
+        }
+
+        if (!class_exists($finalClass, false)) {
+            require_once 'Zend/Controller/Dispatcher/Exception.php';
+            throw new Zend_Controller_Dispatcher_Exception('Invalid controller class ("' . $finalClass . '")');
+        }
+
+        return $finalClass;
+    }
 }
