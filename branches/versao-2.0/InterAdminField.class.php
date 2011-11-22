@@ -380,7 +380,11 @@ class InterAdminField {
 	public static function getCampoHeader($campo) {
 		$key = $campo['tipo'];
 		if (strpos($key, 'special_') === 0 || strpos($key, 'func_') === 0) {
-			return $campo['nome']($campo, '', 'header');
+			if (is_callable($campo['nome'])) {
+				return call_user_func($campo['nome'], $campo, '', 'header');
+			} else {
+				echo 'Função ' . $campo['nome'] . ' não encontrada.';
+			}
 		} elseif (strpos($key, 'select_') === 0) {
 			if ($campo['label']) {
 				return $campo['label'];
@@ -394,5 +398,53 @@ class InterAdminField {
 		} else {
 			return $campo['nome'];
 		}
+	}
+	
+	// função incompleta
+	public static function getCampoList($campo, $valor) {
+		$key = $campo['tipo'];
+		if (strpos($key, 'special_') === 0 || strpos($key, 'func_') === 0) {
+			if (is_callable($campo['nome'])) {
+				return call_user_func($campo['nome'], $campo, $valor, 'list');
+			} else {
+				echo 'Função ' . $campo['nome'] . ' não encontrada.';
+			}
+		} elseif (strpos($key, 'select_') === 0) {
+			if ($valor) {
+				$registros = array();
+				foreach (jp7_explode(',', $valor) as $valor_i) {
+					if (in_array($campo['xtra'], InterAdminField::getSelectTipoXtras())) {
+						$registros[] = jp7_string_left(interadmin_tipos_nome($valor_i), 10);
+					} else {
+						$registro = $campo['nome']->getInterAdminById($valor_i);
+						if ($registro) {
+							$registros[] = $registro->getStringValue();
+						}
+					}
+				}
+				return implode('<br />', $registros);
+			}
+		} elseif (strpos($key, 'file_') === 0) {
+			global $c_cliente_physical_path, $c_remote;
+			
+			$url = interadmin_uploaded_file_url($valor);
+			$ext = jp7_extension($url);
+			$url_size = '';
+			if (!in_array($ext, array('gif','jpg','jpeg','png','---'))) {
+				// Size
+				if ($c_remote) {
+					$url_size = '<span class="filesize" presrc="' . $url . '"></span>';
+				} else {
+                    $url_size = interadmin_filesize(str_replace('../../', $c_cliente_physical_path, $valor));
+				}
+			}
+			?>
+			<div style="width:100%;cursor:pointer;color:#fff;font-size:9px" onclick="interadmin_arquivos_banco_preview('<?php echo $url ?>')">
+				<?php echo @interadmin_arquivos_preview($url,'',true,true); ?><?php if ($url_size) { ?> - <?php echo $url_size ?><?php } ?>
+			</div>
+			<?php
+		} else {
+			return htmlspecialchars($valor);
+		}	
 	}
 }
