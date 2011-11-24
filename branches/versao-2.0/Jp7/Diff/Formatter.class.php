@@ -46,6 +46,7 @@ class Jp7_Diff_Formatter {
 		$this->_start_diff();
 
 		foreach ($diff->edits as $edit) {
+			/*
 			if ($edit->type == 'copy') {
 				if (is_array($block)) {
 					if (sizeof($edit->orig) <= $nlead + $ntrail) {
@@ -65,6 +66,7 @@ class Jp7_Diff_Formatter {
 				$context = $edit->orig;
 			}
 			else {
+				*/			
 				if (! is_array($block)) {
 					$context = array_slice($context, sizeof($context) - $nlead);
 					$x0 = $xi - sizeof($context);
@@ -74,7 +76,7 @@ class Jp7_Diff_Formatter {
 					$block[] = new _DiffOp_Copy($context);
 				}
 				$block[] = $edit;
-			}
+			//}
 
 			if ($edit->orig)
 			$xi += sizeof($edit->orig);

@@ -174,7 +174,7 @@ class _HWLDF_WordAccumulator {
 		array_push ( $this->_lines, $this->_line );
 		else
 		# make empty lines visible by inserting an NBSP
-		array_push ( $this->_lines, NBSP );
+		array_push ( $this->_lines, ' ' );
 		$this->_line = '';
 	}
 
