@@ -401,11 +401,11 @@ class InterAdminField {
 	}
 	
 	// função incompleta
-	public static function getCampoList($campo, $valor) {
+	public static function getCampoList($campo, $valor, $parte = 'list') {
 		$key = $campo['tipo'];
 		if (strpos($key, 'special_') === 0 || strpos($key, 'func_') === 0) {
 			if (is_callable($campo['nome'])) {
-				return call_user_func($campo['nome'], $campo, $valor, 'list');
+				return call_user_func($campo['nome'], $campo, $valor, $parte);
 			} else {
 				echo 'Função ' . $campo['nome'] . ' não encontrada.';
 			}
