@@ -380,11 +380,9 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * @return array
 	 */
 	public function getCamposNames(){
-		$invalid_fields = array('tit', 'func');
 		$fields = array_keys($this->getCampos());
 		foreach ($fields as $key => $field) {
-			$field_arr = explode('_', $field);
-			if (in_array($field_arr[0], $invalid_fields)) {
+			if (strpos($field, 'tit_') === 0 || strpos($field, 'func_') === 0) {
 				unset($fields[$key]);
 			}
 		}

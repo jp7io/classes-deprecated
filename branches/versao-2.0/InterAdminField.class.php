@@ -409,6 +409,8 @@ class InterAdminField {
 			} else {
 				echo 'Função ' . $campo['nome'] . ' não encontrada.';
 			}
+		} elseif (strpos($key, 'date_') === 0) {	
+			return jp7_date_format($valor, 'd/m/Y - H:i');
 		} elseif (strpos($key, 'select_') === 0) {
 			if ($valor) {
 				$registros = array();
