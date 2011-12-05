@@ -31,15 +31,13 @@ class Jp7_InterAdmin_Search {
 		$tables = $this->getTables();
 		foreach ($tables as $table) {
 			$indexes = $db->MetaIndexes($table);
-			if ($indexes !== false) { // false = não existe
-				$columns = $db->MetaColumnNames($table);
-				$textColumns = array_filter($columns, array($this, 'isText'));
-				if ($textColumns) {
-					$index = $indexes['interadmin_search'];
-					if (!$index || array_full_diff($index['columns'], $textColumns)) {
-						$sql = $this->getIndexSql($table, $textColumns, $index);
-						$db->Execute($sql);
-					}
+			$columns = $db->MetaColumnNames($table);
+			$textColumns = array_filter($columns, array($this, 'isText'));
+			if ($textColumns) {
+				$index = $indexes['interadmin_search'];
+				if (!$index || array_full_diff($index['columns'], $textColumns)) {
+					$sql = $this->getIndexSql($table, $textColumns, $index);
+					$db->Execute($sql);
 				}
 			}
 		}
