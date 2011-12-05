@@ -32,12 +32,18 @@ class Jp7_InterAdmin_Search {
 		foreach ($tables as $table) {
 			$indexes = $db->MetaIndexes($table);
 			$columns = $db->MetaColumnNames($table);
-			$textColumns = array_filter($columns, array($this, 'isText'));
-			if ($textColumns) {
-				$index = $indexes['interadmin_search'];
-				if (!$index || array_full_diff($index['columns'], $textColumns)) {
-					$sql = $this->getIndexSql($table, $textColumns, $index);
-					$db->Execute($sql);
+			if ($columns) {
+				$textColumns = array_filter($columns, array($this, 'isText'));
+				if ($textColumns) {
+					if (count($textColumns) > 16) {
+						$textColumns = array_slice($textColumns, 0, 16);
+					}
+					$index = $indexes['interadmin_search'];
+					if (!$index || array_full_diff($index['columns'], $textColumns)) {
+						$sql = $this->getIndexSql($table, $textColumns, $index);
+						krumo($sql);
+						$db->Execute($sql);
+					}
 				}
 			}
 		}
@@ -100,6 +106,9 @@ class Jp7_InterAdmin_Search {
 		$textColumns = array_filter($columns, array($this, 'isText'));
 		if (!$textColumns) {
 			return false;
+		}
+		if (count($textColumns) > 16) {
+			$textColumns = array_slice($textColumns, 0, 16);
 		}
 		$fields = array();		
 		$fields[] = in_array('id', $columns) ? 'id' : '0 AS id';
