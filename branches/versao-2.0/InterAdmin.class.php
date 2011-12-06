@@ -441,11 +441,14 @@ class InterAdmin extends InterAdminAbstract {
 			$link = $this->getTipo()->getUrl();
 		}
 		if ($seo) {
-			$alias = $this->getTipo()->getCamposAlias('varchar_key');
-			if (isset($this->$alias)) {
-				$nome = $this->$alias;
-			} else {
-				$nome = $this->getFieldsValues('varchar_key');
+			$aliases = $this->getTipo()->getCamposAlias();
+			if (array_key_exists('varchar_key', $aliases)) {
+				$alias = $aliases['varchar_key'];
+				if (isset($this->$alias)) {
+					$nome = $this->$alias;
+				} else {
+					$nome = $this->getFieldsValues('varchar_key');
+				}
 			}
 			if (is_null($sep)) {
 				$sep = $seo_sep;
