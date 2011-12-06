@@ -25,12 +25,11 @@ class Jp7_InterAdmin_JSTree {
 		);
 		
 		if ($nivel == 0) {
-			$options['where'] = ($this->options['admin']) ? "admin <> ''" : "admin = ''"; 
+			$options['where'][] = ($this->options['admin']) ? "admin <> ''" : "admin = ''"; 
 		}		
 		if ($nivel < 3) {
 			$options = InterAdmin::mergeOptions($this->options, $options);
 		}	
-		
 		if ($lang->prefix) {
 			$options['fields'][] = 'nome' . $lang->prefix; 
 		}
@@ -39,21 +38,9 @@ class Jp7_InterAdmin_JSTree {
 		foreach ($tipos as $tipo) {
 			// Criando o Node JSON
 			$nome_lang = ($lang->prefix && $tipo->{'nome' . $lang->prefix}) ? $tipo->{'nome' . $lang->prefix} : $tipo->nome;
-			$node = (object) array(
-				'data' => array(
-					'title' => utf8_encode($nome_lang)
-				),
-				'attr' => array(
-					'id' => $tipo->id_tipo
-				),
-				'metadata' => array(
-					//'id_tipo' => $tipo->id_tipo,
-					'model_id_tipo' => $tipo->model_id_tipo
-				),
-				'children' => array()
-			);
-			if ($tipo->icone) {
-				$node->data['icon'] = $this->getIconeUrl($tipo->icone);
+			$node = $this->createTipoNode($nome_lang, $tipo);
+			if (!$node) {
+				continue;
 			}
 			$tree[] = $node;
 			// Aqui entra a recursão
@@ -63,7 +50,27 @@ class Jp7_InterAdmin_JSTree {
 			}
 		}
 	}
-		
+	
+	public function createTipoNode($nome_lang, $tipo) {
+		$node = (object) array(
+			'data' => array(
+				'title' => utf8_encode($nome_lang)
+			),
+			'attr' => array(
+				'id' => $tipo->id_tipo
+			),
+			'metadata' => array(
+				//'id_tipo' => $tipo->id_tipo,
+				'model_id_tipo' => $tipo->model_id_tipo
+			),
+			'children' => array()
+		);
+		if ($tipo->icone) {
+			$node->data['icon'] = $this->getIconeUrl($tipo->icone);
+		}
+		return $node;
+	}
+	
 	public function toJson(){
 		return json_encode($this->tree);	
 	}
