@@ -191,16 +191,20 @@ class Jp7_InterAdmin_Search {
 		$where[] = $this->getTipoFilter();
 		$where[] = 'id_tipo > 0';
 		
-		if ($date_filter && (in_array('date_publish', $columns))) {
-			$date_filters = array(
-				'day' => "date_publish >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
-				'week' => "date_publish >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)",
-				'month' => "date_publish >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)",
-				'year' => "date_publish >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)"
-			);
-			
-			if ($date_filters[$date_filter]) {
-				$where[] = $date_filters[$date_filter];	
+		if ($date_filter) {
+			if (in_array('date_publish', $columns)) {
+				$date_filters = array(
+					'day' => "date_publish >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
+					'week' => "date_publish >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)",
+					'month' => "date_publish >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)",
+					'year' => "date_publish >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)"
+				);
+				
+				if ($date_filters[$date_filter]) {
+					$where[] = $date_filters[$date_filter];	
+				}
+			} else {
+				$where[] = '0 = 1';
 			}
 		}
 		
