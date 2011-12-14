@@ -5,6 +5,8 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract {    /**
      */
     public function prepareData() {
     	$newsTipo = InterAdminTipo::findFirstTipoByModel('News');
+		$this->sectionTipo = $newsTipo;
+		
 		if ($newsTipo) {
 			$options = array(
 				'fields' => array('title', 'image', 'date_publish'),
