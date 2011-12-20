@@ -167,6 +167,7 @@ class Jp7_Box_Manager {
 		// Loading data
 		foreach ($columns as $column) {
 			foreach ($column->boxes as $box) {
+				$box->width = $column->width;
 				$box->prepareData();
 			}
 			$rows[$i][] = $column;
