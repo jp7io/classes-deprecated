@@ -77,6 +77,7 @@ class Jp7_Controller_Dispatcher extends Zend_Controller_Dispatcher_Standard {
 		if (strpos($filename, 'eval') === false) {
 			$class_contents = file_get_contents($filename);
 			$class_contents = str_replace('__Controller_Action', self::getDefaultParentClass(), $class_contents);
+			$class_contents = str_replace('return Jp7_Controller_Dispatcher::evalAsAController', '//', $class_contents);
 			eval('?>' . $class_contents);
 		}
 	}
