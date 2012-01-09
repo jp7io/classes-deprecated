@@ -5,6 +5,8 @@ return Jp7_Controller_Dispatcher::evalAsAController(__FILE__);
 class Jp7_ContactController extends __Controller_Action {
 	
 	public function indexAction() {
+		include_once ROOT_PATH . '/inc/7.form.lib.php';
+		
 		$this->view->headScript()->appendFile('/_default/js/jquery/jquery.maskedinput-1.2.2.min.js');
 		
 		$contactTipo = self::getTipo();
@@ -85,9 +87,22 @@ class Jp7_ContactController extends __Controller_Action {
 					$campo['value'] = null;
 				}
 				$campo['tipo'] = $campo['nome_id'];
-				
-				$field = new InterAdminField($campo);
-				echo $field->getHtml();
+				if (startsWith('char_', $campo['tipo_de_campo'])) {
+					global $j;
+					$form = jp7_db_checkbox($campo['tipo_de_campo'] . "[".$j."]","S", $campo['tipo_de_campo'], $campo['readonly'], "", ($campo['value']) ? $campo['value'] : null);
+					?>
+					<tr>
+						<th></th>
+						<td colspan="2">
+							<?php echo $form; ?><?php echo $campo['nome']; ?>
+						</td>
+						<td></td>
+					</tr>
+					<?php
+				} else {
+					$field = new InterAdminField($campo);
+					echo $field->getHtml();
+				}
 			}
 		}
 		return ob_get_clean();
