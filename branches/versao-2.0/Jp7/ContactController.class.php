@@ -89,7 +89,7 @@ class Jp7_ContactController extends __Controller_Action {
 				$campo['tipo'] = $campo['nome_id'];
 				if (startsWith('char_', $campo['tipo_de_campo'])) {
 					global $j;
-					$form = jp7_db_checkbox($campo['tipo_de_campo'] . "[".$j."]","S", $campo['tipo_de_campo'], $campo['readonly'], "", ($campo['value']) ? $campo['value'] : null);
+					$form = jp7_db_checkbox($campo['tipo'] . "[".$j."]","S", $campo['tipo'], $campo['readonly'], "", ($campo['value']) ? $campo['value'] : null);
 					?>
 					<tr>
 						<th></th>
