@@ -93,7 +93,4 @@ class InterAdminFieldFile {
 		$url = jp7_replace_beginning('../../upload', 'upload', $url);
 		return jp7_file_size($url);
 	}
-	public function getImgHtml($size = false, $crop = true, $bgcolor = '') {
-		return sprintf('<img src="%1$s" alt="%2$s" title="%2$s" />', $this->getUrl($size, $crop, $bgcolor), $this->getText());
-	}
 }
