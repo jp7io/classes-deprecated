@@ -93,8 +93,8 @@ class Jp7_ContactController extends __Controller_Action {
 					?>
 					<tr>
 						<th></th>
-						<td colspan="2">
-							<?php echo $form; ?><?php echo $campo['nome']; ?>
+						<td colspan="2" class="checkbox-container">
+							<?php echo $form; ?><span><?php echo $campo['nome']; ?></span>
 						</td>
 						<td></td>
 					</tr>
