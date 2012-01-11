@@ -89,6 +89,7 @@ class InterAdminField {
 		$temPermissao = $s_user['sa'] || $campo_array['permissoes'] == $s_user['tipo'] || ($campo_array['permissoes'] == 'admin' && $s_user['admin']);
 		$readonlyPermissao = $readonly || ($campo_array['permissoes'] && !$temPermissao);
 		
+		$_tr = '<tr class="' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . '-tr">';
 		$_th = "<th title=\"".$campo. ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . ')' .
 			"\"" . (($obrigatorio || $readonlyPermissao) ? " class=\"".(($obrigatorio)?"obrigatorio":"").(($readonlyPermissao)?" disabled":"")."\"":"").">".$campo_nome.":</th>";
 		if ($ajuda) {
@@ -264,7 +265,7 @@ class InterAdminField {
 					$url = '/_default/img/px.png';
 				}
 				echo "".
-				"<tr>".
+				$_tr.
 					$_th.
 					"<td><input type=\"text\" label=\"" . $campo_nome . "\" name=\"".$campo."[".$j."]\"" . (($obrigatorio) ? " obligatory=\"yes\"" : "") . " value=\"".$valor."\" xtra=\"".$xtra."\" maxlength=\"255\"".$readonly." class=\"inputs_width_file_search\"><input type=\"button\" value=\"Procurar...\" style=\"width:" . ($campo_array['sem_creditos'] ? 60 : 80) . "px\" onclick=\"interadmin_arquivos_banco(this,'".$campo."[".$j."]',false,'".$tamanho."')\" /></td>".
 					"<td rowspan=" . ($campo_array['sem_creditos'] ? 1 : 2) . " align=\"center\" onclick=\"openPopupImage(this);\" class=\"image_preview" . ($valor ? '': ' placeholder') . "\" style=\"cursor:pointer\">".interadmin_arquivos_preview($url) . "</td>".
@@ -279,7 +280,7 @@ class InterAdminField {
 				}
 			}elseif(strpos($tipo_de_campo,"date_")===0){
 				$S="".
-				"<tr>".
+				$_tr.
 					$_th.
 					"<td colspan=\"2\">".
 						((strpos($xtra,"calendar_")!==false)?"<input type=\"hidden\" id=\"".$campo."_calendar_value_".$j."\" value=\"".$valor."\" value=\"".$xtra."\">":"").
@@ -298,7 +299,7 @@ class InterAdminField {
 				echo $S;
 			}elseif(strpos($tipo_de_campo,"password_")===0&&$valor){ // &&$xtra
 				echo "".
-				"<tr>".
+				$_tr.
 					$_th.
 					"<td colspan=\"2\">".
 						"<table width=\"100%\">".
@@ -332,7 +333,7 @@ class InterAdminField {
 			}else{
 				if(!$readonly_hidden){
 					echo "".
-					"<tr".(($s_session['mode']=="light"&&strpos($tipo_de_campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
+					"<tr class=\"" . ($campo_array['nome_id'] ?  $campo_array['nome_id']  :  toId($campo_nome)) . "-tr\" ".(($s_session['mode']=="light"&&strpos($tipo_de_campo,"text_")===0&&$xtra)?" style=\"display:none\"":"").">".
 						"<th title=\"" . $campo . ' (' . (($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)) . ')' . "\"".(($obrigatorio||$readonly)?" class=\"".(($obrigatorio)?"obrigatorio":"").(($readonly)?" disabled":"")."\"":"").">".$campo_nome.":</th>".
 						"<td colspan=\"2\">".$form."</td>".
 						"<td>".$S_ajuda."</td>".
@@ -347,7 +348,7 @@ class InterAdminField {
 				echo "</tbody>";
 				$tit_start=false;
 			}
-			echo "<tr><td height=\"".(($quantidade>1||$s_session['screenwidth']<=800)?5:10)."\" colspan=\"4\" style=\"padding:0px\"></td></tr>\n";
+			echo "<tr class=\"separator-tr\"><td height=\"".(($quantidade>1||$s_session['screenwidth']<=800)?5:10)."\" colspan=\"4\" style=\"padding:0px\"></td></tr>\n";
 		}
 	}
 	/**
