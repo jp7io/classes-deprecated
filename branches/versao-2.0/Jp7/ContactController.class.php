@@ -23,18 +23,19 @@ class Jp7_ContactController extends __Controller_Action {
 		// Recebeu POST
 		if ($this->getRequest()->isPost()) {
 			// Salvando registro
-			$attributes = @array_map('reset', $_POST);
-			
-			$record = $contactTipo->createInterAdmin();
-			$record->setAttributesSafely($attributes);
-			$record->save();
-			
-			// Utilizado para preparar o email, não tem jeito melhor, por enquanto
 			try {
-				$this->_sendEmail($record);
-				$this->_redirect($contactTipo->getUrl() . '/ok');
+				$record = $this->_saveRecord($contactTipo);
+				
+				// Utilizado para preparar o email, não tem jeito melhor, por enquanto
+				try {
+					$this->_sendEmail($record);
+					$this->_redirect($contactTipo->getUrl() . '/ok');
+				} catch (Exception $e2) {
+					throw new Exception('Problema ao enviar a mensagem. Por favor, tente novamente.');
+				}
 			} catch (Exception $e) {
-				$this->view->errorMessage = 'Problema ao enviar a mensagem. Por favor, tente novamente.';
+				// Permite customizar mensagem de erro
+				$this->view->errorMessage = $e->getMessage();
 			}
 		}
 		
@@ -43,8 +44,20 @@ class Jp7_ContactController extends __Controller_Action {
 		
 	}
 	
+	protected function _saveRecord() {
+		$contactTipo = self::getTipo();
+		$attributes = @array_map('reset', $_POST);
+			
+		$record = $contactTipo->createInterAdmin();
+		$record->setAttributesSafely($attributes);
+		$record->save();
+		
+		return $record;
+	}
+	
 	protected function _sendEmail($record) {
 		$contactTipo = self::getTipo();
+		$contactTipo->getFieldsValues('nome');
 		$config = Zend_Registry::get('config');
 		
 		$recipientsTipo = $contactTipo->getFirstChildByModel('ContactRecipients');
@@ -55,8 +68,8 @@ class Jp7_ContactController extends __Controller_Action {
 		$formHelper = new Jp7_Form();
 		// E-mail normal para os destinatários do site
 		$mail = $formHelper->createMail($record, array(
-			'subject' => 'Site ' . $config->name . ' - Contato',
-			'title' => 'Contato',
+			'subject' => 'Site ' . $config->name . ' - ' . $contactTipo->nome,
+			'title' => $contactTipo->nome,
 			'recipients' => $recipients
 		));
 		$mail->setFrom($record->email, $record->name);
@@ -64,8 +77,8 @@ class Jp7_ContactController extends __Controller_Action {
 		
 		// E-mail de resposta para o usuário
 		$reply = $formHelper->createMail($record, array(
-			'subject' => 'Confirmação de Recebimento - ' . $config->name . ' - Contato',
-			'title' => 'Contato',
+			'subject' => 'Confirmação de Recebimento - ' . $config->name . ' - ' . $contactTipo->nome,
+			'title' => $contactTipo->nome,
 			'recipients' => array($record), // Envia para o próprio usuário
 			'message' => 
 				'Agradecemos o seu contato.<br />' .
