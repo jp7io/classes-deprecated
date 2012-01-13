@@ -41,7 +41,7 @@ class Jp7_InterAdmin_Search {
 					$index = $indexes['interadmin_search'];
 					if (!$index || array_full_diff($index['columns'], $textColumns)) {
 						$sql = $this->getIndexSql($table, $textColumns, $index);
-						krumo($sql);
+						//krumo($sql);
 						$db->Execute($sql);
 					}
 				}
