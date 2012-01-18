@@ -146,6 +146,7 @@ abstract class InterAdminAbstract implements Serializable {
 			} elseif ($row = $rs->FetchNextObj()) {
 				$this->_getAttributesFromRow($row, $this, $options); 
 			}
+			$rs->Close();
 		}
 		if (is_array($fields)) {
 			// returns only the fields requested on $fields
@@ -443,7 +444,8 @@ abstract class InterAdminAbstract implements Serializable {
 						$joinNome = Jp7_Inflector::camelize(substr($table, 9));
 						$childrenArr = $this->getInterAdminsChildren();
 						if (!$childrenArr[$joinNome]) {
-							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.');
+							throw new Exception('The field "' . $table . '" cannot be used as a join on $options.' . 
+								'Expected a child named "' . $joinNome . '". Found: ' . implode(', ', array_keys($childrenArr)));
 						}
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
 							'db_prefix' => $this->db_prefix,
@@ -596,8 +598,10 @@ abstract class InterAdminAbstract implements Serializable {
 					$options['order'] .= ($options['order'] ? "," : "") . $aggrCampo;
 				}
 				// @todo Implementar mesma busca do _resolveClauseAlias()
-				$fields[$join] = preg_replace('/([\(,][ ]*)(DISTINCT )?(\b[a-zA-Z_][a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1\2' . $aggrTable . '\3', $campo) .
+				$_tmp = preg_replace('/([\(,][ ]*)(DISTINCT )?(\b[a-zA-Z_][a-zA-Z0-9_.]+\b(?![ ]?\())/', '\1\2' . $aggrTable . '\3', $campo) .
 				 	' AS `' . $table . $aggregateAlias . '`';
+				$_tmp = str_replace('main.NULL', 'NULL', $_tmp);
+				$fields[$join] = $_tmp;
 			// Sem join
 			} else {
 				$nome = ($aliases[$campo]) ? $aliases[$campo] : $campo;
@@ -623,9 +627,9 @@ abstract class InterAdminAbstract implements Serializable {
 	 */
 	protected function _addJoinAlias(&$options = array(), $alias, $campo, $table = 'main') {
 		$joinTipo = $this->getCampoTipo($campo);
-		if (!$joinTipo) {
+		if (!$joinTipo || strpos($campo['tipo'], 'select_multi_') === 0) {
 			die(jp7_debug('The field "' . $alias . '" cannot be used as a join.'));
-		}		
+		}
 		$options['from_alias'][] = $alias; // Used as cache when resolving Where
 		// @todo testar
 		if (in_array($campo['xtra'], InterAdminField::getSelectTipoXtras()) || in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras())) {

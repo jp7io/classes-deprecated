@@ -64,7 +64,7 @@ class Jp7_Debugger {
 		if (!$c_jp7) {
 			return; // Only by Devs
 		}
-		$this->startTime();
+		$this->_startTime[] = $_SERVER['REQUEST_TIME'];
 		// Debug - SQL
 		$this->debugSql = $_GET['debug_sql'];
 		// Debug - Filename
@@ -123,12 +123,14 @@ class Jp7_Debugger {
 	public function showFilename($filename) {
 		global $c_doc_root;
 		if ($this->debugFilename && $this->isSafePoint()) {
-			echo '<div class="debug_msg">' .  str_replace($c_doc_root, '/', $filename ) . '</div>';
+			echo '<div class="debug_msg">' . str_replace($c_doc_root, '/', str_replace('\\', '/', $filename)) . '</div>';
 		}
+		/*
 		if ($this->active) {
 			// Creates a new log entry for this file
 			$this->addLog($filename, 'file');
 		}
+		*/
 		return $filename;
 	}
 	/**
@@ -316,10 +318,10 @@ class Jp7_Debugger {
 		$this->getTime(true);
 	}
 	public function isSafePoint() {
-		return $this->_savePoint || headers_sent();
+		return $this->_safePoint || headers_sent();
 	}
 	public function setSafePoint($bool) {
-		$this->_savePoint = $bool;
+		$this->_safePoint = $bool;
 	}
 	/**
 	 * Envia o trace do erro para debug+CLIENTE@jp7.com.br

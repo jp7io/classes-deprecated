@@ -241,7 +241,7 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function getParent($options = array()) {
 		if (!$this->parent_id) {
-			$this->getFieldsValues('parent_id');
+			$this->getFieldsValues(array('parent_id', 'parent_id_tipo'));
 		}
 		$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
 		if ($this->parent_id) {
@@ -267,7 +267,11 @@ class InterAdmin extends InterAdminAbstract {
 		if (!isset($parent->id)) {
 			$parent->id = 0; // Necessário para que a referência funcione
 		}
+		if (!isset($parent->id_tipo)) {
+			$parent->id_tipo = 0; // Necessário para que a referência funcione
+		}
 		$this->attributes['parent_id'] = &$parent->id;
+		$this->attributes['parent_id_tipo'] = &$parent->id_tipo;
 		$this->_parent = $parent;
 	}
 	/**
@@ -415,6 +419,14 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		return count($arquivos);
 	}
+	
+	public function createLog(array $attributes = array()) {
+		$log = InterAdminLog::create($attributes);
+		$log->setParent($this);
+		$log->setTipo($this->getTipo());
+		return $log;
+	}
+	
 	/**
 	 * Returns the full url for this record.
 	 * 
@@ -429,11 +441,14 @@ class InterAdmin extends InterAdminAbstract {
 			$link = $this->getTipo()->getUrl();
 		}
 		if ($seo) {
-			$alias = $this->getTipo()->getCamposAlias('varchar_key');
-			if (isset($this->$alias)) {
-				$nome = $this->$alias;
-			} else {
-				$nome = $this->getFieldsValues('varchar_key');
+			$aliases = $this->getTipo()->getCamposAlias();
+			if (array_key_exists('varchar_key', $aliases)) {
+				$alias = $aliases['varchar_key'];
+				if (isset($this->$alias)) {
+					$nome = $this->$alias;
+				} else {
+					$nome = $this->getFieldsValues('varchar_key');
+				}
 			}
 			if (is_null($sep)) {
 				$sep = $seo_sep;
@@ -606,13 +621,14 @@ class InterAdmin extends InterAdminAbstract {
 		if (isset($this->varchar_key)) {
 			$this->id_string = toId($this->varchar_key);
 		} else {
-			$alias_varchar_key = ($this->getTipo()->getCamposAlias('varchar_key'));
+			$alias_varchar_key = $this->getTipo()->getCamposAlias('varchar_key');
 			if (isset($this->$alias_varchar_key)) {
 				$this->id_string = toId($this->$alias_varchar_key);
 			}
 		}
 		// log
 		if ($this->id && !isset($this->log)) {
+			// Evita bug em que um registro despublicado tem seu log zerado
 			$old_value = InterAdmin::setPublishedFiltersEnabled(false);
 			$this->getFieldsValues('log');
 			InterAdmin::setPublishedFiltersEnabled($old_value);

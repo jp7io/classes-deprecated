@@ -13,9 +13,8 @@ abstract class Jp7_Box_BoxAbstract {
 	}
 	/**
 	 * Prepara os dados que vão ser utilizados na view do box mais tarde. 
-	 * Exemplo: Faz a busca das notícias que vão ser exibidas.
-	 * 
-	 * @param bool 	$isRecordPage
+	 * Exemplo: Faz a busca das notícias que vão ser exibidas e seta $this->news.
+	 *
 	 * @return void
 	 */
 	public function prepareData() {
