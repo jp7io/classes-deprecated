@@ -189,4 +189,8 @@ class InterAdminLog extends InterAdminAbstract {
 		}
 		return $logs;
 	}
+	
+	public static function getPublishedFilters($table, $alias) {
+		// Não precisa
+	}	
 }
