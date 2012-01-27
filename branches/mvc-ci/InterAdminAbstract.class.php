@@ -334,44 +334,52 @@ abstract class InterAdminAbstract implements Serializable {
 		} else {
 			$use_published_filters = InterAdmin::isPublishedFiltersEnabled();
 		}
-		// Resolve Alias and Joins for 'fields' and 'from'
-		$this->_resolveFieldsAlias($options);
-		// Resolve Alias and Joins for 'where', 'group' and 'order';
-		$clauses = $this->_resolveSqlClausesAlias($options, $use_published_filters);
-		
-		if ($use_published_filters) {
-			foreach ($options['from'] as $key => $from) {
-				list($table, $alias) = explode(' AS ', $from);
-				/*
-				if ($options['skip_published_filters'] && in_array($alias, $options['skip_published_filters'])) {
-					continue;
-				}*/
-				if ($alias == 'main') {
-					// @todo PHP 5.3, trocar $this por static
-					$filters = $this->getPublishedFilters($table, $alias);
-				} else {
-					$join = explode(' ON', $alias);
-					// @todo PHP 5.3, trocar $this por static
-					$options['from'][$key] = $table . ' AS ' . $join[0] . ' ON ' . $this->getPublishedFilters($table, $join[0]) . $join[1];
+		/*
+		$cache = new Jp7_Cache_Recordset($options);
+		if (!$rs = $cache->load()) {
+		*/
+			// Resolve Alias and Joins for 'fields' and 'from'
+			$this->_resolveFieldsAlias($options);
+			// Resolve Alias and Joins for 'where', 'group' and 'order';
+			$clauses = $this->_resolveSqlClausesAlias($options, $use_published_filters);
+			
+			if ($use_published_filters) {
+				foreach ($options['from'] as $key => $from) {
+					list($table, $alias) = explode(' AS ', $from);
+					/*
+					if ($options['skip_published_filters'] && in_array($alias, $options['skip_published_filters'])) {
+						continue;
+					}*/
+					if ($alias == 'main') {
+						// @todo PHP 5.3, trocar $this por static
+						$filters = $this->getPublishedFilters($table, $alias);
+					} else {
+						$join = explode(' ON', $alias);
+						// @todo PHP 5.3, trocar $this por static
+						$options['from'][$key] = $table . ' AS ' . $join[0] . ' ON ' . $this->getPublishedFilters($table, $join[0]) . $join[1];
+					}
 				}
 			}
+			
+			// Sql
+			$sql = "SELECT " . implode(',', $options['fields']) .
+				" FROM " . implode(' LEFT JOIN ', $options['from']) .
+				" WHERE " . $filters . $clauses .
+				(($options['limit']) ? " LIMIT " . $options['limit'] : '');
+			// Debug
+			if ($debugger) {
+				$debugger->showSql($sql, $options['debug']);
+				$debugger->startTime();
+			}
+			// Run SQL
+			$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+			if ($debugger) {
+				$debugger->getTime($options['debug']);
+			}
+		/*
+			$cache->save($rs);
 		}
-		
-		// Sql
-		$sql = "SELECT " . implode(',', $options['fields']) .
-			" FROM " . implode(' LEFT JOIN ', $options['from']) .
-			" WHERE " . $filters . $clauses .
-			(($options['limit']) ? " LIMIT " . $options['limit'] : '');
-		// Debug
-		if ($debugger) {
-			$debugger->showSql($sql, $options['debug']);
-			$debugger->startTime();
-		}
-		// Run SQL
-		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
-		if ($debugger) {
-			$debugger->getTime($options['debug']);
-		}
+		*/
 		return $rs;
 	}
 	/**
