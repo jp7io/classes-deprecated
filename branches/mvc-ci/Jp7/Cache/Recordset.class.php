@@ -29,6 +29,7 @@ class Jp7_Cache_Recordset extends Jp7_Cache_Data {
 			$rows[] = $row;
 		}
 		parent::save($rows);
+		return new Jp7_Cache_Recordset_Fake($rows);
 	}
 	
 }

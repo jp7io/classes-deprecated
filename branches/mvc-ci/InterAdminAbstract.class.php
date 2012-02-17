@@ -18,7 +18,9 @@ abstract class InterAdminAbstract implements Serializable {
 	const DEFAULT_FIELDS_ALIAS = false;
 	const DEFAULT_NAMESPACE = '';
 	
-	protected $_primary_key = 'id';	
+	private static $_cache = false;
+	
+	protected $_primary_key = 'id';
 	/**
 	 * Array of all the attributes with their names as keys and the values of the attributes as values.
 	 * @var array 
@@ -334,10 +336,11 @@ abstract class InterAdminAbstract implements Serializable {
 		} else {
 			$use_published_filters = InterAdmin::isPublishedFiltersEnabled();
 		}
-		/*
-		$cache = new Jp7_Cache_Recordset($options);
-		if (!$rs = $cache->load()) {
-		*/
+		$cache = null;
+		if (self::$_cache) {
+			$cache = new Jp7_Cache_Recordset($options);
+		}
+		if (!$cache || !($rs = $cache->load())) {
 			// Resolve Alias and Joins for 'fields' and 'from'
 			$this->_resolveFieldsAlias($options);
 			// Resolve Alias and Joins for 'where', 'group' and 'order';
@@ -376,10 +379,10 @@ abstract class InterAdminAbstract implements Serializable {
 			if ($debugger) {
 				$debugger->getTime($options['debug']);
 			}
-		/*
-			$cache->save($rs);
+			if ($cache) {
+				$rs = $cache->save($rs);
+			}
 		}
-		*/
 		return $rs;
 	}
 	/**
