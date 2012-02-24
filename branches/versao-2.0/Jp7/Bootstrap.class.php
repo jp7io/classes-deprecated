@@ -92,7 +92,7 @@ class Jp7_Bootstrap {
 		$db = ADONewConnection($dsn);
 		
 		if (!$db) {
-			$db->pass = '{pass}';
+			$config->db->pass = '{pass}';
 			throw new Exception('Unable to connect to the database ' . jp7_formatDsn($config->db));
 		}
 		/* /DB Connection */
