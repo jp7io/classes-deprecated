@@ -276,7 +276,12 @@
 
 			$title = implode('&#013;', $title);
 			
-			$urlNoCache = preg_replace('/^([^&]*)([&]?)([^&]*)$/', '$1?$3$2nocache_force=true', str_replace('?', '&', $_SERVER['REQUEST_URI']));
+			$pos = strpos($_SERVER['REQUEST_URI'], '?');
+			if ($pos === false) {
+				$urlNoCache = $_SERVER['REQUEST_URI'] . '?nocache_force=true';
+			} else {
+				$urlNoCache = substr($_SERVER['REQUEST_URI'], 0, $pos) . '?nocache_force=true&' . substr($_SERVER['REQUEST_URI'], $pos + 1);
+			}
             $event = 'onclick="if (confirm(\'Deseja atualizar o cache desta página?\')) window.location = \'' . $urlNoCache . '\'"';
 	 		
 	 		echo '<div style="' . $css . 'left:0px;" title="' . $title . '" ' . $event . '>CACHE</div>';
