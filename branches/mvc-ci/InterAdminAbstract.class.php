@@ -364,9 +364,25 @@ abstract class InterAdminAbstract implements Serializable {
 				}
 			}
 			
+		    $joins = '';
+		    if ($options['joins']) {
+			    foreach ($options['joins'] as $alias => $join) {
+				    list($joinType, $tipo, $on) = $join;
+				    $onClause = array(
+					    'joins' => $options['joins'],
+					    'where' => $on
+				    );
+				    $table = $tipo->getInterAdminsTableName();
+				    $joins .= ' ' . $joinType . ' JOIN ' . $table . ' AS ' . $alias . ' ON ' . 
+					    $this->getPublishedFilters($table, $alias) . 
+					    $alias . '.id_tipo = ' . $tipo->id_tipo . ' AND ' . $this->_resolveSqlClausesAlias($onClause, $use_published_filters);
+			    }
+		    }
+		    
 			// Sql
 			$sql = "SELECT " . implode(',', $options['fields']) .
 				" FROM " . implode(' LEFT JOIN ', $options['from']) .
+			    $joins .
 				" WHERE " . $filters . $clauses .
 				(($options['limit']) ? " LIMIT " . $options['limit'] : '');
 			// Debug
@@ -514,10 +530,14 @@ abstract class InterAdminAbstract implements Serializable {
 					} else {
 						$joinNome = ($aliases[$table]) ? $aliases[$table] : $table;
 						// Permite utilizar relacionamentos no where sem ter usado o campo no fields
-						if (!in_array($table, (array) $options['from_alias'])) {
-							$this->_addJoinAlias($options, $table, $campos[$joinNome]);
-						}
-						$joinTipo = $this->getCampoTipo($campos[$joinNome]);
+						if ($options['joins'] && $options['joins'][$table]) {
+							$joinTipo = $options['joins'][$table][1];
+						} else {
+						    if (!in_array($table, (array) $options['from_alias'])) {
+							    $this->_addJoinAlias($options, $table, $campos[$joinNome]);
+						    }
+						    $joinTipo = $this->getCampoTipo($campos[$joinNome]);
+						}						
 						$joinAliases = array_flip($joinTipo->getCamposAlias());
 					}
 					// TEMPORARIO FIXME, necessario melhor maneira
@@ -575,10 +595,15 @@ abstract class InterAdminAbstract implements Serializable {
 			if (is_array($campo)) {
 				$nome = ($aliases[$join]) ? $aliases[$join] : $join;
 				if ($nome) {
-					$fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
 					// Join e Recursividade
-					$this->_addJoinAlias($options, $join, $campos[$nome]);
-					$joinTipo = $this->getCampoTipo($campos[$nome]);
+					if ($options['joins'] && $options['joins'][$join]) {
+						$joinTipo = $options['joins'][$join][1];
+					} else {
+					    $fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
+					    // Join e Recursividade
+					    $this->_addJoinAlias($options, $join, $campos[$nome]);
+					    $joinTipo = $this->getCampoTipo($campos[$nome]);
+					}
 					if ($fields[$join] == array('*')) {
 						$fields[$join] = $joinTipo->getCamposNames();
 					}
