@@ -149,13 +149,15 @@ class InterAdminArquivo extends InterAdminAbstract {
 			$parent = $parent->getParent();
 		}
 		
-		$folder =  $upload_root . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
+		$folder = $upload_root . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
 		// Montando nova url
 		$newurl = $folder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
-		
 		// Movendo arquivo temporário
 		@rename($this->url, $newurl);
-		$this->url = $newurl;
+		
+		$clientSideFolder = '../../upload/' . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
+		$this->url = $clientSideFolder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
+		
 		// Movendo o thumb
 		if ($this->url_thumb) {
 			$newurl_thumb = $folder . $id_arquivo_banco . '_t.' . $fieldsValues['tipo'];

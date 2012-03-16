@@ -52,6 +52,7 @@ class Jp7_Bootstrap {
 	}
 	
 	public static function initAdminBar() {
+		global $c_jp7;
 		$config = Zend_Registry::get('config');
 		
 		// Dados da admin bar - Somente se estiver logado
@@ -67,7 +68,8 @@ class Jp7_Bootstrap {
 				'server' => $config->server->interadmin_remote ? reset($config->server->interadmin_remote) : $_SERVER['HTTP_HOST'],
 				'cliente' => $config->name_id,
 				'preview' => (bool) $GLOBALS['s_session']['preview'],
-				'no_hook' => (bool) $GLOBALS['s_session']['no_hook']
+				'no_hook' => (bool) $GLOBALS['s_session']['no_hook'],
+				'c_jp7' => $c_jp7
 			);
 			
 			setcookie('ia_admin_bar', implode(';', $admin_bar_data), 0, '/');

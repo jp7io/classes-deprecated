@@ -18,7 +18,9 @@ abstract class InterAdminAbstract implements Serializable {
 	const DEFAULT_FIELDS_ALIAS = false;
 	const DEFAULT_NAMESPACE = '';
 	
-	protected $_primary_key = 'id';	
+	private static $_cache = false;
+	
+	protected $_primary_key = 'id';
 	/**
 	 * Array of all the attributes with their names as keys and the values of the attributes as values.
 	 * @var array 
@@ -334,59 +336,68 @@ abstract class InterAdminAbstract implements Serializable {
 		} else {
 			$use_published_filters = InterAdmin::isPublishedFiltersEnabled();
 		}
-		// Resolve Alias and Joins for 'fields' and 'from'
-		$this->_resolveFieldsAlias($options);
-		// Resolve Alias and Joins for 'where', 'group' and 'order';
-		$clauses = $this->_resolveSqlClausesAlias($options, $use_published_filters);
-		
-		if ($use_published_filters) {
-			foreach ($options['from'] as $key => $from) {
-				list($table, $alias) = explode(' AS ', $from);
-				/*
-				if ($options['skip_published_filters'] && in_array($alias, $options['skip_published_filters'])) {
-					continue;
-				}*/
-				if ($alias == 'main') {
-					// @todo PHP 5.3, trocar $this por static
-					$filters = $this->getPublishedFilters($table, $alias);
-				} else {
-					$join = explode(' ON', $alias);
-					// @todo PHP 5.3, trocar $this por static
-					$options['from'][$key] = $table . ' AS ' . $join[0] . ' ON ' . $this->getPublishedFilters($table, $join[0]) . $join[1];
+		$cache = null;
+		if (self::$_cache) {
+			$cache = new Jp7_Cache_Recordset($options);
+		}
+		if (!$cache || !($rs = $cache->load())) {
+			// Resolve Alias and Joins for 'fields' and 'from'
+			$this->_resolveFieldsAlias($options);
+			// Resolve Alias and Joins for 'where', 'group' and 'order';
+			$clauses = $this->_resolveSqlClausesAlias($options, $use_published_filters);
+			
+			if ($use_published_filters) {
+				foreach ($options['from'] as $key => $from) {
+					list($table, $alias) = explode(' AS ', $from);
+					/*
+					if ($options['skip_published_filters'] && in_array($alias, $options['skip_published_filters'])) {
+						continue;
+					}*/
+					if ($alias == 'main') {
+						// @todo PHP 5.3, trocar $this por static
+						$filters = $this->getPublishedFilters($table, $alias);
+					} else {
+						$join = explode(' ON', $alias);
+						// @todo PHP 5.3, trocar $this por static
+						$options['from'][$key] = $table . ' AS ' . $join[0] . ' ON ' . $this->getPublishedFilters($table, $join[0]) . $join[1];
+					}
 				}
 			}
-		}
-		
-		$joins = '';
-		if ($options['joins']) {
-			foreach ($options['joins'] as $alias => $join) {
-				list($joinType, $tipo, $on) = $join;
-				$onClause = array(
-					'joins' => $options['joins'],
-					'where' => $on
-				);
-				$table = $tipo->getInterAdminsTableName();
-				$joins .= ' ' . $joinType . ' JOIN ' . $table . ' AS ' . $alias . ' ON ' . 
-					$this->getPublishedFilters($table, $alias) . 
-					$alias . '.id_tipo = ' . $tipo->id_tipo . ' AND ' . $this->_resolveSqlClausesAlias($onClause, $use_published_filters);
+			
+		    $joins = '';
+		    if ($options['joins']) {
+			    foreach ($options['joins'] as $alias => $join) {
+				    list($joinType, $tipo, $on) = $join;
+				    $onClause = array(
+					    'joins' => $options['joins'],
+					    'where' => $on
+				    );
+				    $table = $tipo->getInterAdminsTableName();
+				    $joins .= ' ' . $joinType . ' JOIN ' . $table . ' AS ' . $alias . ' ON ' . 
+					    $this->getPublishedFilters($table, $alias) . 
+					    $alias . '.id_tipo = ' . $tipo->id_tipo . ' AND ' . $this->_resolveSqlClausesAlias($onClause, $use_published_filters);
+			    }
+		    }
+		    
+			// Sql
+			$sql = "SELECT " . implode(',', $options['fields']) .
+				" FROM " . implode(' LEFT JOIN ', $options['from']) .
+			    $joins .
+				" WHERE " . $filters . $clauses .
+				(($options['limit']) ? " LIMIT " . $options['limit'] : '');
+			// Debug
+			if ($debugger) {
+				$debugger->showSql($sql, $options['debug']);
+				$debugger->startTime();
 			}
-		}
-		
-		// Sql
-		$sql = "SELECT " . implode(',', $options['fields']) .
-			" FROM " . implode(' LEFT JOIN ', $options['from']) .
-			$joins .
-			" WHERE " . $filters . $clauses .
-			(($options['limit']) ? " LIMIT " . $options['limit'] : '');
-		// Debug
-		if ($debugger) {
-			$debugger->showSql($sql, $options['debug']);
-			$debugger->startTime();
-		}
-		// Run SQL
-		$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
-		if ($debugger) {
-			$debugger->getTime($options['debug']);
+			// Run SQL
+			$rs = $db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
+			if ($debugger) {
+				$debugger->getTime($options['debug']);
+			}
+			if ($cache) {
+				$rs = $cache->save($rs);
+			}
 		}
 		return $rs;
 	}
@@ -522,10 +533,10 @@ abstract class InterAdminAbstract implements Serializable {
 						if ($options['joins'] && $options['joins'][$table]) {
 							$joinTipo = $options['joins'][$table][1];
 						} else {
-							if (!in_array($table, (array) $options['from_alias'])) {
-								$this->_addJoinAlias($options, $table, $campos[$joinNome]);
-							}
-							$joinTipo = $this->getCampoTipo($campos[$joinNome]);
+						    if (!in_array($table, (array) $options['from_alias'])) {
+							    $this->_addJoinAlias($options, $table, $campos[$joinNome]);
+						    }
+						    $joinTipo = $this->getCampoTipo($campos[$joinNome]);
 						}						
 						$joinAliases = array_flip($joinTipo->getCamposAlias());
 					}
@@ -588,10 +599,10 @@ abstract class InterAdminAbstract implements Serializable {
 					if ($options['joins'] && $options['joins'][$join]) {
 						$joinTipo = $options['joins'][$join][1];
 					} else {
-						$fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
-						
-						$this->_addJoinAlias($options, $join, $campos[$nome]);
-						$joinTipo = $this->getCampoTipo($campos[$nome]);
+					    $fields[] = $table . $nome . (($table != 'main.') ? ' AS `' . $table . $nome . '`' : '');
+					    // Join e Recursividade
+					    $this->_addJoinAlias($options, $join, $campos[$nome]);
+					    $joinTipo = $this->getCampoTipo($campos[$nome]);
 					}
 					if ($fields[$join] == array('*')) {
 						$fields[$join] = $joinTipo->getCamposNames();

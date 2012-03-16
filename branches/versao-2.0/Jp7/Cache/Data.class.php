@@ -14,9 +14,13 @@ class Jp7_Cache_Data {
 	 * @return 
 	 */
 	public function __construct($id, $options = array()) {
+		if (!is_scalar($id)) {
+			$id = md5(serialize($id));
+		}
 		$this->id = $id; 
 		$this->options = $options + array(
-			'lifetime' => 0		
+			'lifetime' => 0,
+			'cache_dir' => self::$_cachedir
 		);
 	}
 	
@@ -31,7 +35,7 @@ class Jp7_Cache_Data {
 	}
 	
 	public function getFilename() {
-		return self::$_cachedir . '_' . $this->id . '.cache';
+		return $this->options['cache_dir'] . '_' . $this->id . '.cache';
 	}
 	
 	/**

@@ -246,8 +246,12 @@ class InterAdmin extends InterAdminAbstract {
 		$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
 		if ($this->parent_id) {
 			if (!$this->_parent) {
+				$parentTipo = null;
+				if ($this->parent_id_tipo) {
+					$parentTipo = InterAdminTipo::getInstance($this->parent_id_tipo);
+				}
 				$options['default_class'] = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin';
-				$this->_parent = InterAdmin::getInstance($this->parent_id, $options);
+				$this->_parent = InterAdmin::getInstance($this->parent_id, $options, $parentTipo);
 				if ($this->_parent->id) {
 					$this->getTipo()->setParent($this->_parent);
 				}
