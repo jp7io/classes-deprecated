@@ -363,7 +363,11 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return InterAdminArquivo
 	 */
 	public function createArquivo(array $attributes = array()) {
-		$arquivo = new InterAdminArquivo();
+		$className = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminArquivo';
+		if (!class_exists($className)) {
+			$className = 'InterAdminArquivo';
+		}
+		$arquivo = new $className();
 		$arquivo->setParent($this);
 		$arquivo->setTipo($this->getTipo());
 		$arquivo->mostrar = 'S';
