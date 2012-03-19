@@ -55,7 +55,7 @@ class Jp7_ContactController extends __Controller_Action {
 		return $record;
 	}
 	
-	protected function _sendEmail($record) {
+	protected function _sendEmail($record, $sendReply = true) {
 		$contactTipo = self::getTipo();
 		$contactTipo->getFieldsValues('nome');
 		$config = Zend_Registry::get('config');
@@ -75,17 +75,19 @@ class Jp7_ContactController extends __Controller_Action {
 		$mail->setFrom($record->email, $record->name);
 		$mail->send();
 		
-		// E-mail de resposta para o usuário
-		$reply = $formHelper->createMail($record, array(
-			'subject' => 'Confirmação de Recebimento - ' . $config->name . ' - ' . $contactTipo->nome,
-			'title' => $contactTipo->nome,
-			'recipients' => array($record), // Envia para o próprio usuário
-			'message' => 
-				'Agradecemos o seu contato.<br />' .
-				'Por favor, aguarde nosso retorno em breve.<br /><br />',
-		));
-		$reply->setFrom($config->admin_email, $config->admin_name);
-		$reply->send();
+		if ($sendReply) {
+			// E-mail de resposta para o usuário
+			$reply = $formHelper->createMail($record, array(
+				'subject' => 'Confirmação de Recebimento - ' . $config->name . ' - ' . $contactTipo->nome,
+				'title' => $contactTipo->nome,
+				'recipients' => array($record), // Envia para o próprio usuário
+				'message' => 
+					'Agradecemos o seu contato.<br />' .
+					'Por favor, aguarde nosso retorno em breve.<br /><br />',
+			));
+			$reply->setFrom($config->admin_email, $config->admin_name);
+			$reply->send();
+		}
 	}
 	
 	protected function _getFormHtml($campos, $record) {
