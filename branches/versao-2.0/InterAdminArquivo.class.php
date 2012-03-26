@@ -152,6 +152,13 @@ class InterAdminArquivo extends InterAdminAbstract {
 		$folder = $upload_root . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
 		// Montando nova url
 		$newurl = $folder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
+		
+		// Mkdir if needed
+		if (!is_dir(dirname($newurl))) {
+			@mkdir(dirname($newurl));
+			@chmod(dirname($newurl), 0777);
+		}
+		
 		// Movendo arquivo temporário
 		@rename($this->url, $newurl);
 		
