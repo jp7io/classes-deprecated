@@ -311,7 +311,7 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @param array $options Default array of options. Available keys: fields, fields_alias, from, where, order, group, limit, all, campos and aliases.
 	 * @return ADORecordSet
 	 */
-	protected function _executeQuery(&$options) {
+	protected function _executeQuery($options, &$select_multi_fields = array()) {
 		global $debugger;
 		$db = $this->getDb();
 		
@@ -397,6 +397,7 @@ abstract class InterAdminAbstract implements Serializable {
 			if ($debugger) {
 				$debugger->getTime($options['debug']);
 			}
+			$select_multi_fields = $options['select_multi_fields'];			
 			/*
 			if ($cache) {
 				$rs = $cache->save($rs);
@@ -703,8 +704,7 @@ abstract class InterAdminAbstract implements Serializable {
 			$aliases = array();
 		}
 		if ($aliases) {
-			$aliases = array_flip($aliases);
-			$fields = $aliases;
+			$fields = array_flip($aliases);
 		}
 		$attributes = &$object->attributes;
 
