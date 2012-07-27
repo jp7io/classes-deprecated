@@ -489,6 +489,15 @@ abstract class InterAdminAbstract implements Serializable {
 						$existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . " AS " . $table . 
 							' WHERE ' . $joinFilter . $table . '.parent_id = main.id AND ' . $table . '.id_tipo = ' . $joinTipo->id_tipo . '' .
 							(($existsMatches[4]) ? ' AND ' : '');
+					} elseif ($options['joins'][$table]) {
+						$joinTipo = $options['joins'][$table][1];
+						$onClause = array(
+						    'joins' => $options['joins'],
+						    'where' => $options['joins'][$table][2]
+					    );
+						$joinFilter = ($use_published_filters) ? $this->getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
+						$existsMatches[2] = 'SELECT id FROM ' . $joinTipo->getInterAdminsTableName() . " AS " . $table . 
+							' WHERE ' . $joinFilter . $this->_resolveSqlClausesAlias($onClause, $use_published_filters) . (($existsMatches[4]) ? ' AND ' : '');
 					}
 					
 					$inicioRep = $inicio . $existsMatches[1] . $existsMatches[2] . $existsMatches[3];
