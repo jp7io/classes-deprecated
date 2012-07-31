@@ -471,31 +471,59 @@ class InterAdminField {
 				} else {
 					$campo['nome'] = $translate->_($campo['nome']);
 				}
-				
-				// Só para CHAR - checkbox
-				if (startsWith('char_', $campo['tipo_de_campo'])) {
-					if (!$record->id && $campo['xtra']) {
-						$campo['value'] = 'S';
-					}
-					global $j;
-					$form = jp7_db_checkbox($campo['tipo'] . "[".$j."]","S", $campo['tipo'], $campo['readonly'], "", ($campo['value']) ? $campo['value'] : null);
-					?>
-					<tr>
-						<th></th>
-						<td colspan="2" class="checkbox-container">
-							<?php echo $form; ?><span><?php echo $campo['nome']; ?></span>
-						</td>
-						<td></td>
-					</tr>
-					<?php
-				// OUTROS CAMPOS
-				} else {
-					$field = new InterAdminField($campo);
-					echo $field->getHtml();
-				}
+				self::_campoHtml($campo);
 			}
 		}
 		return ob_get_clean();
+	}
+	
+	protected static function _campoHtml($campo) {
+		// Só para CHAR - checkbox
+		if (startsWith('char_', $campo['tipo_de_campo'])) {
+			if (!$record->id && $campo['xtra']) {
+				$campo['value'] = 'S';
+			}
+			global $j;
+			$form = jp7_db_checkbox($campo['tipo'] . "[".$j."]","S", $campo['tipo'], $campo['readonly'], "", ($campo['value']) ? $campo['value'] : null);
+			?>
+			<tr>
+				<th></th>
+				<td colspan="2" class="checkbox-container">
+					<?php echo $form; ?><span><?php echo $campo['nome']; ?></span>
+				</td>
+				<td></td>
+			</tr>
+			<?php
+		// OUTROS CAMPOS
+		} elseif (startsWith('file_', $campo['tipo_de_campo'])) {
+			if (!function_exists('interadmin_arquivos_preview')) {
+				include_once ROOT_PATH . '/interadmin/inc/functions.php';	
+			}
+			
+			if ($campo['value']) {
+				$url = interadmin_uploaded_file_url($campo['value']);
+			} else {
+				$url = '/_default/img/px.png';
+			}
+			?>
+			<tr class="<?php echo $campo['tipo']; ?>-tr">
+				<th class="<?php echo $campo['obrigatorio'] ? 'obrigatorio' : ''; ?>"><?php echo $campo['nome']; ?>:</th>
+				<td>
+					<input type="file" <?php echo $campo['obrigatorio'] ? 'obligatory="yes"' : ''; ?> label="<?php echo $campo['nome']; ?>" name="<?php echo $campo['tipo']; ?>[<?php echo $j; ?>]" />
+				</td>
+				<td>
+					<?php if ($campo['value'] instanceof InterAdminFieldFile) { ?>						<a href="<?php echo $campo['value']->getUrl(); ?>" target="_blank">
+							<?php echo interadmin_arquivos_preview($url); ?>
+						</a>
+					<?php } ?>
+				</td>
+				<td></td>
+			</tr>
+			<?php
+		} else {
+			$field = new InterAdminField($campo);
+			echo $field->getHtml();
+		}
 	}
 	
 	public static function validate($record, $campo) {
