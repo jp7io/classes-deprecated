@@ -194,15 +194,26 @@ class InterAdminField {
 					}
 				} elseif ($xtra) {
 					if ($campo_nome == "all") {
-						ob_start();
-						interadmin_tipos_combo($valor,0);
-						$form.=ob_get_contents();
-						ob_end_clean();
+						if ($campo_array['where']) {
+							$sql = "SELECT id_tipo,nome FROM ".$db_prefix."_tipos".
+							" WHERE 1 " . $campo_array['where'] .
+							" ORDER BY ordem,nome";
+							$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
+							while ($row = $rs->FetchNextObj()) {
+								$form.="<option value=\"".$row->id_tipo."\"".(($row->id_tipo==$valor)?" SELECTED":"").">".toHTML($row->nome)."</option>";
+							}
+							$rs->Close();
+						} else {
+							ob_start();
+							interadmin_tipos_combo($valor,0);
+							$form.=ob_get_contents();
+							ob_end_clean();
+						}
 					}else{
 						$sql = "SELECT id_tipo,nome FROM ".$db_prefix."_tipos".
 						" WHERE parent_id_tipo=".$campo_nome.
 						" ORDER BY ordem,nome";
-						$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));;
+						$rs=$db->Execute($sql)or die(jp7_debug($db->ErrorMsg(),$sql));
 						while ($row = $rs->FetchNextObj()) {
 							$form.="<option value=\"".$row->id_tipo."\"".(($row->id_tipo==$valor)?" SELECTED":"").">".toHTML($row->nome)."</option>";
 						}

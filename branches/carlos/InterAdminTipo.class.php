@@ -255,7 +255,7 @@ class InterAdminTipo extends InterAdminAbstract {
 	 * Retrieves the records which have this InterAdminTipo's id_tipo.
 	 * 
 	 * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
-	 * @return array Array of InterAdmin objects.
+	 * @return InterAdmin[] Array of InterAdmin objects.
 	 */
 	public function getInterAdmins($options = array()) {
 		$this->_whereArrayFix($options['where']); // FIXME
