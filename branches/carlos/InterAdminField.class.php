@@ -489,6 +489,9 @@ class InterAdminField {
 	}
 	
 	protected static function _campoHtml($campo) {
+		include_once ROOT_PATH . '/inc/7.app.lib.php';
+		include_once ROOT_PATH . '/inc/7.form.lib.php';
+		
 		// Só para CHAR - checkbox
 		if (startsWith('char_', $campo['tipo_de_campo'])) {
 			if (!$record->id && $campo['xtra']) {
@@ -523,7 +526,8 @@ class InterAdminField {
 					<input type="file" <?php echo $campo['obrigatorio'] ? 'obligatory="yes"' : ''; ?> label="<?php echo $campo['nome']; ?>" name="<?php echo $campo['tipo']; ?>[<?php echo $j; ?>]" />
 				</td>
 				<td>
-					<?php if ($campo['value'] instanceof InterAdminFieldFile) { ?>						<a href="<?php echo $campo['value']->getUrl(); ?>" target="_blank">
+					<?php if ($campo['value'] instanceof InterAdminFieldFile) { ?>
+						<a href="<?php echo $campo['value']->getUrl(); ?>" target="_blank">
 							<?php echo interadmin_arquivos_preview($url); ?>
 						</a>
 					<?php } ?>
