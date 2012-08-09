@@ -17,6 +17,9 @@
 class InterAdminField {
 	public $id;
 	public $id_tipo;
+	
+	public static $php5_2_hack_className = 'InterAdminField';
+	
 	/**
 	 * Construtor público.
 	 * 
@@ -482,13 +485,14 @@ class InterAdminField {
 				} else {
 					$campo['nome'] = $translate->_($campo['nome']);
 				}
-				self::_campoHtml($campo);
+				//self::_campoHtml($campo);
+				call_user_func(self::$php5_2_hack_className . '::_campoHtml', $campo);
 			}
 		}
 		return ob_get_clean();
 	}
 	
-	protected static function _campoHtml($campo) {
+	public static function _campoHtml($campo) {
 		include_once ROOT_PATH . '/inc/7.app.lib.php';
 		include_once ROOT_PATH . '/inc/7.form.lib.php';
 		
