@@ -516,10 +516,6 @@ class InterAdminField {
 			<?php
 		// OUTROS CAMPOS
 		} elseif (startsWith('file_', $campo['tipo_de_campo'])) {
-			if (!function_exists('interadmin_arquivos_preview')) {
-				include_once ROOT_PATH . '/interadmin/inc/functions.php';	
-			}
-			
 			if ($campo['value']) {
 				$url = interadmin_uploaded_file_url($campo['value']);
 			} else {
