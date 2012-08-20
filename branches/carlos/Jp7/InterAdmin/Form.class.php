@@ -28,6 +28,7 @@ class Jp7_InterAdmin_Form extends InterAdminField {
 				$nome_id = $campo['nome_id'];
 				
 				$uploader = new Jp7_Uploader($nome_id, '/.*/', '/.*/');
+				$uploader->setBasePath('upload/');
 				
 				$record->$nome_id = '';
 				// Irá procurar por , essa classe só funciona se o campo for array
