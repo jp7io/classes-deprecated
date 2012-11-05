@@ -12,7 +12,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo {
 		
 	}
 	
-	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
+	public function loadAttributes($fields, $forceAsString = false, $fieldsAlias = false) {
 		if (is_string($fields)) {
 			return $this->attributes[$fields]; 
 		} elseif (is_array($fields)) {

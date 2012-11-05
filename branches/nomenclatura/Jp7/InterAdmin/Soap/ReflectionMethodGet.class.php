@@ -9,7 +9,7 @@ class Jp7_InterAdmin_Soap_ReflectionMethodGet {
 		
 	public function __construct(InterAdminTipo $secao) {
 		$this->secao = $secao;
-		$this->secao->getFieldsValues(array('nome', 'class'));
+		$this->secao->loadAttributes(array('nome', 'class'));
 	} 
 	
 	/**
