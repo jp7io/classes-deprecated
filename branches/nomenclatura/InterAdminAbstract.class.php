@@ -114,7 +114,7 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @return mixed If $fields is an array an object will be returned, otherwise it will return the value retrieved.
 	 * @todo Multiple languages - When there is no id_tipo yet, the function is unable to decide which language table it should use.
 	 */
-	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
+	public function loadAttributes($fields, $forceAsString = false, $fieldsAlias = false) {
 		if ($this->_deleted) {
 			throw new Exception('This record has been deleted.');
 		}
@@ -145,7 +145,7 @@ abstract class InterAdminAbstract implements Serializable {
 			$rs = $this->_executeQuery($options);
 			if ($row = $rs->FetchNextObj()) {
 				if ($forceAsString) {
-					$this->_getFieldsValuesAsString($row, $fieldsAlias);
+					$this->_loadAttributesAsString($row, $fieldsAlias);
 				} else {
 					$this->_getAttributesFromRow($row, $this, $options);
 				}
@@ -738,7 +738,7 @@ abstract class InterAdminAbstract implements Serializable {
 						$multi_options = $options['select_multi_fields'][$alias];
 						if ($multi_options) {
 							foreach ($value as $item) {
-								$item->getFieldsValues($multi_options['fields'], false, $multi_options['fields_alias']);
+								$item->loadAttributes($multi_options['fields'], false, $multi_options['fields_alias']);
 							}
 						}
 					}
@@ -819,7 +819,7 @@ abstract class InterAdminAbstract implements Serializable {
 			unset($this->attributes[$key]);
 		}
 		$isAliased = $this->staticConst('DEFAULT_FIELDS_ALIAS');
-		$this->getFieldsValues($fields, false, $isAliased);
+		$this->loadAttributes($fields, false, $isAliased);
 	}
 	/**
 	 * Creates a object of the given Class name with the same attributes.
@@ -935,5 +935,10 @@ abstract class InterAdminAbstract implements Serializable {
 	 */
 	public function setDb(ADOConnection $db) {
 		$this->_db = $db;
+	}
+	
+	public function getFieldsValues($fields, $forceAsString = false, $fieldsAlias = false) {
+		trigger_error("Deprecated function getFieldsValues().", E_USER_NOTICE);
+		return $this->loadAttributes($fields, $forceAsString, $fieldsAlias);
 	}
 }

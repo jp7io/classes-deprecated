@@ -53,7 +53,7 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	protected static $publish_filters_enabled = true;
 	/**
-	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
+	 * Public Constructor. If $options['fields'] was passed the method $this->loadAttributes() is called.
 	 * @param string $id This record's 'id'.
 	 * @param array $options Default array of options. Available keys: db_prefix, table, fields, fields_alias.
 	 */
@@ -66,7 +66,7 @@ class InterAdmin extends InterAdminAbstract {
 		
 		if ($options['fields'] && $this->id) {
 			$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
-			$this->getFieldsValues($options['fields'], false, $options['fields_alias']);
+			$this->loadAttributes($options['fields'], false, $options['fields_alias']);
 		}
 	}
 	/**
@@ -110,7 +110,7 @@ class InterAdmin extends InterAdminAbstract {
 		}
 		// Fields		
 		if ($options['fields']) {
-			$finalInstance->getFieldsValues($options['fields'], false, $options['fields_alias']);
+			$finalInstance->loadAttributes($options['fields'], false, $options['fields_alias']);
 		}
 		return $finalInstance;
 	}
@@ -195,15 +195,13 @@ class InterAdmin extends InterAdminAbstract {
 	 * Gets fields values by their alias.
 	 *  
 	 * @param array|string $fields
-	 * @see InterAdmin::getFieldsValues()
+	 * @see InterAdmin::loadAttributes()
 	 * @return 
 	 */
-	public function getByAlias($fields) {
-		if (func_num_args() > 1) {
-			throw new Exception('Only 1 argument is expected and it should be an array.');
-		}
-		return $this->getFieldsValues($fields, false, true);
+	public function loadAttributes($fields, $forceAsString = false, $fieldsAlias = true) {
+		return parent::loadAttributes($fields, $forceAsString, $fieldsAlias);
 	}
+	
 	/**
 	 * Gets the InterAdminTipo object for this record, which is then cached on the $_tipo property.
 	 * 
@@ -241,7 +239,7 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function getParent($options = array()) {
 		if (!$this->parent_id) {
-			$this->getFieldsValues(array('parent_id', 'parent_id_tipo'));
+			$this->loadAttributes(array('parent_id', 'parent_id_tipo'));
 		}
 		$options = $options + array('fields_alias' => $this->staticConst('DEFAULT_FIELDS_ALIAS'));
 		if ($this->parent_id) {
@@ -256,7 +254,7 @@ class InterAdmin extends InterAdminAbstract {
 					$this->getTipo()->setParent($this->_parent);
 				}
 			} elseif ($options['fields']) {
-				$this->_parent->getFieldsValues($options['fields'], false, $options['fields_alias']);
+				$this->_parent->loadAttributes($options['fields'], false, $options['fields_alias']);
 			}
 		}
 		return $this->_parent;
@@ -444,7 +442,7 @@ class InterAdmin extends InterAdminAbstract {
 		global $seo, $seo_sep;
 				
 		if ($seo && $this->getParent()->id) {
-			$link = $this->_parent->getUrl() . '/' . toSeo($this->getTipo()->getFieldsValues('nome'));
+			$link = $this->_parent->getUrl() . '/' . toSeo($this->getTipo()->loadAttributes('nome'));
 		} else {
 			$link = $this->getTipo()->getUrl();
 		}
@@ -455,7 +453,7 @@ class InterAdmin extends InterAdminAbstract {
 				if (isset($this->$alias)) {
 					$nome = $this->$alias;
 				} else {
-					$nome = $this->getFieldsValues('varchar_key');
+					$nome = $this->loadAttributes('varchar_key');
 				}
 			}
 			if (is_null($sep)) {
@@ -493,7 +491,7 @@ class InterAdmin extends InterAdminAbstract {
 			$sql = "INSERT INTO " . $this->db_prefix . "_tags (parent_id, id, id_tipo) VALUES 
 				(" . $this->id . "," .
 				(($tag instanceof InterAdmin) ? $tag->id : 0) . "," .
-				(($tag instanceof InterAdmin) ? $tag->getFieldsValues('id_tipo') : $tag->id_tipo) . ")";
+				(($tag instanceof InterAdmin) ? $tag->loadAttributes('id_tipo') : $tag->id_tipo) . ")";
 			$db->Execute($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 		}
 	}
@@ -517,7 +515,7 @@ class InterAdmin extends InterAdminAbstract {
 			$this->_tags = array();
 			while ($row = $rs->FetchNextObj()) {
 				$tag_tipo = InterAdminTipo::getInstance($row->id_tipo);
-				$tag_text = $tag_tipo->getFieldsValues('nome');
+				$tag_text = $tag_tipo->loadAttributes('nome');
 				if ($row->id) {
 					$options = array(
 						'fields' => array('varchar_key'),
@@ -548,7 +546,7 @@ class InterAdmin extends InterAdminAbstract {
 	 */
 	public function isPublished() {
 		global $config, $s_session;
-		$this->getFieldsValues(array('date_publish', 'date_expire', 'char_key', 'publish', 'deleted'));
+		$this->loadAttributes(array('date_publish', 'date_expire', 'char_key', 'publish', 'deleted'));
 		return (
 			strtotime($this->date_publish) <= time() &&
 			(strtotime($this->date_expire) >= time() || $this->date_expire == '0000-00-00 00:00:00') &&
@@ -565,7 +563,7 @@ class InterAdmin extends InterAdminAbstract {
 	 * @deprecated Kept for backwards compatibility
 	 * @return mixed
 	 */
-	protected function _getFieldsValuesAsString($sqlRow, $fields_alias) {
+	protected function _loadAttributesAsString($sqlRow, $fields_alias) {
 		global $lang;
 		$campos = $this->getTipo()->getCampos();
 		
@@ -608,7 +606,7 @@ class InterAdmin extends InterAdminAbstract {
 			}
 		}
 		if ($camposCombo) {
-			$valoresCombo = $this->getFieldsValues($camposCombo);
+			$valoresCombo = $this->loadAttributes($camposCombo);
 			$stringValue = array();
 			foreach ($valoresCombo as $key => $value) {
 				if ($value instanceof InterAdminFieldFile) {
@@ -640,7 +638,7 @@ class InterAdmin extends InterAdminAbstract {
 		if ($this->id && !isset($this->log)) {
 			// Evita bug em que um registro despublicado tem seu log zerado
 			$old_value = InterAdmin::setPublishedFiltersEnabled(false);
-			$this->getFieldsValues('log');
+			$this->loadAttributes('log');
 			InterAdmin::setPublishedFiltersEnabled($old_value);
 		}
 		$this->log = date('d/m/Y H:i') . ' - ' . self::getLogUser() . ' - ' . $_SERVER['REMOTE_ADDR'] . chr(13) . $this->log;
@@ -771,4 +769,10 @@ class InterAdmin extends InterAdminAbstract {
 		));
 		$this->$fieldToSet = $record;
 	}
+	
+	public function getByAlias($fields) {
+		trigger_error("Deprecated function getByAlias().", E_USER_NOTICE);
+		return $this->loadAttributes($fields);
+	}
+	
 }

@@ -34,7 +34,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 */
 	protected $_parent;
 	/**
-	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
+	 * Public Constructor. If $options['fields'] was passed the method $this->loadAttributes() is called.
 	 * 
 	 * @param int $id_arquivo This record's 'id_arquivo'.
 	 * @param array $options Default array of options. Available keys: db_prefix, fields.
@@ -45,7 +45,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 		$this->_db = $options['db'] ? $options['db'] : $GLOBALS['db'];
 		
 		if ($options['fields']) {
-			$this->getFieldsValues($options['fields']);
+			$this->loadAttributes($options['fields']);
 		}
 	}
 	/**
@@ -86,7 +86,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 	public function getParent($options = array()) {
 		if (!$this->_parent) {
 			$tipo = $this->getTipo();
-			if ($this->id || $this->getFieldsValues('id')) {
+			if ($this->id || $this->loadAttributes('id')) {
 				$this->_parent = InterAdmin::getInstance($this->id, $options, $tipo);
 			}
 		}
@@ -109,7 +109,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 */
 	public function getUrl() {
 		global $config;
-		$url = ($this->url) ? $this->url : $this->getFieldsValues('url');
+		$url = ($this->url) ? $this->url : $this->loadAttributes('url');
 		$url = str_replace('../../', $config->url, $url);
 		return $url; 
 	}
@@ -119,7 +119,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 	 * @return string
 	 */
 	public function getText() {
-		return htmlspecialchars($this->getFieldsValues('legenda'));
+		return htmlspecialchars($this->loadAttributes('legenda'));
 	}
 	/**
 	 * Adds this file to the table _arquivos_banco and sets it's $url with the new $id_arquivo_banco.
@@ -149,7 +149,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 			$parent = $parent->getParent();
 		}
 		
-		$folder = $upload_root . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
+		$folder = $upload_root . toId($parent->getTipo()->loadAttributes('nome')) . '/';
 		// Montando nova url
 		$newurl = $folder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
 		
@@ -164,7 +164,7 @@ class InterAdminArquivo extends InterAdminAbstract {
 			throw new Exception('Impossível renomear arquivo "' . $this->url . '" para "' . $newurl . '". getcwd(): ' . getcwd());
 		}
 		
-		$clientSideFolder = '../../upload/' . toId($parent->getTipo()->getFieldsValues('nome')) . '/';
+		$clientSideFolder = '../../upload/' . toId($parent->getTipo()->loadAttributes('nome')) . '/';
 		$this->url = $clientSideFolder . $id_arquivo_banco . '.' . $fieldsValues['tipo'];
 		
 		// Movendo o thumb

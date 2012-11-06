@@ -38,7 +38,7 @@ class InterAdminLog extends InterAdminAbstract {
 	 */
 	protected $_parent;
 	/**
-	 * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
+	 * Public Constructor. If $options['fields'] was passed the method $this->loadAttributes() is called.
 	 * 
 	 * @param int $id_log This record's 'id_log'.
 	 * @param array $options Default array of options. Available keys: db_prefix, db, fields.
@@ -49,7 +49,7 @@ class InterAdminLog extends InterAdminAbstract {
 		$this->_db = $options['db'] ? $options['db'] : $GLOBALS['db'];
 		
 		if ($options['fields']) {
-			$this->getFieldsValues($options['fields']);
+			$this->loadAttributes($options['fields']);
 		}
 	}
 	/**
@@ -90,7 +90,7 @@ class InterAdminLog extends InterAdminAbstract {
 	public function getParent($options = array()) {
 		if (!$this->_parent) {
 			$tipo = $this->getTipo();
-			if ($this->id || $this->getFieldsValues('id')) {
+			if ($this->id || $this->loadAttributes('id')) {
 				$this->_parent = InterAdmin::getInstance($this->id, $options, $tipo);
 			}
 		}
