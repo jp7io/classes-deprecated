@@ -264,7 +264,7 @@ abstract class InterAdminAbstract implements Serializable {
 	 * @return mixed The object created by the key or the value itself.
 	 */
 	protected function _getByForeignKey(&$value, $field, $campo = '', $object) {
-		$interAdminClass = $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdmin';
+		$interAdminClass = static::DEFAULT_NAMESPACE . 'InterAdmin';
 		
 		$options = array();
 		if (strpos($field, 'date_') === 0) {
@@ -366,14 +366,12 @@ abstract class InterAdminAbstract implements Serializable {
 					list($table, $alias) = explode(' AS ', $from);
 					if ($alias == 'main') {
 						if (!$options['skip_published_filters'] || !in_array('main', $options['skip_published_filters'])) {
-							// @todo PHP 5.3, trocar $this por static
-							$filters = $this->getPublishedFilters($table, 'main');
+							$filters = static::getPublishedFilters($table, 'main');
 						}						
 					} else {
 						$joinArr = explode(' ON', $alias);
 						if (!$options['skip_published_filters'] || !in_array($joinArr[0], $options['skip_published_filters'])) {
-							// @todo PHP 5.3, trocar $this por static
-							$options['from'][$key] = $table . ' AS ' . $joinArr[0] . ' ON ' . $this->getPublishedFilters($table, $joinArr[0]) . $joinArr[1];
+							$options['from'][$key] = $table . ' AS ' . $joinArr[0] . ' ON ' . static::getPublishedFilters($table, $joinArr[0]) . $joinArr[1];
 						}
 					}
 				}
@@ -504,7 +502,7 @@ abstract class InterAdminAbstract implements Serializable {
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
 							'db_prefix' => $this->db_prefix,
 							'db' => $this->_db,
-							'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
+							'default_class' => static::DEFAULT_NAMESPACE . 'InterAdminTipo'
 						));
 		
 						$joinFilter = ($use_published_filters) ? $this->getPublishedFilters($joinTipo->getInterAdminsTableName(), $table) : '';
@@ -554,7 +552,7 @@ abstract class InterAdminAbstract implements Serializable {
 						$joinTipo = InterAdminTipo::getInstance($childrenArr[$joinNome]['id_tipo'], array(
 							'db_prefix' => $this->db_prefix,
 							'db' => $this->_db,
-							'default_class' => $this->staticConst('DEFAULT_NAMESPACE') . 'InterAdminTipo'
+							'default_class' => static::DEFAULT_NAMESPACE . 'InterAdminTipo'
 						));
 						if (!in_array($table, (array) $options['from_alias'])) {
 							$options['from_alias'][] = $table;
@@ -800,18 +798,6 @@ abstract class InterAdminAbstract implements Serializable {
 		}
 	}
 	/**
-	 * Equals to static::CONSTNAME on PHP 5.3
-	 * 
-	 * @param object $constname
-	 * @return 
-	 */
-	protected function staticConst($constname) {
-		$constname = get_class($this) . '::' . $constname;
-		if (defined($constname)) {
-			return constant($constname);
-		}
-	}
-	/**
 	 * Sets this object´s attributes with the given array keys and values.
 	 * 
 	 * @param array $attributes
@@ -838,7 +824,7 @@ abstract class InterAdminAbstract implements Serializable {
 		foreach ($fields as $key) {
 			unset($this->attributes[$key]);
 		}
-		$isAliased = $this->staticConst('DEFAULT_FIELDS_ALIAS');
+		$isAliased = static::DEFAULT_FIELDS_ALIAS;
 		$this->getFieldsValues($fields, false, $isAliased);
 	}
 	/**
