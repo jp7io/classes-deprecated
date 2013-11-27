@@ -265,24 +265,25 @@ class InterAdmin extends InterAdminAbstract {
 	 * @return InterAdmin
 	 */
 	public function getParent($options = array()) {
-		if (!$this->parent_id) {
-			$this->getFieldsValues(array('parent_id', 'parent_id_tipo'));
-		}
-		$options = $options + array('fields_alias' => static::DEFAULT_FIELDS_ALIAS);
-		if ($this->parent_id) {
-			if (!$this->_parent) {
-				$parentTipo = null;
-				if ($this->parent_id_tipo) {
-					$parentTipo = InterAdminTipo::getInstance($this->parent_id_tipo);
-				}
-				$options['default_class'] = static::DEFAULT_NAMESPACE . 'InterAdmin';
+		if (!$this->_parent) {
+			if (!$this->parent_id || !$this->parent_id_tipo) {
+				$this->getFieldsValues(array('parent_id', 'parent_id_tipo'));
+			}
+			$options = $options + array('fields_alias' => static::DEFAULT_FIELDS_ALIAS);
+			
+			$parentTipo = null;
+			if ($this->parent_id_tipo) {
+				$parentTipo = InterAdminTipo::getInstance($this->parent_id_tipo);
+			}
+			$options['default_class'] = static::DEFAULT_NAMESPACE . 'InterAdmin';
+			if ($this->parent_id) {
 				$this->_parent = InterAdmin::getInstance($this->parent_id, $options, $parentTipo);
 				if ($this->_parent->id) {
 					$this->getTipo()->setParent($this->_parent);
 				}
-			} elseif ($options['fields']) {
-				$this->_parent->getFieldsValues($options['fields'], false, $options['fields_alias']);
 			}
+		} elseif ($options['fields']) {
+			$this->_parent->getFieldsValues($options['fields'], false, $options['fields_alias']);
 		}
 		return $this->_parent;
 	}

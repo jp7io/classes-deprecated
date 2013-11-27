@@ -383,7 +383,7 @@ abstract class InterAdminAbstract implements Serializable {
 				    list($joinType, $tipo, $on) = $join;
 				    $table = $tipo->getInterAdminsTableName();
 				    $joins .= ' ' . $joinType . ' JOIN ' . $table . ' AS ' . $alias . ' ON ' . 
-					    $this->getPublishedFilters($table, $alias) . 
+					    ($use_published_filters ? static::getPublishedFilters($table, $alias) : '') . 
 					    $alias . '.id_tipo = ' . $tipo->id_tipo . ' AND ' . $this->_resolveSql($on, $options, $use_published_filters);
 			    }
 		    }
