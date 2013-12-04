@@ -41,7 +41,7 @@ class InterAdminFieldFile {
 	public function getAbsoluteUrl() {
 		global $config, $jp7_app;
 		
-		if ($jp7_app == 'intermail_new') {
+		if ($jp7_app && $jp7_app != 'interadmin') {
 			return jp7_replace_beginning('../../upload/', 'http://' . $config->server->host . '/' . $config->name_id . '/' . $jp7_app . '/upload/', $this->url);
 		} else {
 			return jp7_replace_beginning('../../upload/', $config->url . 'upload/', $this->url);
