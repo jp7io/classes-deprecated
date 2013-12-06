@@ -72,7 +72,7 @@ class Jp7_InterAdmin_Util {
 				if ($attributeTipo = $attribute->getTipo()) {
 					$options = array();
 					if ($bind_children) {
-						$options['order'] = 'parent_id = ' . $record->parent_id . ' DESC';
+						$options['order'] = 'parent_id = ' . $record->parent_id . ' DESC, deleted = \'\' DESC';
 					}
 					$record->$attributeName = $attributeTipo->findByIdString($attribute->id_string, $options);
 				}
