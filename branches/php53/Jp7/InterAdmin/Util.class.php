@@ -69,7 +69,9 @@ class Jp7_InterAdmin_Util {
 	protected static function _importAttributeFromIdString($record, $bind_children = false) {
 		foreach ($record->attributes as $attributeName => $attribute) {
 			if ($attribute instanceof InterAdmin && $attribute->id_string) {
-				if ($attributeTipo = $attribute->getTipo()) {
+				$attributeTipo = InterAdminTipo::getInstance($attribute->id_tipo);
+				//$attribute->setTipo($attributeTipo);
+				if ($attributeTipo) {
 					$options = array();
 					if ($bind_children) {
 						$options['order'] = 'parent_id = ' . $record->parent_id . ' DESC, deleted = \'\' DESC';
