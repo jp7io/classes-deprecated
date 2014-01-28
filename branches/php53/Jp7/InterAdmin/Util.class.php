@@ -96,7 +96,9 @@ class Jp7_InterAdmin_Util {
 	 * @return 	void	
 	 */
 	public static function import(array $records, $id_tipo, $parent_id = 0, $import_children = true, $use_id_string = false, $bind_children = false) {
+		$returnIds = array();
 		foreach ($records as $record) {
+			$returnId = array('id' => $record->id);
 			unset($record->id);
 			
 			$tipo = InterAdminTipo::getInstance($id_tipo);
@@ -109,11 +111,14 @@ class Jp7_InterAdmin_Util {
 			}
 			
 			$record->save();
+			$returnId['new_id'] = $record->id;
 			
 			if ($import_children) {
 				self::_importChildren($record, $use_id_string, $bind_children);
 			}
+			$returnIds[] = $returnId;
 		}
+		return $returnIds;
 	}
 	
 	public static function _importChildren($record, $use_id_string, $bind_children) {
