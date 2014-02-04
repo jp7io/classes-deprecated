@@ -64,7 +64,7 @@ class InterAdminFieldFile {
 			}
 			$retorno = $parent->$varchar_key;
 		}
-		return htmlspecialchars($retorno);
+		return isospecialchars($retorno);
 	}
 	/**
      * Returns $parent.
