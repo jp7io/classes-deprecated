@@ -238,7 +238,9 @@ class InterAdmin extends InterAdminAbstract {
 	public function getTipo($options = array()) {
 		if (!$this->_tipo) {
 			if (!$id_tipo = $this->id_tipo) {
-				$id_tipo = jp7_fields_values($this->getTableName(), 'id', $this->id, 'id_tipo');
+				global $db;
+				$sql = "SELECT id_tipo FROM " . $this->getTableName() . " WHERE id = " . intval($this->id);
+				$id_tipo = $db->GetOne($sql) or die(jp7_debug($db->ErrorMsg(), $sql));
 			}
 			$this->setTipo(InterAdminTipo::getInstance($id_tipo, array(
 				'db_prefix' => $this->db_prefix,

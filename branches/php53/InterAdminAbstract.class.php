@@ -871,8 +871,7 @@ abstract class InterAdminAbstract implements Serializable {
 	protected function _whereArrayFix(&$where) {
 		if (!is_array($where)) {
 			if ($where) {
-				$where = explode(' AND ', $where);
-				$where = array_filter($where, 'array_trim'); // Para remover itens vazios
+				$where = jp7_explode(' AND ', $where);
 			} else {
 				$where = array();
 			}
