@@ -34,6 +34,6 @@ class Cdn
     private static function getVersion()
     {
         // Using timestamp of the git folder as version number
-        return filemtime(base_path('.git'));
+        return 'todo';
     }
 }
