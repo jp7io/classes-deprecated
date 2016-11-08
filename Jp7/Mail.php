@@ -118,7 +118,7 @@ class Jp7_Mail extends Zend_Mail
                     $template = str_replace('http://', 'http://'.$_SERVER['PHP_AUTH_USER'].':'.$_SERVER['PHP_AUTH_PW'].'@', $template);
                     $template = str_replace('https://', 'https://'.$_SERVER['PHP_AUTH_USER'].':'.$_SERVER['PHP_AUTH_PW'].'@', $template);
                 }
-                $template = file_get_contents($template);
+                $template = url_get_contents($template);
 
                 //echo "template: ".$template;
                 $message_html = str_replace('%MESSAGE%', $message_html, $template);
