@@ -139,6 +139,21 @@ if (!function_exists('interadmin_data')) {
         }
         return route($prefix.$name, $parameters, $absolute);
     }
+    
+    function url_get_contents($url, array $contextOptions = [])
+    {
+        if (ends_with(parse_url($url)['host'], '.dev')) {
+            // Local development does not have SSL certificates
+            $contextOptions += [
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                ],
+            ];
+        }
+        $context = stream_context_create($contextOptions);
+        return file_get_contents($url, false, $context);
+    }
 }
 // Laravel 5.2
 if (!function_exists('resource_path')) {
