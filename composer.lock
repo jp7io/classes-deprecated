@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "4d814b49f23546cfdced195c8fdf7623",
-    "content-hash": "70a11a1622499844a994109e7d814354",
+    "hash": "1c24db22a9ef9ba8e741da94c4aa41e7",
+    "content-hash": "f99dcc8801dcc05254ecaac6d8c83c21",
     "packages": [
         {
             "name": "jdorn/sql-formatter",
@@ -58,179 +58,51 @@
             "time": "2014-01-12 16:20:24"
         },
         {
-            "name": "jeremykendall/php-domain-parser",
-            "version": "3.0.0",
+            "name": "jp7internet/interadmin-orm",
+            "version": "v3.1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/jeremykendall/php-domain-parser.git",
-                "reference": "896e7e70f02bd4fd77190052799bc61e4d779672"
+                "url": "git@github.com:jp7internet/interadmin-orm.git",
+                "reference": "d87656de196a2820332359da1c8f98c2bbb01345"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jeremykendall/php-domain-parser/zipball/896e7e70f02bd4fd77190052799bc61e4d779672",
-                "reference": "896e7e70f02bd4fd77190052799bc61e4d779672",
+                "url": "https://api.github.com/repos/jp7internet/interadmin-orm/zipball/d87656de196a2820332359da1c8f98c2bbb01345",
+                "reference": "d87656de196a2820332359da1c8f98c2bbb01345",
                 "shasum": ""
             },
             "require": {
-                "ext-curl": "*",
-                "ext-intl": "*",
-                "ext-mbstring": "*",
-                "php": ">=5.3.0"
+                "jdorn/sql-formatter": "~1.2"
             },
             "require-dev": {
-                "jeremykendall/debug-die": "0.0.1.*",
-                "mikey179/vfsstream": "~1.4",
-                "phpunit/phpunit": "~4.4"
+                "jp7internet/inc": "dev-master",
+                "phpunit/phpunit": "^4.8"
             },
-            "bin": [
-                "bin/parse",
-                "bin/update-psl"
-            ],
+            "suggest": {
+                "adodb/adodb-php": "~5.0 (Deprecated) For legacy ORM v2 without Laravel",
+                "werkint/jsmin": "~1.0.0 (Deprecated) JS Minification library",
+                "zendframework/zendframework1": "1.12.0 (Deprecated) For legacy ZF1 applications"
+            },
             "type": "library",
             "autoload": {
+                "classmap": [
+                    "legacy"
+                ],
+                "psr-4": {
+                    "Jp7\\": "Jp7/"
+                },
                 "psr-0": {
-                    "Pdp\\": "src/"
+                    "Jp7_": ""
                 },
                 "files": [
-                    "src/pdp-parse-url.php"
+                    "Jp7/Laravel/functions.php"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "MIT"
+                "proprietary"
             ],
-            "authors": [
-                {
-                    "name": "Jeremy Kendall",
-                    "homepage": "http://about.me/jeremykendall",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Contributors",
-                    "homepage": "https://github.com/jeremykendall/php-domain-parser/graphs/contributors"
-                }
-            ],
-            "description": "Public Suffix List based URL parsing implemented in PHP.",
-            "homepage": "https://github.com/jeremykendall/php-domain-parser",
-            "keywords": [
-                "Public Suffix List",
-                "domain parsing",
-                "url parsing"
-            ],
-            "time": "2015-03-30 12:49:45"
-        },
-        {
-            "name": "league/uri",
-            "version": "4.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/thephpleague/uri.git",
-                "reference": "0cbce9fe7d9808690ebda67b110ad96bcae9daee"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/uri/zipball/0cbce9fe7d9808690ebda67b110ad96bcae9daee",
-                "reference": "0cbce9fe7d9808690ebda67b110ad96bcae9daee",
-                "shasum": ""
-            },
-            "require": {
-                "ext-fileinfo": "*",
-                "ext-intl": "*",
-                "ext-mbstring": "*",
-                "jeremykendall/php-domain-parser": "^3.0",
-                "php": ">=5.5.9",
-                "psr/http-message": "^1.0"
-            },
-            "require-dev": {
-                "fabpot/php-cs-fixer": "^1.9",
-                "phpunit/phpunit": "^4.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "4.1-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "League\\Uri\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ignace Nyamagana Butera",
-                    "email": "nyamsprod@gmail.com",
-                    "homepage": "https://nyamsprod.com"
-                }
-            ],
-            "description": "URI manipulation library",
-            "homepage": "http://url.thephpleague.com",
-            "keywords": [
-                "data",
-                "data-uri",
-                "ftp",
-                "http",
-                "parse_url",
-                "psr-7",
-                "rfc3986",
-                "uri",
-                "url",
-                "ws"
-            ],
-            "time": "2016-03-24 08:38:29"
-        },
-        {
-            "name": "psr/http-message",
-            "version": "1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-fig/http-message.git",
-                "reference": "85d63699f0dbedb190bbd4b0d2b9dc707ea4c298"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/http-message/zipball/85d63699f0dbedb190bbd4b0d2b9dc707ea4c298",
-                "reference": "85d63699f0dbedb190bbd4b0d2b9dc707ea4c298",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Psr\\Http\\Message\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
-                }
-            ],
-            "description": "Common interface for HTTP messages",
-            "keywords": [
-                "http",
-                "http-message",
-                "psr",
-                "psr-7",
-                "request",
-                "response"
-            ],
-            "time": "2015-05-04 20:22:00"
+            "description": "JP7 Classes",
+            "time": "2016-09-30 16:32:53"
         }
     ],
     "packages-dev": [
@@ -860,17 +732,79 @@
             "time": "2016-05-30 02:40:53"
         },
         {
-            "name": "jp7internet/inc",
-            "version": "dev-master",
+            "name": "jeremykendall/php-domain-parser",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
-                "url": "git@github.com:jp7internet/inc.git",
-                "reference": "2eba65a8f3327a6bed40641868feb5f6aefe0476"
+                "url": "https://github.com/jeremykendall/php-domain-parser.git",
+                "reference": "896e7e70f02bd4fd77190052799bc61e4d779672"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jp7internet/inc/zipball/2eba65a8f3327a6bed40641868feb5f6aefe0476",
-                "reference": "2eba65a8f3327a6bed40641868feb5f6aefe0476",
+                "url": "https://api.github.com/repos/jeremykendall/php-domain-parser/zipball/896e7e70f02bd4fd77190052799bc61e4d779672",
+                "reference": "896e7e70f02bd4fd77190052799bc61e4d779672",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-intl": "*",
+                "ext-mbstring": "*",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "jeremykendall/debug-die": "0.0.1.*",
+                "mikey179/vfsstream": "~1.4",
+                "phpunit/phpunit": "~4.4"
+            },
+            "bin": [
+                "bin/parse",
+                "bin/update-psl"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Pdp\\": "src/"
+                },
+                "files": [
+                    "src/pdp-parse-url.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jeremy Kendall",
+                    "homepage": "http://about.me/jeremykendall",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/jeremykendall/php-domain-parser/graphs/contributors"
+                }
+            ],
+            "description": "Public Suffix List based URL parsing implemented in PHP.",
+            "homepage": "https://github.com/jeremykendall/php-domain-parser",
+            "keywords": [
+                "Public Suffix List",
+                "domain parsing",
+                "url parsing"
+            ],
+            "time": "2015-03-30 12:49:45"
+        },
+        {
+            "name": "jp7internet/inc",
+            "version": "v3.1.1",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:jp7internet/inc.git",
+                "reference": "d4d1376150b1208e0ad9ccc039eea577c2291856"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jp7internet/inc/zipball/d4d1376150b1208e0ad9ccc039eea577c2291856",
+                "reference": "d4d1376150b1208e0ad9ccc039eea577c2291856",
                 "shasum": ""
             },
             "require": {
@@ -890,11 +824,7 @@
                 "proprietary"
             ],
             "description": "Jp7 Includes",
-            "support": {
-                "source": "https://github.com/jp7internet/inc/tree/master",
-                "issues": "https://github.com/jp7internet/inc/issues"
-            },
-            "time": "2016-07-14 13:51:06"
+            "time": "2016-10-04 22:33:08"
         },
         {
             "name": "league/flysystem",
@@ -978,6 +908,70 @@
                 "storage"
             ],
             "time": "2016-07-18 12:22:57"
+        },
+        {
+            "name": "league/uri",
+            "version": "4.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/uri.git",
+                "reference": "0cbce9fe7d9808690ebda67b110ad96bcae9daee"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/uri/zipball/0cbce9fe7d9808690ebda67b110ad96bcae9daee",
+                "reference": "0cbce9fe7d9808690ebda67b110ad96bcae9daee",
+                "shasum": ""
+            },
+            "require": {
+                "ext-fileinfo": "*",
+                "ext-intl": "*",
+                "ext-mbstring": "*",
+                "jeremykendall/php-domain-parser": "^3.0",
+                "php": ">=5.5.9",
+                "psr/http-message": "^1.0"
+            },
+            "require-dev": {
+                "fabpot/php-cs-fixer": "^1.9",
+                "phpunit/phpunit": "^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Uri\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ignace Nyamagana Butera",
+                    "email": "nyamsprod@gmail.com",
+                    "homepage": "https://nyamsprod.com"
+                }
+            ],
+            "description": "URI manipulation library",
+            "homepage": "http://url.thephpleague.com",
+            "keywords": [
+                "data",
+                "data-uri",
+                "ftp",
+                "http",
+                "parse_url",
+                "psr-7",
+                "rfc3986",
+                "uri",
+                "url",
+                "ws"
+            ],
+            "time": "2016-03-24 08:38:29"
         },
         {
             "name": "monolog/monolog",
@@ -1732,6 +1726,55 @@
             "time": "2015-10-02 06:51:40"
         },
         {
+            "name": "psr/http-message",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-message.git",
+                "reference": "85d63699f0dbedb190bbd4b0d2b9dc707ea4c298"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/85d63699f0dbedb190bbd4b0d2b9dc707ea4c298",
+                "reference": "85d63699f0dbedb190bbd4b0d2b9dc707ea4c298",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP messages",
+            "keywords": [
+                "http",
+                "http-message",
+                "psr",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "time": "2015-05-04 20:22:00"
+        },
+        {
             "name": "psr/log",
             "version": "1.0.0",
             "source": {
@@ -2477,9 +2520,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "jp7internet/inc": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
