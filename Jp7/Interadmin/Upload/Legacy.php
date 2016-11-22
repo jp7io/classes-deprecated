@@ -3,6 +3,7 @@
 class Jp7_Interadmin_Upload_Legacy extends Jp7_Interadmin_Upload_AdapterAbstract
 {
     public static $templates = [
+        'original' => null,
         'thumb_interadmin' => '40x40'
     ];
 
