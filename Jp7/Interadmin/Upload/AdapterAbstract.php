@@ -13,6 +13,7 @@ abstract class Jp7_Interadmin_Upload_AdapterAbstract implements Jp7_Interadmin_U
 
     protected function getScheme()
     {
+        global $config;
         return $config->storage['scheme'] ?? 'http'.(isset($_SERVER['HTTPS']) ? 's' : '');
     }
 
