@@ -18,7 +18,7 @@ class InterAdminRecordUrl
         // if ($this->_url) {
         //     return $this->_url;
         // }
-        $url_arr = '';
+        $url_arr = [];
         $parent = $type;
         while ($parent) {
             if (!isset($parent->nome)) {
@@ -38,16 +38,17 @@ class InterAdminRecordUrl
                 $parent = $parent->getTipo();
             }
         }
-        $url_arr = array_reverse((array) $url_arr);
+        $url_arr = array_reverse($url_arr);
         if ($seo) {
             $url = $config->url.$lang->path.jp7_implode('/', $url_arr);
         } else {
-            $url = $config->url.$lang->path_url.implode('_', $url_arr);
+            $url = implode('_', $url_arr);
             $pos = strpos($url, '_');
             if ($pos) {
                 $url = substr_replace($url, '/', $pos, 1);
             }
             $url .= (count($url_arr) > 1) ? '.php' : '/';
+            $url = $config->url.$lang->path_url.$url;
         }
         //$this->_url = $url;
         return $url;
