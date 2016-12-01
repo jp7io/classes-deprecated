@@ -10,7 +10,6 @@
     }
   ],
   "require": {
-    "jdorn/sql-formatter": "~1.2",
     "jp7internet/interadmin-orm": "3.2.x-dev"
   },
   "require-dev": {
