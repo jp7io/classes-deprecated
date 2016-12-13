@@ -29,6 +29,10 @@ class QaAuth
         if (!App::environment('staging') && !starts_with($request->getHttpHost(), 'alt.')) {
             return true;
         }
+        // Allow AJAX calls
+        if ($request->ajax()) {
+            return true;
+        }
         // Allow PHP file_get_content calls
         if (empty($_SERVER['HTTP_USER_AGENT'])) {
             return true;
