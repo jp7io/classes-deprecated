@@ -278,10 +278,6 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract
             '';
 
         file_put_contents($filename, $content);
-
-        if ($c_remote) {
-            interadmin_update_remote_files(['dynamic.css']);
-        }
     }
 
     protected static function _getCssBase($base_id, $properties)
