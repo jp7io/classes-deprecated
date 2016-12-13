@@ -32,7 +32,7 @@ class InterAdminHandler
     protected function renderWithWhoops($e)
     {
         $whoops = new \Whoops\Run;
-        if (php_sapi_name() === 'cli') {
+        if (php_sapi_name() === 'cli' || getenv('APP_ENV') !== 'local') {
             $whoops->pushHandler(new \Whoops\Handler\PlainTextHandler());
         } else {
             $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler());
