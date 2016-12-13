@@ -29,14 +29,14 @@ class QaAuth
         if (!App::environment('staging') && !starts_with($request->getHttpHost(), 'alt.')) {
             return true;
         }
-        // Allow AJAX calls
-        if ($request->ajax()) {
+        // Allow API calls
+        if ($request->ajax() || $request->wantsJson()) {
             return true;
         }
-        // Allow PHP file_get_content calls
+        // Allow PHP file_get_contents() calls
         if (empty($_SERVER['HTTP_USER_AGENT'])) {
             return true;
-        }            
+        }
         // Browser: HTTP authentication
         $name = config('app.name');
         return (isset($_SERVER['PHP_AUTH_USER']) && $_SERVER['PHP_AUTH_USER'] === $name && $_SERVER['PHP_AUTH_PW'] === $name);
