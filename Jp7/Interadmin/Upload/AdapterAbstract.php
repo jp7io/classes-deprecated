@@ -11,6 +11,11 @@ abstract class Jp7_Interadmin_Upload_AdapterAbstract implements Jp7_Interadmin_U
             $path;
     }
 
+    public function hasPurging()
+    {
+        return true;
+    }
+
     protected function getScheme()
     {
         global $config;

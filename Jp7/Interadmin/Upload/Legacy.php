@@ -18,4 +18,9 @@ class Jp7_Interadmin_Upload_Legacy extends Jp7_Interadmin_Upload_AdapterAbstract
 
         return (string) $url;
     }
+
+    public function purge($path)
+    {
+        // no action is needed
+    }
 }
