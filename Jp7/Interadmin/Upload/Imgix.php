@@ -32,10 +32,10 @@ class Jp7_Interadmin_Upload_Imgix extends Jp7_Interadmin_Upload_AdapterAbstract
         if (!Jp7_Interadmin_Upload::isImage($path) || !isset($config->imgix['api_key'])) {
             return;
         }
-
         $context = stream_context_create([
             'http' => [
                 'method' => 'POST',
+                'timeout' => 2, // Fire and forget
                 'header'  => [
                     'Content-Type: application/x-www-form-urlencoded',
                     'Authorization: Basic '.base64_encode($config->imgix['api_key'].':')
@@ -45,7 +45,11 @@ class Jp7_Interadmin_Upload_Imgix extends Jp7_Interadmin_Upload_AdapterAbstract
                 ])
             ]
         ]);
-
-        file_get_contents('https://api.imgix.com/v2/image/purger', false, $context);
+        try {
+            file_get_contents('https://api.imgix.com/v2/image/purger', false, $context);
+        } catch (Exception $e) {
+            // ignore because of Fire and forget timeout
+            Log::info($e);
+        }
     }
 }
