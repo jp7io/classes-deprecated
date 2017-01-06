@@ -667,7 +667,11 @@ class Jp7_Deprecated
             $array = &$GLOBALS;
         }
 
-        $table = replace_prefix(DB::getTablePrefix(), '', $table);
+        $db_prefix = DB::getTablePrefix();
+        if ($table.'_' === $db_prefix) {
+            $table .= '_registros';
+        }
+        $table = replace_prefix($db_prefix, '', $table);
         $columns = DB::getSchemaBuilder()->getColumnListing($table);
 
         foreach ($rs as $row) {
