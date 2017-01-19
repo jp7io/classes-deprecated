@@ -291,6 +291,8 @@ class Jp7_Deprecated
      *
      * @author JP
      *
+     * @todo ($GLOBALS["jp7_app"]=='intermail') will not be TRUE, since the previous condition ($GLOBALS['db_type']) is TRUE on the Intermail.
+     *
      * @version (2008/09/17)
      */
     public static function jp7_fields_values($table_or_id, $field_or_id = '', $id_value = '', $field_name = '', $OOP = false)
@@ -344,9 +346,11 @@ class Jp7_Deprecated
                         " AND (deleted = '' OR deleted IS NULL)".
                         " AND date_publish <= '".date('Y/m/d H:i:s')."'";
             }
-
-            $rs = DB::select($sql);
-            foreach ($rs as $row) {
+            $rs = $db->Execute($sql);
+            if ($rs === false) {
+                throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+            }
+            if ($row = $rs->FetchNextObj()) {
                 if (count($fields_arr) > 1 || $OOP) {
                     if (empty($O)) {
                         $O = new stdClass();
@@ -358,6 +362,7 @@ class Jp7_Deprecated
                     $O = $row->$fields;
                 }
             }
+            $rs->Close();
 
             return $O;
         }
@@ -659,7 +664,10 @@ class Jp7_Deprecated
     {
         global $db, $jp7_app;
         $sql = 'SELECT * FROM '.$table.' WHERE '.$table_id_name.'='.$table_id_value;
-        $rs = DB::select($sql);
+        $rs = $db->Execute($sql);
+        if ($rs === false) {
+            throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+        }
 
         if ($returnValues) {
             $array = [];
@@ -667,14 +675,14 @@ class Jp7_Deprecated
             $array = &$GLOBALS;
         }
 
-        $table = replace_prefix(DB::getTablePrefix(), '', $table);
-        $columns = DB::getSchemaBuilder()->getColumnListing($table);
-
-        foreach ($rs as $row) {
-            foreach ($columns as $column) {
-                $array[$var_prefix.$column] = $row->$column;
+        while ($row = $rs->FetchNextObj()) {
+            $meta_cols = $db->MetaColumns($table, false);
+            foreach ($meta_cols as $meta) {
+                $name = $meta->name;
+                $array[$var_prefix.$name] = $row->$name;
             }
         }
+        $rs->Close();
         if ($returnValues) {
             return $array;
         }

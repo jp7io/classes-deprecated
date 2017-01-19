@@ -95,14 +95,16 @@ class Pagination
 
         if ($sql) {
             if ($GLOBALS['jp7_app']) {
-                $rs = DB::select($sql);
-                $row = $rs[0];
+                $rs = $db->Execute($sql);
+                if ($rs === false) {
+                    throw new Jp7_Interadmin_Exception($db->ErrorMsg());
+                }
             } else {
                 $rs = interadmin_query($sql);
-                $row = $rs->FetchNextObj();
-                $rs->Close();
             }
+            $row = $rs->FetchNextObj();
             $this->records = $row->records;
+            $rs->Close();
         } elseif (isset($records)) {
             $this->records = $records;
         } else {
