@@ -298,19 +298,19 @@ class InterSite
         /* @todo TEMP - Creating old globals */
         $GLOBALS['c_url'] = $this->url;
         $GLOBALS['c_site'] = $this->name_id;
-        $GLOBALS['c_menu'] = @$this->menu;
-        $GLOBALS['c_cache'] = $this->cache;
-        $GLOBALS['c_cache_delay'] = @$this->cache_delay;
+        $GLOBALS['c_menu'] = $this->menu ?? null;
+        $GLOBALS['c_cache'] = $this->cache ?? null;
+        $GLOBALS['c_cache_delay'] = $this->cache_delay ?? null;
         $GLOBALS['db_prefix'] = $this->db->prefix;
         $GLOBALS['c_cliente_url_path'] = $GLOBALS['c_path'] = jp7_path($this->server->path);
-        $GLOBALS['c_analytics'] = @$this->google_analytics;
-        $GLOBALS['googlemaps_key'] = @$this->google_maps;
+        $GLOBALS['c_analytics'] = $this->google_analytics ?? null;
+        $GLOBALS['googlemaps_key'] = $this->google_maps ?? null;
         $GLOBALS['c_w3c'] = true;
         // InterAdmin
-        $GLOBALS['c_publish'] = @$this->interadmin_preview;
-        $GLOBALS['c_remote'] = @$this->interadmin_remote;
+        $GLOBALS['c_publish'] = $this->interadmin_preview ?? null;
+        $GLOBALS['c_remote'] = $this->interadmin_remote ?? null;
         $GLOBALS['c_cliente_title'] = $this->name;
-        $GLOBALS['c_nobackup'] = @$this->nobackup;
+        $GLOBALS['c_nobackup'] = $this->nobackup ?? null;
         foreach ($this->langs as $sigla => $lang) {
             $GLOBALS['c_lang'][] = [$sigla, $lang->name, (bool) $lang->multibyte];
         }
