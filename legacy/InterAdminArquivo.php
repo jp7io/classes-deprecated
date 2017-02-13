@@ -49,10 +49,6 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
     public function __construct($id_arquivo = 0, $options = [])
     {
         $this->id_arquivo = $id_arquivo;
-
-        if ($options['fields']) {
-            $this->getFieldsValues($options['fields']);
-        }
     }
     /**
      * Gets the InterAdminTipo object for this record, which is then cached on the $_tipo property.
