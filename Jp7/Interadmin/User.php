@@ -2,6 +2,11 @@
 
 class Jp7_Interadmin_User extends InterAdmin
 {
+    public static function type()
+    {
+        return (new Interadmin_Login)->getUsuarioTipo();
+    }
+
     /**
      * Masks something@example.com into someth***@exam***.com
      */

@@ -31,6 +31,17 @@ class Jp7_Interadmin_Upload
         }
     }
 
+    public static function hasPurging()
+    {
+        return static::getAdapter()->hasPurging();
+    }
+
+    public static function purge($path)
+    {
+        $path = substr($path, strlen('../../'));
+        return static::getAdapter()->purge($path);
+    }
+
     public static function getHumanSize($path)
     {
         try {

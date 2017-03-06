@@ -12,4 +12,13 @@ class Jp7_Interadmin_Upload_Intervention extends Jp7_Interadmin_Upload_AdapterAb
 
         return $this->url($path);
     }
+
+    public function purge($path)
+    {
+        if (!Jp7_Interadmin_Upload::isImage($path)) {
+            return;
+        }
+        $purgeUrl = $this->imageUrl($path, 'clear');
+        url_get_contents($purgeUrl);
+    }
 }

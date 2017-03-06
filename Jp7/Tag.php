@@ -93,6 +93,7 @@ abstract class Jp7_Tag
      */
     public function getTagName()
     {
-        return mb_strtolower(end(explode('_', get_called_class())));
+        $classParts = explode('_', get_called_class());
+        return mb_strtolower(end($classParts));
     }
 }
