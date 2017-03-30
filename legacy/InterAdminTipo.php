@@ -94,7 +94,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
     /**
      * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
      *
-     * @return InterAdmin[] Array of InterAdmin objects.
+     * @return array InterAdmin[] Array of InterAdmin objects.
      */
     public function find($options = [])
     {
@@ -180,7 +180,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
      *
      * @param array $options [optional]
      *
-     * @return InterAdmin[]
+     * @return array InterAdmin[]
      */
     public function getInterAdminsUsingThisModel($options = [])
     {

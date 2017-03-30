@@ -13,7 +13,7 @@ class Jp7_Interadmin_Util
      * @param InterAdminTipo $tipoObj InterAdminTipo where the records are.
      * @param array          $ids     Array de IDs.
      *
-     * @return InterAdmin[]
+     * @return array InterAdmin[]
      */
     public static function export(InterAdminTipo $tipoObj, array $ids, $use_id_string = false)
     {

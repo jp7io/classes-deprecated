@@ -178,7 +178,7 @@ class Jp7_Box_Manager
      * @param InterAdminTipo $boxTipo
      * @param InterAdmin     $pageRecord [optional]
      *
-     * @return InterAdmin[] An array of columns. Each column has an attribute called "boxes".
+     * @return array InterAdmin[] An array of columns. Each column has an attribute called "boxes".
      */
     public static function buildBoxes($boxTipo)
     {
@@ -226,9 +226,9 @@ class Jp7_Box_Manager
     /**
      * Creates objects from records using their respective classes.
      *
-     * @param InterAdmin[] $columns
+     * @param array InterAdmin[] $columns
      *
-     * @return InterAdmin[] An array of columns. Each column has an attribute called "boxes".
+     * @return array InterAdmin[] An array of columns. Each column has an attribute called "boxes".
      */
     public static function createObjects($columns)
     {
