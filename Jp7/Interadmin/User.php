@@ -9,6 +9,8 @@ class Jp7_Interadmin_User extends InterAdmin
 
     /**
      * Masks something@example.com into someth***@exam***.com
+     *
+     * @deprecated Using Laravel Auth methods
      */
     public function maskEmail()
     {
@@ -23,6 +25,9 @@ class Jp7_Interadmin_User extends InterAdmin
         return $username.'@'.$domain;
     }
 
+    /**
+     * @deprecated Using Laravel Auth methods
+     */
     public function getResetToken()
     {
         if ($this->reset_token_sent_at < new Jp7_Date('-1 day')) {
@@ -37,6 +42,8 @@ class Jp7_Interadmin_User extends InterAdmin
 
     /**
      * Crypto strong 256-bit random token
+     *
+     * @deprecated Using Laravel Auth methods
      */
     private function newResetToken()
     {
@@ -92,6 +99,9 @@ class Jp7_Interadmin_User extends InterAdmin
         }
     }
 
+    /**
+     * @deprecated Using Laravel Auth methods
+     */
     public function resetPassword($password, $confirm_password)
     {
         if (strlen($password) < 6) {
