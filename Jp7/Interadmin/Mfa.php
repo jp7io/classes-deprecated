@@ -82,7 +82,7 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
         $dbToken = $this->getValidMfaToken([
             'where' => [
                 "md5(id) = '".$mfaCookie['id']."'",
-                "md5(UNIX_TIMESTAMP(date_publish)) = '".$mfaCookie['timestamp']."'",
+                "md5(date_publish) = '".$mfaCookie['timestamp']."'",
             ],
         ]);
 
@@ -168,7 +168,7 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
 
         $cookie = [
             'id' => md5($mfaToken->id),
-            'timestamp' => md5($mfaToken->date_publish->getTimestamp()),
+            'timestamp' => md5($mfaToken->date_publish),
         ];
 
         setcookie('mfa['.$this->getCliente().']['.$cookieKey.']', serialize($cookie), strtotime('+15 days'), '/');
