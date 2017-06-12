@@ -24,7 +24,7 @@ class Jp7_Interadmin_Upload
         }
         $path = substr($path, strlen('../../'));
 
-        if (static::isImage($path)) {
+        if (static::isImage($path) && ($template !== 'original' || !static::isGif($path))) {
             return static::getAdapter()->imageUrl($path, $template);
         } else {
             return static::getAdapter()->url($path);
@@ -64,6 +64,12 @@ class Jp7_Interadmin_Upload
     {
         return preg_match('/.(jpg|jpeg|png|gif)[#?]?[^?\/#]*$/i', $url);
     }
+
+    public static function isGif($url)
+    {
+        return preg_match('/.gif[#?]?[^?\/#]*$/i', $url);
+    }
+
 
     public static function getAdapter()
     {
