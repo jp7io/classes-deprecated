@@ -4,11 +4,11 @@ class Jp7_Interadmin_Search
 {
     private $booleanMode = false;
 
-    public function search($search, $date_filter = false, $exclude_tables = [])
+    public function search($search, $date_filter = false, $exclude_tables = [], $extra_where = '')
     {
         global $db;
 
-        $sql = $this->getSql($search, $date_filter, $exclude_tables);
+        $sql = $this->getSql($search, $date_filter, $exclude_tables, $extra_where);
         $rs = $db->Execute($sql);
         if ($rs === false) {
             throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -66,12 +66,12 @@ class Jp7_Interadmin_Search
         return $sql;
     }
 
-    public function getSql($search, $date_filter, $exclude_tables = [])
+    public function getSql($search, $date_filter, $exclude_tables = [], $extra_where = '')
     {
         $tables = array_diff($this->getTables(), $exclude_tables);
         $sqls = [];
         foreach ($tables as $table) {
-            $tableSql = $this->getTableSql($table, $search, $date_filter);
+            $tableSql = $this->getTableSql($table, $search, $date_filter, $extra_where);
             if ($tableSql) {
                 $sqls[] = $tableSql;
             }
@@ -109,7 +109,7 @@ class Jp7_Interadmin_Search
      *
      * @return string
      */
-    public function getTableSql($table, $search, $date_filter)
+    public function getTableSql($table, $search, $date_filter, $extra_where = '')
     {
         global $db, $s_session;
 
@@ -204,6 +204,9 @@ class Jp7_Interadmin_Search
         }
 
         $where[] = $this->getTipoFilter();
+        if ($extra_where) {
+            $where[] = $extra_where;
+        }
         $where[] = 'id_tipo > 0';
 
         if ($date_filter) {
