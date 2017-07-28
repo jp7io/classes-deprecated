@@ -273,6 +273,8 @@ class InterSite
             'host' => getenv('STORAGE_HOST'),
             'path' => getenv('STORAGE_PATH') ?: '',
         ];
+
+        $this->google_analytics = $this->google_analytics ?: getenv('GOOGLE_ANALYTICS_KEY');
     }
 
     public function start()
