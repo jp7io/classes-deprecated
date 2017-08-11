@@ -426,6 +426,8 @@ class InterAdminField
         if (strpos($key, 'special_') === 0 || strpos($key, 'func_') === 0) {
             if (is_callable($campo['nome'])) {
                 return call_user_func($campo['nome'], $campo, '', 'header');
+            } elseif (str_contains($campo['nome'], '\\')) {
+                return $campo['label'];
             } else {
                 echo 'Função '.$campo['nome'].' não encontrada.';
             }
