@@ -5,8 +5,6 @@ use Jp7\Interadmin\Type;
 
 class Jp7_Interadmin_Util
 {
-    protected static $_default_vars = ['id_slug', 'parent_id', 'date_publish', 'date_insert', 'date_expire', 'date_modify', 'log', 'publish', 'deleted'];
-
     /**
      * Exports records and their children.
      *
@@ -18,7 +16,6 @@ class Jp7_Interadmin_Util
     public static function export(InterAdminTipo $tipoObj, array $ids, $use_id_string = false)
     {
         $options = [
-            'fields' => array_merge(['*'], self::$_default_vars),
             'class' => 'InterAdmin',
             'fields_alias' => false,
         ];
