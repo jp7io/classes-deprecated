@@ -96,10 +96,10 @@ class Jp7_Collections
         $clause = str_replace(' $a->OR ', ' OR ', $clause);
         $fnBody = 'return '.$clause.';';
         if ($debug) {
-            krumo($fnBody);
+            dump($fnBody);
         }
 
-        return create_function('$a', $fnBody);
+        return eval('return function ($a) { '.$fnBody.'};');
     }
 
     /**
@@ -207,10 +207,10 @@ class Jp7_Collections
             $retorno = &$fnBody;
         }
         if ($debug) {
-            krumo($fnBody);
+            dump($fnBody);
         }
         if ($fnBody) {
-            usort($array, create_function('$a,$b', $fnBody));
+            usort($array, eval('return function ($a,$b) { '.$fnBody.'};'));
         }
 
         return $array;
