@@ -402,7 +402,7 @@ class InterAdmin extends Record implements InterAdminAbstract
     public function save()
     {
         // Using id_string is deprecated, use id_slug instead
-        if (empty($this->attributes['id_string']) && in_array('id_string', $this->getColumns())) {
+        if (empty($this->attributes['id_string']) && array_key_exists('varchar_key', $this->_aliases) && in_array('id_string', $this->getColumns())) {
             $this->id_string = toId($this->varchar_key);
         }
         return parent::save();
