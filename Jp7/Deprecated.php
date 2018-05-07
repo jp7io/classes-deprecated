@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @deprecated
+ */
 class Jp7_Deprecated
 {
     /**
@@ -309,7 +312,7 @@ class Jp7_Deprecated
         if (is_numeric($table_or_id)) {
             // ($id,$field)
             global $db_prefix, $lang;
-            $table = $db_prefix.$lang->prefix;
+            $table = $db_prefix.$lang->prefix.'_registros';
             $table_id_name = 'id';
             $table_id_value = $table_or_id;
             $fields = $field_or_id;
