@@ -1,5 +1,7 @@
 <?php
 
+use Carbon\Carbon;
+
 /**
  * JP7's PHP Functions.
  *
@@ -14,7 +16,7 @@
 /**
  * Helper for date utils.
  */
-class Jp7_Date extends DateTime
+class Jp7_Date extends Carbon
 {
     /**
      * A test Date instance to be returned when now instances are created.
@@ -38,7 +40,7 @@ class Jp7_Date extends DateTime
         return parent::__construct($time, $timezone);
     }
 
-    public static function setTestNow(Jp7_Date $testNow = null)
+    public static function setTestNow($testNow = null)
     {
         static::$testNow = $testNow;
     }
@@ -86,15 +88,16 @@ class Jp7_Date extends DateTime
     }
 
     /**
-     * Get a copy of the instance.
-     *
-     * @return static
+     * @param $string
+     * @deprecated use copy() or clone
      */
-    public function copy()
+    public function cloneAndModify($string)
     {
-        return clone $this;
+        $copy = clone $this;
+
+        return $copy->modify($string);
     }
-    
+
     /**
      * Retorna string da diferença de tempo, ex: '3 dias atrás'.
      * O valor é arredondado: 2 anos e 4 meses retorna '2 anos atrás'.
@@ -287,28 +290,43 @@ class Jp7_Date extends DateTime
         return $this->format('Y-m-d H:i:s');
     }
 
-    public function minute()
+    public function minute($value = null)
     {
+        if ($value !== null) {
+            return pareng::minute($value);
+        }
         return $this->format('i');
     }
-    public function hour()
+    public function hour($value = null)
     {
+        if ($value !== null) {
+            return pareng::hour($value);
+        }
         return $this->format('H');
     }
-    public function day()
+    public function day($value = null)
     {
+        if ($value !== null) {
+            return pareng::day($value);
+        }
         return $this->format('d');
     }
-    public function month()
+    public function month($value = null)
     {
+        if ($value !== null) {
+            return pareng::month($value);
+        }
         return $this->format('m');
     }
     public function quarter()
     {
         return ceil($this->format('m') / 3);
     }
-    public function year()
+    public function year($value = null)
     {
+        if ($value !== null) {
+            return pareng::year($value);
+        }
         return $this->format('Y');
     }
 
