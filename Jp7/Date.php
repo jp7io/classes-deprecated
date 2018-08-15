@@ -99,6 +99,43 @@ class Jp7_Date extends Carbon
     }
 
     /**
+     * Adds an amount of days, months, years, hours, minutes and seconds to a Date object.
+     *
+     * @param DateInterval|string $interval
+     * @return Date|bool
+     */
+    public function add($interval)
+    {
+        if (is_string($interval)) {
+            // Check for ISO 8601
+            if (strtoupper(substr($interval, 0, 1)) == 'P') {
+                $interval = new DateInterval($interval);
+            } else {
+                $interval = DateInterval::createFromDateString($interval);
+            }
+        }
+        return parent::add($interval) ? $this : false;
+    }
+    /**
+     * Subtracts an amount of days, months, years, hours, minutes and seconds from a DateTime object.
+     *
+     * @param DateInterval|string $interval
+     * @return Date|bool
+     */
+    public function sub($interval)
+    {
+        if (is_string($interval)) {
+            // Check for ISO 8601
+            if (strtoupper(substr($interval, 0, 1)) == 'P') {
+                $interval = new DateInterval($interval);
+            } else {
+                $interval = DateInterval::createFromDateString($interval);
+            }
+        }
+        return parent::sub($interval) ? $this : false;
+    }
+    
+    /**
      * Retorna string da diferença de tempo, ex: '3 dias atrás'.
      * O valor é arredondado: 2 anos e 4 meses retorna '2 anos atrás'.
      * Diferenças menores de 1 minuto retornam 'agora'.
