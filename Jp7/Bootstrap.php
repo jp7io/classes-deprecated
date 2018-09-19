@@ -121,7 +121,7 @@ class Jp7_Bootstrap
         $frontController->setRouter(new Jp7_Controller_Router());
         $frontController->setControllerDirectory(APPLICATION_PATH.'/controllers');
         //$frontController->setControllerDirectory(. '/institucional/application/modules/default/controllers');
-        $frontController->addControllerDirectory(jp7_package_path('classes').'/Jp7', 'jp7');
+        $frontController->addControllerDirectory(jp7_package_path('classes-deprecated').'/Jp7', 'jp7');
 
         if (is_dir(APPLICATION_PATH.'/modules')) {
             $frontController->addModuleDirectory(APPLICATION_PATH.'/modules');
@@ -198,7 +198,7 @@ class Jp7_Bootstrap
             $view->getScriptPaths()
         ));
         // Permite o uso de Helpers customizados da Jp7
-        $view->addHelperPath(jp7_package_path('classes') . '/Jp7/View/Helper', 'Jp7_View_Helper');
+        $view->addHelperPath(jp7_package_path('classes-deprecated') . '/Jp7/View/Helper', 'Jp7_View_Helper');
 
         // Adicionando JS e CSS padrão
         $config = Zend_Registry::get('config');
