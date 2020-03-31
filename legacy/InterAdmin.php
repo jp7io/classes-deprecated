@@ -247,7 +247,7 @@ class InterAdmin extends Record implements InterAdminAbstract
     public function getFirstChild($id_tipo, $options = [])
     {
         $retorno = $this->getChildren($id_tipo, ['limit' => 1] + $options);
-        return $retorno[0];
+        return $retorno[0] ?? null;
     }
     /**
      * Returns the first Child by ID.
@@ -331,7 +331,7 @@ class InterAdmin extends Record implements InterAdminAbstract
     public function getFirstArquivo($options = [])
     {
         $retorno = $this->getArquivos($options + ['limit' => 1]);
-        return $retorno[0];
+        return $retorno[0] ?? null;
     }
     /**
      * Deletes all the InterAdminArquivo records related with this record.
@@ -398,7 +398,7 @@ class InterAdmin extends Record implements InterAdminAbstract
         $this->setRawAttributes($attributes);
         $this->_update($attributes);
     }
-    
+
     public function save()
     {
         // Using id_string is deprecated, use id_slug instead
