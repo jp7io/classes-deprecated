@@ -187,7 +187,7 @@ class Jp7_Interadmin_Search
                 if (mb_strlen($word) > 4) {
                     $like = [];
                     foreach ($plural as $word) {
-                        $like[] = reset($textColumns)." LIKE '%".str_replace('*', '%', $word)."%'";
+                        $like[] = reset($textColumns)." LIKE '%".str_replace('*', '%', addslashes($word))."%'";
                     }
                     $match .= ' + ('.implode(' OR ', $like).') * '.$weight;
                 } else {
