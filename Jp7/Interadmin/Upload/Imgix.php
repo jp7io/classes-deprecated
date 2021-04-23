@@ -37,16 +37,22 @@ class Jp7_Interadmin_Upload_Imgix extends Jp7_Interadmin_Upload_AdapterAbstract
                 'method' => 'POST',
                 'timeout' => 2, // Fire and forget
                 'header'  => [
-                    'Content-Type: application/x-www-form-urlencoded',
-                    'Authorization: Basic '.base64_encode($config->imgix['api_key'].':')
+                    'Content-Type: application/vnd.api+json',
+                    'Authorization: Bearer ' . $config->imgix['api_key']
                 ],
-                'content' => http_build_query([
-                    'url' => $this->imageUrl($path, 'original')
+                'content' => json_encode([
+                    'data' => [
+                        'attributes' => [
+                            'url' => $this->imageUrl($path, 'original'),
+
+                        ],
+                        'type' => 'purges'
+                    ]
                 ])
             ]
         ]);
         try {
-            file_get_contents('https://api.imgix.com/v2/image/purger', false, $context);
+            file_get_contents('https://api.imgix.com/api/v1/purge', false, $context);
         } catch (Exception $e) {
             // ignore because of Fire and forget timeout
             Log::info($e);
