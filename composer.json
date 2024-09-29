@@ -1,12 +1,12 @@
 {
-  "name": "jp7internet/classes-deprecated",
+  "name": "jp7io/classes-deprecated",
   "description": "JP7 Classes Deprecated",
   "keywords": [],
   "license": "proprietary",
   "repositories" : [
     {
         "type": "composer",
-        "url": "https://satis.jp7.com.br"
+        "url": "https://satis.jp7.io"
     }
   ],
   "require": {
