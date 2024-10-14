@@ -104,7 +104,7 @@ class Jp7_Date extends Carbon
      * @param DateInterval|string $interval
      * @return Date|bool
      */
-    public function addRaw($interval)
+    public function rawAdd($interval)
     {
         if (is_string($interval)) {
             // Check for ISO 8601
@@ -114,7 +114,7 @@ class Jp7_Date extends Carbon
                 $interval = DateInterval::createFromDateString($interval);
             }
         }
-        return parent::add($interval) ? $this : false;
+        return parent::rawAdd($interval) ? $this : false;
     }
     /**
      * Subtracts an amount of days, months, years, hours, minutes and seconds from a DateTime object.
@@ -122,7 +122,7 @@ class Jp7_Date extends Carbon
      * @param DateInterval|string $interval
      * @return Date|bool
      */
-    public function sub($interval)
+    public function rawSub($interval)
     {
         if (is_string($interval)) {
             // Check for ISO 8601
@@ -132,7 +132,7 @@ class Jp7_Date extends Carbon
                 $interval = DateInterval::createFromDateString($interval);
             }
         }
-        return parent::sub($interval) ? $this : false;
+        return parent::rawSub($interval) ? $this : false;
     }
 
     /**
@@ -330,28 +330,28 @@ class Jp7_Date extends Carbon
     public function minute($value = null)
     {
         if ($value !== null) {
-            return pareng::minute($value);
+            return parent::minute($value);
         }
         return $this->format('i');
     }
     public function hour($value = null)
     {
         if ($value !== null) {
-            return pareng::hour($value);
+            return parent::hour($value);
         }
         return $this->format('H');
     }
     public function day($value = null)
     {
         if ($value !== null) {
-            return pareng::day($value);
+            return parent::day($value);
         }
         return $this->format('d');
     }
     public function month($value = null)
     {
         if ($value !== null) {
-            return pareng::month($value);
+            return parent::month($value);
         }
         return $this->format('m');
     }
@@ -362,7 +362,7 @@ class Jp7_Date extends Carbon
     public function year($value = null)
     {
         if ($value !== null) {
-            return pareng::year($value);
+            return parent::year($value);
         }
         return $this->format('Y');
     }
