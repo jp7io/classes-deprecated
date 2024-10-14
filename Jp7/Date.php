@@ -20,7 +20,7 @@ class Jp7_Date extends Carbon
 {
     /**
      * A test Date instance to be returned when now instances are created.
-     *  
+     *
      * @see copied from Carbon: http://carbon.nesbot.com/docs/#api-testing
      * @var Jp7_Date
      */
@@ -104,7 +104,7 @@ class Jp7_Date extends Carbon
      * @param DateInterval|string $interval
      * @return Date|bool
      */
-    public function add($interval)
+    public function addRaw($interval)
     {
         if (is_string($interval)) {
             // Check for ISO 8601
@@ -134,7 +134,7 @@ class Jp7_Date extends Carbon
         }
         return parent::sub($interval) ? $this : false;
     }
-    
+
     /**
      * Retorna string da diferença de tempo, ex: '3 dias atrás'.
      * O valor é arredondado: 2 anos e 4 meses retorna '2 anos atrás'.
