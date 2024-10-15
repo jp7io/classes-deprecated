@@ -84,6 +84,12 @@ class InterSite
      * @var string
      */
     public $charset = 'UTF-8';
+    /**
+     * Default charset.
+     *
+     * @var string
+     */
+    public $google_analytics;
 
     protected static $instance = null;
 
