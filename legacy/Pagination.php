@@ -49,6 +49,60 @@ class Pagination
      * @var
      */
     public $sql_limit;
+    /**
+     * Querystring.
+     *
+     * @var
+     */
+    public $query_string;
+    /**
+     * Html.
+     *
+     * @var
+     */
+    public $htm;
+    /**
+     * HtmlNumbers.
+     *
+     * @var
+     */
+    public $htm_numbers;
+    /**
+     * HtmlNumbersExtra.
+     *
+     * @var
+     */
+    public $htm_numbers_extra;
+    /**
+     * HtmlBack.
+     *
+     * @var
+     */
+    public $htm_back;
+    /**
+     * HtmlGo.
+     *
+     * @var
+     */
+    public $htm_go;
+    /**
+     * HtmlCombo.
+     *
+     * @var
+     */
+    public $htm_combo;
+    /**
+     * RequestUri.
+     *
+     * @var
+     */
+    public $request_uri;
+    /**
+     * Parameters.
+     *
+     * @var
+     */
+    public $parameters;
 
     /**
      * Creates pagination based on a SQL query, the pagination can be retrieved using its "htm" propertie ($this->htm).
@@ -133,7 +187,7 @@ class Pagination
         $go_url = isset($_GET['go_url']) ? $_GET['go_url'] : '';
 
         $this->query_string = preg_replace('([&]?go_url='.$go_url.')', '', $this->query_string); // Retira a GO Url da Query String
-        if ($this->query_string[0] == '&') {
+        if (str_starts_with($this->query_string, '&')) {
             $this->query_string = mb_substr($this->query_string, 1); // Limpa & que sobrou no começo da string
         }
         $this->parameters = $parameters;
