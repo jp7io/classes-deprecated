@@ -675,7 +675,7 @@ class Jp7_Deprecated
         if ($returnValues) {
             $array = [];
         } else {
-            $array = &$GLOBALS;
+            $array = $GLOBALS;
         }
 
         while ($row = $rs->FetchNextObj()) {
