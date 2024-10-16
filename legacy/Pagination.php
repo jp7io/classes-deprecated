@@ -179,7 +179,7 @@ class Pagination
         $this->sql_limit = ' LIMIT '.$this->init.','.$this->limit;
 
         // HTM
-        $this->query_string = preg_replace('([&]?p_page=[0-9]+)', '', $_SERVER['QUERY_STRING']); // Retira a pagina atual da Query String
+        $this->query_string = (isset($_SERVER['QUERY_STRING'])) ? preg_replace('([&]?p_page=[0-9]+)', '', $_SERVER['QUERY_STRING']) : ''; // Retira a pagina atual da Query String
         if ($seo) {
             $this->query_string = preg_replace('([&]?baseurl=true)', '', $this->query_string); // Retira a baseurl se a pagina tiver S.E.O.
         }
