@@ -99,6 +99,7 @@ class Jp7_Deprecated
         // Split
         $sql_slipt = preg_replace(['/([	 ])(FROM )/', '/([	 ])(WHERE )/', '/([ 	])(ORDER BY )/'], '{;}\1\2', $sql, 1);
         $sql_slipt = explode('{;}', $sql_slipt);
+        $sql_final = '';
         foreach ($sql_slipt as $value) {
             if (empty($sql_select) && strpos($value, 'SELECT ') !== false) {
                 $sql_select = $value;
@@ -200,7 +201,7 @@ class Jp7_Deprecated
             $debugger->addLog($sql, 'sql', $debugger->getTime($_GET['debug_sql']));
         }
 
-        if ($rs && $sql) {
+        if (!empty($rs) && $sql) {
             eval("global \$".$rs.";\$".$rs."=\$rs_pre;");
         } else {
             return $rs_pre;
