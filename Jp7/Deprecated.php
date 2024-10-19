@@ -50,7 +50,7 @@ class Jp7_Deprecated
         // Update
         $sql = 'UPDATE '.$table.' SET ';
         for ($i = 0; $i < count($fields_arr_db); $i++) {
-            eval("\$field_value=\$".$fields_arr_db[$i].';');
+            $field_value = ${$fields_arr_db[$i]};
             $sql .= $fields_arr_db[$i]."='".$field_value."'";
             if ($i != count($fields_arr_db) - 1) {
                 $sql .= ',';
@@ -100,16 +100,16 @@ class Jp7_Deprecated
         $sql_slipt = preg_replace(['/([	 ])(FROM )/', '/([	 ])(WHERE )/', '/([ 	])(ORDER BY )/'], '{;}\1\2', $sql, 1);
         $sql_slipt = explode('{;}', $sql_slipt);
         foreach ($sql_slipt as $value) {
-            if (!$sql_select && strpos($value, 'SELECT ') !== false) {
+            if (empty($sql_select) && strpos($value, 'SELECT ') !== false) {
                 $sql_select = $value;
             }
-            if (!$sql_from && strpos($value, 'FROM ') !== false) {
+            if (empty($sql_from) && strpos($value, 'FROM ') !== false) {
                 $sql_from = $value;
             }
-            if (!$sql_where && strpos($value, 'WHERE ') !== false) {
+            if (empty($sql_where) && strpos($value, 'WHERE ') !== false) {
                 $sql_where = $value;
             }
-            if (!$sql_final && strpos($value, 'ORDER BY ') !== false) {
+            if (empty($sql_final) && strpos($value, 'ORDER BY ') !== false) {
                 $sql_final = $value;
             }
         }
@@ -467,9 +467,10 @@ class Jp7_Deprecated
         $ext = mb_substr($ext, $pos1);
         if ($ext == 'swf') {
             if (!$parameters) {
-                $parameters = [wmode => 'transparent'];
+                $parameters = ['wmode' => 'transparent'];
             }
             global $is;
+            $S2 = '';
             foreach ($parameters as $key => $value) {
                 $S2 .= '<param name="'.$key.'" value="'.$value."\" />\n";
             }
@@ -757,8 +758,9 @@ class Jp7_Deprecated
                 } else {
                     $table_field_value = $GLOBALS[$var_prefix.$table_field_name];
                 }
-                $sql_campos .= ' '.$table_field_name.' '.(($i == $table_columns_num) ? ') ' : ",\n");
+                $sql_campos = ' '.$table_field_name.' '.(($i == $table_columns_num) ? ') ' : ",\n");
                 //se for definido valor
+                $valores = '';
                 if (($table_field_value !== '' && !is_null($table_field_value)) || strpos($table_field_name, 'int_') === 0) {
                     $valores .= toBase($table_field_value, $force_magic_quotes_gpc).(($i == $table_columns_num) ? ')' : ",\n");
                     //se não for definido valor e for mysql salva branco

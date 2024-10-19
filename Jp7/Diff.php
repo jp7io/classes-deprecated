@@ -169,6 +169,12 @@ class Jp7_Diff
  */
 class _HWLDF_WordAccumulator
 {
+
+    private $_lines;
+    private $_line;
+    private $_group;
+    private $_tag;
+
     public function _HWLDF_WordAccumulator()
     {
         $this->_lines = [];
