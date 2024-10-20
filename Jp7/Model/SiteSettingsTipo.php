@@ -206,7 +206,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract
                         $special_1 = unserialize($registro->special_1);
                     }
                     foreach ($_POST as $key => $values) {
-                        if (starts_with($key, 'css_') && !ends_with($key, '_xtra')) {
+                        if (str_starts_with($key, 'css_') && !ends_with($key, '_xtra')) {
                             $special_1[mb_substr($key, 4)] = $values[0];
                         }
                     }

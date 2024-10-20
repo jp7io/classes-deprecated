@@ -93,6 +93,6 @@ class Jp7_Interadmin_Upload
 
     protected static function isExternal($path)
     {
-        return !starts_with($path, '../../upload/');
+        return !str_starts_with($path, '../../upload/');
     }
 }
