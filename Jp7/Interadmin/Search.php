@@ -39,7 +39,7 @@ class Jp7_Interadmin_Search
                     if (count($textColumns) > 16) {
                         $textColumns = array_slice($textColumns, 0, 16);
                     }
-                    $index = $indexes['interadmin_search'];
+                    $index = $indexes['interadmin_search'] ?? '';
                     if (!$index || array_full_diff($index['columns'], $textColumns)) {
                         $sql = $this->getIndexSql($table, $textColumns, $index);
                         $executedSqls[] = $sql;
@@ -180,7 +180,7 @@ class Jp7_Interadmin_Search
             foreach ($words as $word) {
                 $plural = [];
                 $plural[] = $word;
-                if (!ends_with($word, '*')) {
+                if (!str_ends_with($word, '*')) {
                     $plural[] = Jp7_Inflector::plural($word);
                 }
                 $plural = array_unique($plural);
