@@ -132,7 +132,7 @@ class Jp7_Deprecated
                             ' AND ('.$alias.".date_expire>'".$DbNow."' OR ".$alias.'.date_expire IS NULL OR '.$alias.".date_expire='0000-00-00 00:00:00')".
                             ' AND ('.$alias.".char_key<>'' OR ".$alias.'.char_key IS NULL)'.
                             ' AND ('.$alias.".deleted='' OR ".$alias.'.deleted IS NULL)'.
-                            ((config('interadmin.preview') && !$s_session['preview']) ? ' AND ('.$alias.".publish<>'' OR ".$alias.'.publish IS NULL)' : '').' AND ';
+                            ((config('interadmin.preview') && empty($s_session['preview'])) ? ' AND ('.$alias.".publish<>'' OR ".$alias.'.publish IS NULL)' : '').' AND ';
                     $sql_where = str_replace('WHERE ', $sql_where_replace, $sql_where);
                 }
                 if ($c_path_upload) {
@@ -155,7 +155,7 @@ class Jp7_Deprecated
                             " AND char_key <> ''".
                             " AND (deleted LIKE '' OR deleted IS NULL)".
                             " AND (date_expire > '".$DbNow."' OR date_expire IS NULL OR date_expire = '0000-00-00 00:00:00')".
-                            ((config('interadmin.preview') && !$s_session['preview']) ? " AND (publish <> '' OR publish IS NULL)" : '').' AND ', $sql_where);
+                            ((config('interadmin.preview') && empty($s_session['preview'])) ? " AND (publish <> '' OR publish IS NULL)" : '').' AND ', $sql_where);
                 }
             }
             if ($c_path_upload) {
@@ -245,7 +245,7 @@ class Jp7_Deprecated
         $sql = 'SELECT id,'.$field.' AS field FROM '.$table.
         ' WHERE id_tipo='.$id_tipo.
         " AND char_key<>''".
-        (($s_session['preview'] || !config('interadmin.preview')) ? '' : " AND publish<>''").
+        ((!empty($s_session['preview']) || !config('interadmin.preview')) ? '' : " AND publish<>''").
         " AND (deleted='' OR deleted IS NULL)".
         " AND date_publish<='".date('Y/m/d H:i:s')."'".
         $sql_where.
@@ -437,7 +437,7 @@ class Jp7_Deprecated
         $path = $path.(($lang && $lang != $config->lang_default) ? $lang : 'site').'/home/'.(($publish || !$admin_time || !$index_time) ? 'index.php' : 'index_P.htm').(($s_session['preview']) ? '?s_interadmin_preview='.$s_session['preview'] : '');
         @ini_set('allow_url_fopen', '1');
         //if(!@include $path.(($s_session['preview'])?"&":"?")."HTTP_USER_AGENT=".urlencode($_SERVER['HTTP_USER_AGENT']))header("Location: ".$path);
-        if (!@readfile($path.(($s_session['preview']) ? '&' : '?').'HTTP_USER_AGENT='.urlencode($_SERVER['HTTP_USER_AGENT']))) {
+        if (!@readfile($path.((!empty($s_session['preview'])) ? '&' : '?').'HTTP_USER_AGENT='.urlencode($_SERVER['HTTP_USER_AGENT']))) {
             header('Location: '.$path);
         }
         //}

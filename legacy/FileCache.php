@@ -64,7 +64,7 @@ class FileCache
         global $debugger, $s_session, $interadmin_gerar_menu;
 
         // Cache not desired
-        if (!$config->cache || $debugger->debugFilename || $debugger->debugSql || $s_session['preview'] || $interadmin_gerar_menu) {
+        if (!$config->cache || $debugger->debugFilename || $debugger->debugSql || !empty($s_session['preview']) || $interadmin_gerar_menu) {
             return;
         }
 

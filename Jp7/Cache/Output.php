@@ -32,7 +32,7 @@
             global $debugger, $s_session;
             $config = Zend_Registry::get('config');
 
-            if ($config->cache && !$debugger->debugFilename && !$debugger->debugSql && !$s_session['preview']) {
+            if ($config->cache && !$debugger->debugFilename && !$debugger->debugSql && emoty($s_session['preview'])) {
                 self::$_enabled = true;
             }
 
