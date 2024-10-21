@@ -708,9 +708,9 @@ class Jp7_Deprecated
      *
      * @author JP, Cristiano
      *
-     * @version (2007/12/17)
+     * @version (2024/10/21)
      */
-    public static function jp7_db_insert($table, $table_id_name, $table_id_value = 0, $var_prefix = '', $var_check = true, $force_magic_quotes_gpc = false)
+    public static function jp7_db_insert($table, $table_id_name, $table_id_value = 0, $var_prefix = '', $var_check = true, $force_magic_quotes_gpc = false, $data = [])
     {
         global $db;
 
@@ -722,7 +722,10 @@ class Jp7_Deprecated
             $sql = 'UPDATE '.$table.' SET ';
             $j = 0;
             foreach ($table_columns as $table_field_name) {
-                if (is_array($var_prefix)) {
+                if ($data) {
+                    $var_isset = !empty($data[$table_field_name]);
+                    $table_field_value = $var_isset ? $data[$table_field_name] : '';
+                } elseif (is_array($var_prefix)) {
                     $var_isset = array_key_exists($table_field_name, $var_prefix);
                     $table_field_value = $var_prefix[$table_field_name];
                 } else {
