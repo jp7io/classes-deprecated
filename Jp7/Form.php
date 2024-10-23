@@ -313,7 +313,7 @@ class Jp7_Form extends Zend_Form
 /*
 $usuarioTipo = new Ciintranet_UsuarioTipo();
 $form = new Jp7_Form();
-$elements = $form->createElements($usuarioTipo->getCampos());
+$elements = $form->createElements($usuarioTipo->getFields());
 $form->addElements($elements);
 
 $form->populate($usuarioLogado->attributes);

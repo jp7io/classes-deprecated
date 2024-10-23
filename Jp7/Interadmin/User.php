@@ -52,7 +52,7 @@ class Jp7_Interadmin_User extends InterAdmin
 
     public function getPasswordType()
     {
-        return $this->getType()->getCampos()['password_key']['xtra'];
+        return $this->getType()->getFields()['password_key']['xtra'];
     }
 
     private function checkHash($value)

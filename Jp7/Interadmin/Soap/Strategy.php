@@ -50,8 +50,8 @@ class Jp7_Interadmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
                     if ($isDynamicClass || is_subclass_of($type, 'InterAdmin')) {
                         $tipo = Jp7_Interadmin_Soap::getClassTipo($type);
 
-                        $tipo->getCamposAlias();
-                        $campos = $tipo->getCampos();
+                        $tipo->getFieldsAlias();
+                        $campos = $tipo->getFields();
 
                         $elements = [];
                         foreach ($campos as $campo) {

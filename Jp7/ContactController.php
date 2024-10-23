@@ -44,12 +44,12 @@ class Jp7_ContactController extends __Controller_Action
         }
 
         // Construindo HTML do form
-        $this->view->form = $this->_getFormHtml($contactTipo->getCampos(), $record);
+        $this->view->form = $this->_getFormHtml($contactTipo->getFields(), $record);
     }
 
     protected function _validateAndSave($record)
     {
-        foreach ($record->getTipo()->getCampos() as $campo) {
+        foreach ($record->getTipo()->getFields() as $campo) {
             $this->_validateCampo($record, $campo);
         }
         $record->save();

@@ -63,7 +63,7 @@ class InterAdminFieldFile
             $fieldsAlias = constant(get_class($parent).'::DEFAULT_FIELDS_ALIAS');
             $varchar_key = 'varchar_key';
             if ($fieldsAlias) {
-                $varchar_key = $parent->getTipo()->getCamposAlias($varchar_key);
+                $varchar_key = $parent->getTipo()->getFieldsAlias($varchar_key);
             }
             $retorno = $parent->$varchar_key;
         }

@@ -295,7 +295,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
     {
         $options = ['default_namespace' => static::DEFAULT_NAMESPACE];
         $record = Record::getInstance(0, $options, $this);
-        if ($mostrar = $this->getCamposAlias('char_key')) {
+        if ($mostrar = $this->getFieldsAlias('char_key')) {
             $record->$mostrar = 'S';
         }
         $record->date_publish = date('c');

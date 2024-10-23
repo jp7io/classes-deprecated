@@ -91,7 +91,7 @@ class Jp7_Interadmin_Util
             return;
         }
         $relationships = $record->getType()->getRelationships();
-        $aliases = $record->getType()->getCamposAlias();
+        $aliases = $record->getType()->getFieldsAlias();
         foreach ($relations as $relation => $id_string) {
             $query = clone $relationships[$relation]['query'];
             if ($bind_children) {
@@ -302,7 +302,7 @@ class Jp7_Interadmin_Util
         }
 
         $phpdoc = '/**'."\r\n";
-        foreach ($tipo->getCampos() as $campo) {
+        foreach ($tipo->getFields() as $campo) {
             $phpdoc .= ' * @property '.self::_getTipoPhpDocCampo($tipo, $campo).' $'.$campo['nome_id']."\r\n";
         }
         $phpdoc .= ' * @property Jp7_Date date_publish'."\r\n";

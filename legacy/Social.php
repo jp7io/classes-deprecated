@@ -245,7 +245,7 @@ class Social
         $html .= '<table class="form">'."\n";
 
         $form = new InterAdminTipo($id_tipo);
-        $fields = $form->getCampos();
+        $fields = $form->getFields();
 
         ob_start();
         foreach ($fields as $field) {

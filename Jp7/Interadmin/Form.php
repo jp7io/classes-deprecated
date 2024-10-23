@@ -10,7 +10,7 @@ class Jp7_Interadmin_Form extends InterAdminField
         InterAdminField::$php5_2_hack_className = get_class($this);
 
         $this->tipo = $tipo;
-        $this->campos = $tipo->getCampos();
+        $this->campos = $tipo->getFields();
     }
 
     public function getHtml($record = null)
