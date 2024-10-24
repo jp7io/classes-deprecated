@@ -2,12 +2,18 @@
 
 abstract class Jp7_Interadmin_Upload_AdapterAbstract implements Jp7_Interadmin_Upload_AdapterInterface
 {
+
+    private $config;
+
+    public function __construct($config)
+    {
+        $this->config = $config;
+    }
+
     public function url($path)
     {
-        global $config;
-        
-        return $this->getScheme().'://'.$config->storage['host'].'/'.
-            ($config->storage['path'] ? $config->storage['path'].'/' : '') .
+        return $this->getScheme().'://'.$this->config->storage['host'].'/'.
+            ($this->config->storage['path'] ? $this->config->storage['path'].'/' : '') .
             $path;
     }
 
@@ -18,8 +24,7 @@ abstract class Jp7_Interadmin_Upload_AdapterAbstract implements Jp7_Interadmin_U
 
     protected function getScheme()
     {
-        global $config;
-        return $config->storage['scheme'] ?? 'http'.(isset($_SERVER['HTTPS']) ? 's' : '');
+        return $this->config->storage['scheme'] ?? 'http'.(isset($_SERVER['HTTPS']) ? 's' : '');
     }
 
     protected function setHost($url, $host)

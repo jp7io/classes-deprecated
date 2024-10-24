@@ -7,7 +7,18 @@ class Jp7_Interadmin_Upload
     /**
      * @var AdapterInterface
      */
-    protected static $adapter;
+    protected $adapter;
+
+    /**
+     * @var AdapterInterface
+     */
+    protected $config;
+
+    public function __construct($config, $adapter = null)
+    {
+        $this->config = $config;
+        $this->adapter = $this->getAdapter($adapter);
+    }
 
     /**
      * Altera o endereço para que aponte para a url do cliente.
@@ -16,79 +27,73 @@ class Jp7_Interadmin_Upload
      *
      * @return string
      */
-    public static function url($path = '../../', $template = 'original')
+    public function url($path = '../../', $template = 'original')
     {
-        if (static::isExternal($path)) {
+        if ($this->isExternal($path)) {
             // Not an upload path => Wont change
             return $path;
         }
         $path = substr($path, strlen('../../'));
 
-        if (static::isImage($path) && ($template !== 'original' || !static::isGif($path))) {
-            return static::getAdapter()->imageUrl($path, $template);
+        if ($this->isImage($path) && ($template !== 'original' || !$this->isGif($path))) {
+            return $this->adapter->imageUrl($path, $template);
         } else {
-            return static::getAdapter()->url($path);
+            return $this->adapter->url($path);
         }
     }
 
-    public static function hasPurging()
+    public function hasPurging()
     {
-        return static::getAdapter()->hasPurging();
+        return $this->adapter->hasPurging();
     }
 
-    public static function purge($path)
+    public function purge($path)
     {
         $path = substr($path, strlen('../../'));
-        return static::getAdapter()->purge($path);
+        return $this->adapter->purge($path);
     }
 
-    public static function getHumanSize($path)
+    public function getHumanSize($path)
     {
         try {
-            return jp7_human_size(static::getSize($path));
+            return jp7_human_size($this->getSize($path));
         } catch (RuntimeException $e) {
             return '0KB';
         }
     }
 
-    public static function getSize($path)
+    public function getSize($path)
     {
-        if (static::isExternal($path)) {
+        if ($this->isExternal($path)) {
             return;
         }
         $path = substr($path, strlen('../../'));
         return Storage::size($path);
     }
 
-    public static function isImage($url)
+    public function isImage($url)
     {
         return preg_match('/.(jpg|jpeg|png|gif)[#?]?[^?\/#]*$/i', $url);
     }
 
-    public static function isGif($url)
+    public function isGif($url)
     {
         return preg_match('/.gif[#?]?[^?\/#]*$/i', $url);
     }
 
 
-    public static function getAdapter()
+    public function getAdapter()
     {
-        global $config;
-        if (!static::$adapter) {
-            if ($config->imagecache === 'imgix') {
-                static::$adapter = new Jp7_Interadmin_Upload_Imgix;
-            } elseif ($config->imagecache) {
-                static::$adapter = new Jp7_Interadmin_Upload_Intervention;
-            } else {
-                static::$adapter = new Jp7_Interadmin_Upload_Legacy;
-            }
+        $imagecache = $this->config->imagecache ?? null;
+        if (empty($this->adapter)) {
+            if (empty($imagecache))
+                $this->adapter = new Jp7_Interadmin_Upload_Legacy($this->config);
+            } elseif ($imagecache === 'imgix') {
+                $this->adapter = new Jp7_Interadmin_Upload_Imgix($this->config);
+            } elseif ($imagecache) {
+                $this->adapter = new Jp7_Interadmin_Upload_Intervention($this->config);
         }
-        return static::$adapter;
-    }
-
-    public static function setAdapter(AdapterInterface $adapter)
-    {
-        static::$adapter = $adapter;
+        return $this->adapter;
     }
 
     protected static function isExternal($path)

@@ -447,7 +447,7 @@ class InterAdminField
     }
 
     // função incompleta
-    public static function getCampoList($campo, $valor, $parte = 'list')
+    public static function getCampoList($config, $campo, $valor, $parte = 'list')
     {
         $key = $campo['tipo'];
         if (strpos($key, 'special_') === 0 || strpos($key, 'func_') === 0) {
@@ -477,7 +477,8 @@ class InterAdminField
         } elseif (strpos($key, 'file_') === 0) {
             global $c_cliente_physical_path, $c_remote;
 
-            $url = Jp7_Interadmin_Upload::url($valor);
+            $jp7InteradminUpload = new Jp7_Interadmin_Upload($config);
+            $url = $jp7InteradminUpload->url($valor);
             $ext = jp7_extension($url);
             $url_size = '';
             if (!in_array($ext, ['gif', 'jpg', 'jpeg', 'png', '---'])) {
@@ -559,7 +560,8 @@ class InterAdminField
         // OUTROS CAMPOS
         } elseif (str_starts_with($campo['tipo_de_campo'], 'file_')) {
             if ($campo['value']) {
-                $url = Jp7_Interadmin_Upload::url($campo['value']);
+                $jp7InteradminApp = new Jp7_Interadmin_Upload($jp7App);
+                $url = $jp7InteradminApp->url($campo['value']);
             } else {
                 $url = DEFAULT_PATH.'/img/px.png';
             }

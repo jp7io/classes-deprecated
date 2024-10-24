@@ -3,17 +3,22 @@
 class Jp7_Interadmin_Upload_Imgix extends Jp7_Interadmin_Upload_AdapterAbstract
 {
 
+    private $config;
+
+    public function __construct($config)
+    {
+        parent::__construct($config);
+    }
+
     // IMGIX_HOST/upload/bla/123?w=40&h=40
     public function imageUrl($path, $template)
     {
-        global $config;
-
         $url = $this->url($path);
 
         // Replace host
-        $url = $this->setHost($url, $config->imgix['host']);
+        $url = $this->setHost($url, $this->config->imgix['host']);
 
-        $params = $config->imgix['templates'][$template];
+        $params = $this->config->imgix['templates'][$template];
         if ($params) {
             $url = $this->mergeQuery($url, $params);
         }
@@ -28,8 +33,9 @@ class Jp7_Interadmin_Upload_Imgix extends Jp7_Interadmin_Upload_AdapterAbstract
 
     public function purge($path)
     {
-        global $config;
-        if (!Jp7_Interadmin_Upload::isImage($path) || !isset($config->imgix['api_key'])) {
+        $jp7InteradminUpload = new Jp7_Interadmin_Upload($this->config);
+
+        if (!$jp7InteradminUpload->isImage($path) || !isset($config->imgix['api_key'])) {
             return;
         }
         $context = stream_context_create([
