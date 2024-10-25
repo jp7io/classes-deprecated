@@ -50,9 +50,10 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
                     ],
                 ] + $campo;
                 ob_start();
-                $field = new InterAdminField($campo);
-                echo $field->getHtml();
-                echo str_replace('value="0"', 'value=""', ob_get_clean());
+                $field = new \InterAdminField($campo);
+                // FIXME
+                // echo $field->getHtml();
+                // echo str_replace('value="0"', 'value=""', ob_get_clean());
                 break;
         }
     }
