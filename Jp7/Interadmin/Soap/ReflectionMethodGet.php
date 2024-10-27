@@ -53,6 +53,6 @@ class Jp7_Interadmin_Soap_ReflectionMethodGet
 
     protected function _getClassName()
     {
-        return ($this->secao->class) ? $this->secao->class : Jp7_Inflector::camelize($this->secao->nome).'_'.$this->secao->id_tipo;
+        return ($this->secao->class) ? $this->secao->class : Jp7_Inflector::camelize($this->secao->nome).'_'.$this->secao->type_id;
     }
 }

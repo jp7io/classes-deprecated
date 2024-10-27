@@ -26,7 +26,7 @@ class InterAdmin extends Record implements InterAdminAbstract
     const DEFAULT_NAMESPACE = '';
 
     /**
-     * Sets only the editable attributes, prevents the user from setting $id_tipo, for example.
+     * Sets only the editable attributes, prevents the user from setting $type_id, for example.
      *
      * @param array $attributes
      */
@@ -72,7 +72,7 @@ class InterAdmin extends Record implements InterAdminAbstract
             if (strpos($methodName, 'getFirst') === 0) {
                 $nome_id = mb_substr($methodName, mb_strlen('getFirst'));
                 if ($child = $this->_deprecatedFindChild($nome_id)) {
-                    return $this->getFirstChild($child['id_tipo'], (array) $args[0]);
+                    return $this->getFirstChild($child['type_id'], (array) $args[0]);
                 }
             // get{ChildName}ById
             } elseif (mb_substr($methodName, -4) == 'ById') {
@@ -80,7 +80,7 @@ class InterAdmin extends Record implements InterAdminAbstract
                 if ($child = $this->_deprecatedFindChild($nome_id)) {
                     $options = (array) $args[1];
                     $options['where'][] = 'id = '.intval($args[0]);
-                    return $this->getFirstChild($child['id_tipo'], $options);
+                    return $this->getFirstChild($child['type_id'], $options);
                 }
             // get{ChildName}ByIdString
             } elseif (mb_substr($methodName, -10) == 'ByIdString') {
@@ -88,32 +88,32 @@ class InterAdmin extends Record implements InterAdminAbstract
                 if ($child = $this->_deprecatedFindChild($nome_id)) {
                     $options = (array) $args[1];
                     $options['where'][] = "id_string = '".$args[0]."'";
-                    return $this->getFirstChild($child['id_tipo'], $options);
+                    return $this->getFirstChild($child['type_id'], $options);
                 }
             // get{ChildName}Count
             } elseif (mb_substr($methodName, -5) == 'Count') {
                 $nome_id = mb_substr($methodName, mb_strlen('get'), -mb_strlen('Count'));
                 if ($child = $this->_deprecatedFindChild($nome_id)) {
-                    return $this->getChildrenCount($child['id_tipo'], (array) $args[0]);
+                    return $this->getChildrenCount($child['type_id'], (array) $args[0]);
                 }
             // get{ChildName}
             } else {
                 $nome_id = mb_substr($methodName, mb_strlen('get'));
                 if ($child = $this->_deprecatedFindChild($nome_id)) {
-                    return $this->getChildren($child['id_tipo'], (array) $args[0]);
+                    return $this->getChildren($child['type_id'], (array) $args[0]);
                 }
             }
         // create{ChildName}
         } elseif (strpos($methodName, 'create') === 0) {
             $nome_id = mb_substr($methodName, mb_strlen('create'));
             if ($child = $this->_deprecatedFindChild($nome_id)) {
-                return $this->createChild($child['id_tipo'], (array) @$args[0]);
+                return $this->createChild($child['type_id'], (array) @$args[0]);
             }
         // delete{ChildName}
         } elseif (strpos($methodName, 'delete') === 0) {
             $nome_id = mb_substr($methodName, mb_strlen('delete'));
             if ($child = $this->_deprecatedFindChild($nome_id)) {
-                return $this->deleteChildren($child['id_tipo'], (array) $args[0]);
+                return $this->deleteChildren($child['type_id'], (array) $args[0]);
             }
         }
         return parent::__call($methodName, $args);
@@ -172,14 +172,14 @@ class InterAdmin extends Record implements InterAdminAbstract
     /**
      * Creates and returns a child record.
      *
-     * @param int   $id_tipo
+     * @param int   $type_id
      * @param array $attributes Attributes to be merged into the new record.
      *
      * @return
      */
-    public function createChild($id_tipo, array $attributes = [])
+    public function createChild($type_id, array $attributes = [])
     {
-        return $this->getChildrenTipo($id_tipo)->createInterAdmin($attributes);
+        return $this->getChildrenTipo($type_id)->createInterAdmin($attributes);
     }
 
     /**
@@ -225,79 +225,79 @@ class InterAdmin extends Record implements InterAdminAbstract
     /**
      * Returns the number of children using COUNT(id).
      *
-     * @param int   $id_tipo
+     * @param int   $type_id
      * @param array $options Default array of options. Available keys: where.
      *
      * @return int Count of InterAdmins found.
      */
-    public function getChildrenCount($id_tipo, $options = [])
+    public function getChildrenCount($type_id, $options = [])
     {
         $options['fields'] = ['COUNT(DISTINCT id)'];
-        $retorno = $this->getFirstChild($id_tipo, $options);
+        $retorno = $this->getFirstChild($type_id, $options);
         return intval($retorno->count_distinct_id);
     }
     /**
      * Returns the first Child.
      *
-     * @param int   $id_tipo
+     * @param int   $type_id
      * @param array $options [optional]
      *
      * @return InterAdmin
      */
-    public function getFirstChild($id_tipo, $options = [])
+    public function getFirstChild($type_id, $options = [])
     {
-        $retorno = $this->getChildren($id_tipo, ['limit' => 1] + $options);
+        $retorno = $this->getChildren($type_id, ['limit' => 1] + $options);
         return $retorno[0] ?? null;
     }
     /**
      * Returns the first Child by ID.
      *
-     * @param int   $id_tipo
+     * @param int   $type_id
      * @param int   $id
      * @param array $options [optional]
      *
      * @return InterAdmin
      */
-    public function getChildById($id_tipo, $id, $options = [])
+    public function getChildById($type_id, $id, $options = [])
     {
         $options['limit'] = 1;
         $options['where'][] = 'id = '.intval($id);
-        $retorno = $this->getChildren($id_tipo, $options);
+        $retorno = $this->getChildren($type_id, $options);
         return $retorno[0];
     }
     /**
-     * Deletes all the children of a given $id_tipo.
+     * Deletes all the children of a given $type_id.
      *
-     * @param int   $id_tipo
+     * @param int   $type_id
      * @param array $options [optional]
      *
      * @return int Number of deleted children.
      */
-    public function deleteChildren($id_tipo, $options = [])
+    public function deleteChildren($type_id, $options = [])
     {
-        $children = $this->getChildren($id_tipo, $options);
+        $children = $this->getChildren($type_id, $options);
         foreach ($children as $child) {
             $child->delete();
         }
         return count($children);
     }
     /**
-     *  Deletes the children of a given $id_tipo forever.
+     *  Deletes the children of a given $type_id forever.
      *
-     * @param int   $id_tipo
+     * @param int   $type_id
      * @param array $options [optional]
      *
      * @return int Count of deleted InterAdmins.
      */
-    public function deleteChildrenForever($id_tipo, $options = [])
+    public function deleteChildrenForever($type_id, $options = [])
     {
-        if ($id_tipo) {
-            $tipo = $this->getChildrenTipo($id_tipo);
+        if ($type_id) {
+            $tipo = $this->getChildrenTipo($type_id);
             return $tipo->deleteInterAdminsForever($options);
         }
     }
     /**
-     * Creates a new InterAdminArquivo with id_tipo, id and mostrar set.
+     * Creates a new InterAdminArquivo with type_id, id and mostrar set.
      *
      * @param array $attributes [optional]
      *
@@ -349,19 +349,19 @@ class InterAdmin extends Record implements InterAdminAbstract
         return count($arquivos);
     }
     /**
-     * Retrieves this record´s children for the given $id_tipo.
+     * Retrieves this record´s children for the given $type_id.
      *
-     * @param int   $id_tipo
+     * @param int   $type_id
      * @param array $options Default array of options. Available keys: fields, where, order, group, limit, class.
      *
      * @return array Array of InterAdmin objects.
      */
-    public function getChildren($id_tipo, $options = [])
+    public function getChildren($type_id, $options = [])
     {
         $children = [];
-        if ($id_tipo) {
+        if ($type_id) {
             $options = $options + ['fields_alias' => static::DEFAULT_FIELDS_ALIAS];
-            if ($childrenTipo = $this->getChildrenTipo($id_tipo)) {
+            if ($childrenTipo = $this->getChildrenTipo($type_id)) {
                 $children = $childrenTipo->find($options);
             }
         }
@@ -486,7 +486,7 @@ class InterAdmin extends Record implements InterAdminAbstract
             $rs = $db->select($sql);
             $this->_tags = [];
             foreach ($rs as $row) {
-                if ($tag_tipo = InterAdminTipo::getInstance($row->id_tipo)) {
+                if ($tag_tipo = InterAdminTipo::getInstance($row->type_id)) {
                     $tag_text = $tag_tipo->nome;
                     if ($row->id) {
                         $options = [
@@ -523,10 +523,10 @@ class InterAdmin extends Record implements InterAdminAbstract
         $db = $this->getDb();
         $sql = 'DELETE FROM '.$db->getTablePrefix().'tags WHERE parent_id = '.$this->id;
         foreach ($tags as $tag) {
-            $sql = 'INSERT INTO '.$db->getTablePrefix().'tags (parent_id, id, id_tipo) VALUES
+            $sql = 'INSERT INTO '.$db->getTablePrefix().'tags (parent_id, id, type_id) VALUES
                 ('.$this->id.','.
                 ($tag instanceof self ? $tag->id : 0).','.
-                ($tag instanceof self ? $tag->id_tipo : $tag->id_tipo).')';
+                ($tag instanceof self ? $tag->type_id : $tag->type_id).')';
             if (!$db->insert($sql)) {
                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
             }
@@ -535,7 +535,7 @@ class InterAdmin extends Record implements InterAdminAbstract
 
     public function getTagFilters()
     {
-        return '(tags.id = '.$this->id." AND tags.id_tipo = '".$this->getTipo()->id_tipo."')";
+        return '(tags.id = '.$this->id." AND tags.type_id = '".$this->getTipo()->type_id."')";
     }
 
     public function setFieldBySearch($attribute, $searchValue, $searchColumn = 'varchar_key')

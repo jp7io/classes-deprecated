@@ -6,7 +6,7 @@ class Jp7_Model_ImagesTipo extends Jp7_Model_TipoAbstract
     public $isSubTipo = true;
 
     public $attributes = [
-        'id_tipo' => 'Images',
+        'type_id' => 'Images',
         'nome' => 'Imagens',
         'campos' => 'varchar_key{,}Nome{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}name{;}file_1{,}Arquivo{,}{,}{,}S{,}S{,}trigger{,}S{,}{,}{,}{,}{,}{,}{,}{,}file{;}int_key{,}Ordem{,}{,}{,}{,}S{,}0{,}{,}1{,}{,}{,}{,}{,}{,}{,}ordem{;}char_key{,}Mostrar{,}{,}{,}{,}{,}S{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}char_1{,}Destaque{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}featured{;}',
         'children' => '',
@@ -16,7 +16,7 @@ class Jp7_Model_ImagesTipo extends Jp7_Model_TipoAbstract
         'editpage' => '',
         'class' => '',
         'class_tipo' => '',
-        'model_id_tipo' => 0,
+        'model_type_id' => 0,
         'tabela' => '',
         'editar' => 'S',
         'icone' => 'picture',

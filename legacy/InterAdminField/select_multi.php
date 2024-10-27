@@ -6,7 +6,7 @@ function interadmin_ajax_busca_combo(campo,idtipo,busca){
     if(busca.length>2||busca=='*'){
         obj[0].text='Carregando...'
         if(busca=='*')busca=''
-        ajax_function('box_'+campo,'select_multi_combo_ajax.php?id_tipo='+idtipo+'&busca='+busca,interadmin_ajax_busca_resultado)
+        ajax_function('box_'+campo,'select_multi_combo_ajax.php?type_id='+idtipo+'&busca='+busca,interadmin_ajax_busca_resultado)
     }else{
         obj[0].text='Inserir no mínimo três caracteres.'
     }
@@ -92,7 +92,7 @@ function interadmin_select_multi_item_down(campo) {
             <select name="<?= $campo ?>[<?= $j ?>][]" id="<?= $campo ?>[<?= $j ?>]" select_multi="true" size="10" multiple="multiple"  class="select_multi_half" />
                 <?php
                 $sql = "SELECT campos, tabela FROM " . $db_prefix . "_tipos" .
-                    " WHERE id_tipo=" . $campo_nome;
+                    " WHERE type_id=" . $campo_nome;
                 $rs = $db->Execute($sql);
                 if ($rs === false) {
                     throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -123,7 +123,7 @@ function interadmin_select_multi_item_down(campo) {
                 // Loop
                 if ($valor) {
                     $sql = "SELECT id,varchar_key" . $select_campos_2 . " FROM " . $db_prefix . (($selectMultiTabela) ? '_' . $selectMultiTabela : '') .
-                        " WHERE id_tipo=" . $campo_nome .
+                        " WHERE type_id=" . $campo_nome .
                         " AND id IN (" . trim($valor, ', ') . ")" .
                         $sql_where .
                         " AND deleted=''" .
@@ -163,12 +163,12 @@ function interadmin_select_multi_item_down(campo) {
                             }
                         }
                         // Output
-                        if ($style == "checkbox")echo "<input type=\"checkbox\" name=\"" . $field_name . "\" id=\"" . $field_name . "_" . $row->id . "\" value=\"" . $row->id . "\"" . (($selected)?" checked style=\"color:blue\"":"") . (($row->id == $id)?" style=\"color:red\"":"") . ((interadmin_tipos_nome($parent_id_tipo_2) == "Classes")?" style=\"background:#DDD\"":"") . "><label for=\"" . $field_name . "_" . $row->id . "\" unselectable=\"on\"" . (($selected)?" style=\"color:blue\"":"") . ">" . $S . $row->varchar_key . jp7_string_left($select_campos_sql, 100) . "</label><br>\n";
+                        if ($style == "checkbox")echo "<input type=\"checkbox\" name=\"" . $field_name . "\" id=\"" . $field_name . "_" . $row->id . "\" value=\"" . $row->id . "\"" . (($selected)?" checked style=\"color:blue\"":"") . (($row->id == $id)?" style=\"color:red\"":"") . ((interadmin_tipos_nome($parent_type_id_2) == "Classes")?" style=\"background:#DDD\"":"") . "><label for=\"" . $field_name . "_" . $row->id . "\" unselectable=\"on\"" . (($selected)?" style=\"color:blue\"":"") . ">" . $S . $row->varchar_key . jp7_string_left($select_campos_sql, 100) . "</label><br>\n";
                         else {
                             $buscaValor = $S . $row->varchar_key . jp7_string_left($select_campos_sql, 100);
-                            echo "<option value=\"" . $row->id . "\"" . (($selected)?" SELECTED style=\"color:blue\"":"") . (($row->id == $id)?" style=\"color:red\"":"") . ((interadmin_tipos_nome($parent_id_tipo_2) == "Classes")?" style=\"background:#DDD\"":"") . " title=\"" . $buscaValor . "\">" . /*mb_substr($row->varchar_key,0,1).")".*/$buscaValor . "</option>\n";
+                            echo "<option value=\"" . $row->id . "\"" . (($selected)?" SELECTED style=\"color:blue\"":"") . (($row->id == $id)?" style=\"color:red\"":"") . ((interadmin_tipos_nome($parent_type_id_2) == "Classes")?" style=\"background:#DDD\"":"") . " title=\"" . $buscaValor . "\">" . /*mb_substr($row->varchar_key,0,1).")".*/$buscaValor . "</option>\n";
                         }
-                        //if ($style!="checkbox"||$nivel<2)interadmin_tipos_combo($current_id_tipo,$row->id_tipo,$nivel+1,$prefix,"",$style,$field_name);
+                        //if ($style!="checkbox"||$nivel<2)interadmin_tipos_combo($current_type_id,$row->type_id,$nivel+1,$prefix,"",$style,$field_name);
                     }
                     $rs->Close();
                 }

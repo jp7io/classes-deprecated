@@ -231,7 +231,7 @@ class Social
     /* Bookmarking */
 
     /* Send to a friend */
-    public function displaySendFriend($id_tipo, $url = false, $title = '', $template = 'default')
+    public function displaySendFriend($type_id, $url = false, $title = '', $template = 'default')
     {
         global $xtra_disabledfields;
         // Set the default configuration
@@ -244,7 +244,7 @@ class Social
         $html .= '<input type="hidden" name="template" value="'.$template.'" />'."\n";
         $html .= '<table class="form">'."\n";
 
-        $form = new InterAdminTipo($id_tipo);
+        $form = new InterAdminTipo($type_id);
         $fields = $form->getFields();
 
         ob_start();

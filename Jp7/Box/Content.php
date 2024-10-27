@@ -80,9 +80,9 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract
                         'where' => [
                             "campos LIKE '%}title{%'",
                             "campos LIKE '%}image{%'",
-                            "model_id_tipo != 'Introduction'",
+                            "model_type_id != 'Introduction'",
                         ],
-                        'order' => 'parent_id_tipo, ordem',
+                        'order' => 'parent_type_id, ordem',
                         'use_published_filters' => true,
                     ]);
         ?>

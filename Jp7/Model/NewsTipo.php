@@ -5,7 +5,7 @@ class Jp7_Model_NewsTipo extends Jp7_Model_TipoAbstract
     protected static $_children;
 
     public $attributes = [
-        'id_tipo' => 'News',
+        'type_id' => 'News',
         'nome' => 'Notícias',
         'campos' => 'varchar_key{,}Título{,}{,}{,}S{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}title{;}varchar_1{,}Subtítulo{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}subtitle{;}text_1{,}Resumo{,}{,}5{,}{,}{,}html_light{,}{,}{,}{,}{,}{,}{,}{,}{,}summary{;}text_2{,}Texto{,}{,}20{,}{,}S{,}S{,}{,}{,}{,}{,}{,}{,}{,}{,}text{;}varchar_2{,}Créditos{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}credits{;}file_1{,}Imagem{,}{,}{,}{,}S{,}0{,}S{,}{,}{,}{,}{,}{,}{,}{,}image{;}varchar_3{,}Link{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}link{;}int_key{,}Ordem{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}ordem{;}char_key{,}Mostrar{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}char_1{,}Destaque{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}featured{;}char_2{,}Destaque Home{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}home{;}',
         'children' => '',
@@ -15,7 +15,7 @@ class Jp7_Model_NewsTipo extends Jp7_Model_TipoAbstract
         'editpage' => '',
         'class' => '',
         'class_tipo' => '',
-        'model_id_tipo' => 0,
+        'model_type_id' => 0,
         'tabela' => '',
         'layout' => Jp7_Box_Manager::COL_2_LEFT,
         'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
@@ -32,10 +32,10 @@ class Jp7_Model_NewsTipo extends Jp7_Model_TipoAbstract
             $videos = $this->_findChildByModel('ContentVideos');
             $contentFiles = $this->_findChildByModel('ContentFiles');
 
-            self::$_children = $contentSubitem->id_tipo.'{,}Subitens{,}{,}S{;}'.
-                $images->id_tipo.'{,}Imagens{,}{,}S{;}'.
-                $videos->id_tipo.'{,}Vídeos{,}{,}S{;}'.
-                $contentFiles->id_tipo.'{,}Arquivos para Download{,}{,}S{;}';
+            self::$_children = $contentSubitem->type_id.'{,}Subitens{,}{,}S{;}'.
+                $images->type_id.'{,}Imagens{,}{,}S{;}'.
+                $videos->type_id.'{,}Vídeos{,}{,}S{;}'.
+                $contentFiles->type_id.'{,}Arquivos para Download{,}{,}S{;}';
         }
         $this->children = self::$_children;
     }

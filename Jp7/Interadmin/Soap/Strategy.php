@@ -62,7 +62,7 @@ class Jp7_Interadmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
 
                         $elements += [
                             'id' => 'xsd:int',
-                            'id_tipo' => 'xsd:int',
+                            'type_id' => 'xsd:int',
                             'parent_id' => 'xsd:int',
                             'date_insert' => 'xsd:dateTime',
                             'date_modify' => 'xsd:dateTime',
@@ -75,10 +75,10 @@ class Jp7_Interadmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
                     } else {
                         // InterAdminTipo
                         $this->_appendElements($dom, $all, [
-                            'id_tipo' => 'xsd:int',
+                            'type_id' => 'xsd:int',
                             'nome' => 'xsd:string',
-                            'parent_id_tipo' => 'xsd:int',
-                            'model_id_tipo' => 'xsd:int',
+                            'parent_type_id' => 'xsd:int',
+                            'model_type_id' => 'xsd:int',
                             'class' => 'xsd:string',
                             'class_tipo' => 'xsd:string',
                             'deleted_tipo' => 'xsd:boolean',

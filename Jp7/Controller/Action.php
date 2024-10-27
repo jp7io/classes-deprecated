@@ -158,10 +158,10 @@ class Jp7_Controller_Action extends Zend_Controller_Action
         }
         // Adiciona breadcrumb to tipo
         if ($secao = static::getTipo()) {
-            if ($secao->getNome() == 'Home' && !$secao->getParent()->id_tipo) {
+            if ($secao->getNome() == 'Home' && !$secao->getParent()->type_id) {
                 return; // Home
             }
-            while ($secao->id_tipo) {
+            while ($secao->type_id) {
                 $this->view->headTitle($secao->getNome());
                 $secao = $secao->getParent();
             }
@@ -283,7 +283,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
         foreach ($path as $key => $directory) {
             $tipo = $tipo->getFirstChild([
                 'fields' => ['template', 'nome'],
-                'where' => ["id_tipo_string = '".toId($directory)."'"],
+                'where' => ["type_id_string = '".toId($directory)."'"],
             ]);
             if (toSeo($tipo->nome) != $directory) {
                 $tipo = null;
@@ -381,10 +381,10 @@ class Jp7_Controller_Action extends Zend_Controller_Action
         $menu = $rootTipo->getChildren($options);
 
         foreach ($menu as $item) {
-            $item->active = ($this->getTipo() == $item->id_tipo);
+            $item->active = ($this->getTipo() == $item->type_id);
             $item->subitens = $item->getChildren($options);
             foreach ($item->subitens as $subitem) {
-                if ($this->getTipo() == $subitem->id_tipo) {
+                if ($this->getTipo() == $subitem->type_id) {
                     $item->active = true;
                     $subitem->active = true;
                 }

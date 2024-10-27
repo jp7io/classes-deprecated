@@ -297,7 +297,7 @@ class Jp7_Form extends Zend_Form
             }
         }
         /*$fieldsValues = array(
-            'id_tipo' => 0,
+            'type_id' => 0,
             'id' => 0,
             'tipo' => $this->getExtension(),
             'parte' => 0,

@@ -6,7 +6,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo
     public $hasOwnPage = true;
 
     /**
-     * $id_tipo não é inteiro.
+     * $type_id não é inteiro.
      *
      * @return
      */
@@ -31,9 +31,9 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo
         }
     }
 
-    protected function _findChildByModel($model_id_tipo)
+    protected function _findChildByModel($model_type_id)
     {
-        $child = InterAdminTipo::findFirstTipoByModel($model_id_tipo, [
+        $child = InterAdminTipo::findFirstTipoByModel($model_type_id, [
             'where' => ["admin <> ''"],
         ]);
         if (!$child) {
@@ -51,9 +51,9 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo
                     $classesTipo = $sistemaTipo->getFirstChildByNome('Classes');
                     if ($classesTipo) {
                         $child = new InterAdminTipo();
-                        $child->parent_id_tipo = $classesTipo->id_tipo;
-                        $child->model_id_tipo = $model_id_tipo;
-                        $child->nome = 'Modelo - '.$model_id_tipo;
+                        $child->parent_type_id = $classesTipo->type_id;
+                        $child->model_type_id = $model_type_id;
+                        $child->nome = 'Modelo - '.$model_type_id;
                         $child->mostrar = 'S';
                         $child->admin = 'S';
                         $child->save();
@@ -62,7 +62,7 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo
                     }
                 }
             }
-            //throw new Exception('Could not find a Tipo using the model "' . $model_id_tipo . '". You need to create one in Sistema/Classes.');
+            //throw new Exception('Could not find a Tipo using the model "' . $model_type_id . '". You need to create one in Sistema/Classes.');
         } else {
             return $child;
         }
@@ -83,8 +83,8 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo
      */
     public function createBoxesSettingsAndIntroduction(InterAdminTipo $tipo)
     {
-        if (!$tipo->id_tipo) {
-            throw new Exception('Tipo deveria ter id_tipo.');
+        if (!$tipo->type_id) {
+            throw new Exception('Tipo deveria ter type_id.');
         }
         if (!$tipo->getFirstChildByModel('Introduction')) {
             $introduction = $tipo->createChild('Introduction');
@@ -98,13 +98,13 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo
             $images->ordem = -50;
             $images->save();
         }
-        if ($tipo->model_id_tipo !== 'Videos' && !$tipo->getFirstChildByModel('ContentVideos')) {
+        if ($tipo->model_type_id !== 'Videos' && !$tipo->getFirstChildByModel('ContentVideos')) {
             $videos = $tipo->createChild('ContentVideos');
             $videos->nome = 'Vídeos';
             $videos->ordem = -40;
             $videos->save();
         }
-        if ($tipo->model_id_tipo !== 'Files' && !$tipo->getFirstChildByModel('ContentFiles')) {
+        if ($tipo->model_type_id !== 'Files' && !$tipo->getFirstChildByModel('ContentFiles')) {
             $files = $tipo->createChild('ContentFiles');
             $files->nome = 'Arquivos para Download';
             $files->ordem = -30;
@@ -197,12 +197,12 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo
         }
 
         $view->headStyle()->appendStyle('
-.content-'.toId($this->id_tipo).' .item .img-wrapper {
+.content-'.toId($this->type_id).' .item .img-wrapper {
 	height: '.$params->imgHeight.'px;
 	width: '.$params->imgWidth.'px;
 	line-height: '.$params->imgHeight.'px;
 }
-.content-'.toId($this->id_tipo).' .item .img-wrapper img {
+.content-'.toId($this->type_id).' .item .img-wrapper img {
 	max-height: '.$params->imgHeight.'px;
 	max-width: '.$params->imgWidth.'px;
 }

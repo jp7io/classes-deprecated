@@ -13,7 +13,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract
     private static $_theme_editor = false;
 
     public $attributes = [
-        'id_tipo' => 'SiteSettings',
+        'type_id' => 'SiteSettings',
         'nome' => 'Configurações do Site',
         'campos' => 'tit_1{,}Cabeçalho{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_1{;}file_1{,}Logo{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}{;}varchar_key{,}Título{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}header_title{;}varchar_1{,}Subtítulo{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}header_subtitle{;}tit_3{,}Dados do Administrador{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_3{;}varchar_2{,}Nome{,}Nome utilizado como remetente nos e-mails enviados pelo site.{,}{,}S{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}admin_name{;}varchar_3{,}E-mail{,}E-mail utilizado como remetente nos e-mails enviados pelo site.{,}{,}S{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}admin_email{;}tit_2{,}Template{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}tit_2{;}special_1{,}Jp7_Model_SiteSettingsTipo::getTemplateFields{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}Template{,}{,}{,}template_data{;}char_key{,}Mostrar{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}',
         'children' => '',
@@ -23,7 +23,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract
         'editpage' => '',
         'class' => '',
         'class_tipo' => '',
-        'model_id_tipo' => 0,
+        'model_type_id' => 0,
         'tabela' => '',
         'unico' => 'S',
         'disparo' => 'Jp7_Model_SiteSettingsTipo::saveTemplateFields',
@@ -191,11 +191,11 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract
         }
     }
 
-    public static function saveTemplateFields($from, $id, $id_tipo)
+    public static function saveTemplateFields($from, $id, $type_id)
     {
         if ($from == 'edit' || $from == 'insert') {
-            if ($id && $id_tipo) {
-                $tipo = InterAdminTipo::getInstance($id_tipo);
+            if ($id && $type_id) {
+                $tipo = InterAdminTipo::getInstance($type_id);
                 $registro = $tipo->findById($id, [
                     'fields' => ['special_1'],
                     'fields_alias' => false,

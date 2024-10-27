@@ -7,7 +7,7 @@ class Jp7_View_Helper_PageClass extends Zend_View_Helper_Abstract
         $classes = [];
         if ($this->view->tipo) {
             $classes[] = 'page-'.toSeo($this->view->tipo->nome);
-            $classes[] = 'tipo-'.$this->view->tipo->id_tipo;
+            $classes[] = 'tipo-'.$this->view->tipo->type_id;
         }
 
         return implode(' ', $classes);

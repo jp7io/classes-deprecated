@@ -7,7 +7,7 @@ class Jp7_Interadmin_Soap_UsuarioTipo extends InterAdminTipo
     public function __construct($options = [])
     {
         /*
-         * @global Define o $id_tipo em que são gravados os usuários com acesso.
+         * @global Define o $type_id em que são gravados os usuários com acesso.
          */
         global $c_tipos_permissoes_xml_csv;
         if (!$c_tipos_permissoes_xml_csv) {

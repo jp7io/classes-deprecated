@@ -211,7 +211,7 @@ class Jp7_Deprecated
      * Creates a list from values on the database.
      *
      * @param string $table     Name of the table containing the itens.
-     * @param int    $id_tipo   ID of the type.
+     * @param int    $type_id   ID of the type.
      * @param int    $id        ID of the current item.
      * @param string $type      Type of the list, the available values are: "combo" or "list", the default value is "list".
      * @param string $order     SQL string to be placed after the "ORDER BY" statement, the default value is "int_key,date_publish,varchar_key".
@@ -229,7 +229,7 @@ class Jp7_Deprecated
      *
      * @version (2009/06/13)
      */
-    public static function interadmin_list($table, $id_tipo, $id, $type = 'list', $order = 'int_key,date_publish,varchar_key', $field = 'varchar_key', $sql_where = '', $seo = false)
+    public static function interadmin_list($table, $type_id, $id, $type = 'list', $order = 'int_key,date_publish,varchar_key', $field = 'varchar_key', $sql_where = '', $seo = false)
     {
         global $db, $s_session, $l_selecione, $config;
         //global $id;
@@ -243,7 +243,7 @@ class Jp7_Deprecated
                     "<option value=\"\">--------------------</option>\n";
         }
         $sql = 'SELECT id,'.$field.' AS field FROM '.$table.
-        ' WHERE id_tipo='.$id_tipo.
+        ' WHERE type_id='.$type_id.
         " AND char_key<>''".
         ((!empty($s_session['preview']) || !config('interadmin.preview')) ? '' : " AND publish<>''").
         " AND (deleted='' OR deleted IS NULL)".

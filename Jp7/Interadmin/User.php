@@ -117,7 +117,7 @@ class Jp7_Interadmin_User extends InterAdmin
     }
 
     // Special - Disparo
-    public static function disparo($from, $id, $id_tipo)
+    public static function disparo($from, $id, $type_id)
     {
         if ($from !== 'insert' || empty($_POST['char_send_link'][0])) {
             return;

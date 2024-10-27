@@ -52,9 +52,9 @@ class Jp7_Box_Sections extends Jp7_Box_BoxAbstract
                         'where' => [
                             "admin = ''",
                             "menu != ''",
-                            // "model_id_tipo NOT IN ('Boxes', 'Settings', 'Introduction', 'Images')"
+                            // "model_type_id NOT IN ('Boxes', 'Settings', 'Introduction', 'Images')"
                         ],
-                        'order' => 'parent_id_tipo, ordem',
+                        'order' => 'parent_type_id, ordem',
                         'use_published_filters' => true,
                     ]);
         ?>

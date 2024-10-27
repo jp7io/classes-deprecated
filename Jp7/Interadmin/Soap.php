@@ -21,8 +21,8 @@ class Jp7_Interadmin_Soap
     public static function getClassTipo($type)
     {
         if (self::isDynamicClass($type)) {
-            $id_tipo = preg_replace('/[a-zA-Z_]*/', '', $type);
-            $tipo = new InterAdminTipo($id_tipo);
+            $type_id = preg_replace('/[a-zA-Z_]*/', '', $type);
+            $tipo = new InterAdminTipo($type_id);
         } else {
             $tipoName = $type.'Tipo';
             $tipo = new $tipoName();

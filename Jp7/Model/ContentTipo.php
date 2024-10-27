@@ -5,7 +5,7 @@ class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract
     protected static $_children;
 
     public $attributes = [
-        'id_tipo' => 'Content',
+        'type_id' => 'Content',
         'nome' => 'Conteúdo',
         'campos' => 'varchar_key{,}Título{,}{,}{,}{,}{,}0{,}{,}2{,}{,}{,}{,}{,}{,}{,}title{;}varchar_1{,}Subtítulo{,}{,}{,}{,}S{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}subtitle{;}text_1{,}Resumo{,}{,}3{,}{,}{,}html_light{,}{,}{,}{,}{,}{,}{,}{,}{,}summary{;}text_2{,}Texto{,}{,}20{,}{,}S{,}S{,}{,}{,}{,}{,}{,}{,}{,}{,}text{;}file_1{,}Imagem{,}{,}{,}{,}S{,}0{,}S{,}{,}{,}{,}{,}{,}{,}{,}image{;}int_key{,}Ordem{,}{,}{,}{,}{,}0{,}{,}1{,}{,}{,}{,}{,}{,}{,}ordem{;}char_key{,}Mostrar{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}char_1{,}Destaque{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}featured{;}',
         'children' => '',
@@ -15,7 +15,7 @@ class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract
         'editpage' => '',
         'class' => '',
         'class_tipo' => '',
-        'model_id_tipo' => 0,
+        'model_type_id' => 0,
         'tabela' => '',
         'layout' => Jp7_Box_Manager::COL_2_LEFT,
         'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
@@ -31,10 +31,10 @@ class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract
             $videos = $this->_findChildByModel('ContentVideos');
             $contentFiles = $this->_findChildByModel('ContentFiles');
 
-            self::$_children = $contentSubitem->id_tipo.'{,}Subitens{,}{,}{;}'.
-                $images->id_tipo.'{,}Imagens{,}{,}{;}'.
-                $videos->id_tipo.'{,}Vídeos{,}{,}{;}'.
-                $contentFiles->id_tipo.'{,}Arquivos para Download{,}{,}{;}';
+            self::$_children = $contentSubitem->type_id.'{,}Subitens{,}{,}{;}'.
+                $images->type_id.'{,}Imagens{,}{,}{;}'.
+                $videos->type_id.'{,}Vídeos{,}{,}{;}'.
+                $contentFiles->type_id.'{,}Arquivos para Download{,}{,}{;}';
         }
         $this->children = self::$_children;
     }

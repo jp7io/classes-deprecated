@@ -17,7 +17,7 @@
 class InterAdminField
 {
     public $id;
-    public $id_tipo;
+    public $type_id;
 
     public static $php5_2_hack_className = 'InterAdminField';
 
@@ -209,7 +209,7 @@ class InterAdminField
                 } elseif ($xtra) {
                     if ($campo_nome == 'all') {
                         if ($campo_array['where']) {
-                            $sql = 'SELECT id_tipo,nome FROM '.$db_prefix.'_tipos'.
+                            $sql = 'SELECT type_id,nome FROM '.$db_prefix.'_tipos'.
                             ' WHERE 1 '.$campo_array['where'].
                             ' ORDER BY ordem,nome';
                             $rs = $db->Execute($sql);
@@ -217,7 +217,7 @@ class InterAdminField
                                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
                             }
                             while ($row = $rs->FetchNextObj()) {
-                                $form .= '<option value="'.$row->id_tipo.'"'.(($row->id_tipo == $valor) ? ' SELECTED' : '').'>'.toHTML($row->nome).'</option>';
+                                $form .= '<option value="'.$row->type_id.'"'.(($row->type_id == $valor) ? ' SELECTED' : '').'>'.toHTML($row->nome).'</option>';
                             }
                             $rs->Close();
                         } else {
@@ -227,15 +227,15 @@ class InterAdminField
                             ob_end_clean();
                         }
                     } else {
-                        $sql = 'SELECT id_tipo,nome FROM '.$db_prefix.'_tipos'.
-                        ' WHERE parent_id_tipo='.$campo_nome.
+                        $sql = 'SELECT type_id,nome FROM '.$db_prefix.'_tipos'.
+                        ' WHERE parent_type_id='.$campo_nome.
                         ' ORDER BY ordem,nome';
                         $rs = $db->Execute($sql);
                         if ($rs === false) {
                             throw new Jp7_Interadmin_Exception($db->ErrorMsg());
                         }
                         while ($row = $rs->FetchNextObj()) {
-                            $form .= '<option value="'.$row->id_tipo.'"'.(($row->id_tipo == $valor) ? ' SELECTED' : '').'>'.toHTML($row->nome).'</option>';
+                            $form .= '<option value="'.$row->type_id.'"'.(($row->type_id == $valor) ? ' SELECTED' : '').'>'.toHTML($row->nome).'</option>';
                         }
                         $rs->Close();
                     }
@@ -262,13 +262,13 @@ class InterAdminField
             if (strpos($tipo_de_campo, 'varchar_') === 0) {
                 switch ($xtra) {
                     case 'id': // ID
-                        $onkeypress = " onkeypress=\"return DFonlyThisChars(true,true,'_.',event)\" onblur=\"if (this.value) ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS['id_tipo'].'&campo='.$campo.'&valor_atual='.$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
+                        $onkeypress = " onkeypress=\"return DFonlyThisChars(true,true,'_.',event)\" onblur=\"if (this.value) ajax_function(this,'interadmin_inserir_checkuniqueid.php?type_id=".$GLOBALS['type_id'].'&campo='.$campo.'&valor_atual='.$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
                         if ($id && !$s_user['admin']) {
                             $onkeypress .= ' disabled="disabled"';
                         } // Impede alteração
                         break;
                     case 'id_email': // ID E-Mail
-                        $onkeypress = " xtype=\"email\" onkeypress=\"return DFonlyThisChars(true,true,'_@.-+',event)\" onblur=\"if (this.value) ajax_function(this,'interadmin_inserir_checkuniqueid.php?id_tipo=".$GLOBALS['id_tipo'].'&campo='.$campo.'&valor_atual='.$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
+                        $onkeypress = " xtype=\"email\" onkeypress=\"return DFonlyThisChars(true,true,'_@.-+',event)\" onblur=\"if (this.value) ajax_function(this,'interadmin_inserir_checkuniqueid.php?type_id=".$GLOBALS['type_id'].'&campo='.$campo.'&valor_atual='.$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
                         break;
                     case 'email': // E-Mail
                         $onkeypress = " xtype=\"email\" onkeypress=\"return DFonlyThisChars(true,true,'_@-.+',event)\"";

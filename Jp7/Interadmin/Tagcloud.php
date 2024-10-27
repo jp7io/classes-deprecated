@@ -36,7 +36,7 @@ class Jp7_Interadmin_Tagcloud
 
         $tags_arr_unique = [];
         foreach ($tags_arr as $tag) {
-            $tag_key = ($tag->id) ? $tag->id_tipo.';'.$tag->id : $tag->id_tipo;
+            $tag_key = ($tag->id) ? $tag->type_id.';'.$tag->id : $tag->type_id;
             $tags_arr_unique[$tag_key]['obj'] = $tag;
             $tags_arr_unique[$tag_key]['hits'] += $tag->interadmin->hits;
         }

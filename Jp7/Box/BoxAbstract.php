@@ -229,7 +229,7 @@ abstract class Jp7_Box_BoxAbstract
     {
         $tree = [];
         foreach ($tipos as $tipo) {
-            $tree[$tipo->parent_id_tipo][] = $tipo;
+            $tree[$tipo->parent_type_id][] = $tipo;
         }
         $options = [];
         $this->_addTiposRecursively($options, $tree);
@@ -242,19 +242,19 @@ abstract class Jp7_Box_BoxAbstract
 
         return $this->options($options, $value);
     }
-    protected function _addTiposRecursively(&$options, &$tree, $parent_id_tipo = 0, $level = 0)
+    protected function _addTiposRecursively(&$options, &$tree, $parent_type_id = 0, $level = 0)
     {
-        if (is_array($tree[$parent_id_tipo])) {
-            foreach ($tree[$parent_id_tipo] as $tipo) {
+        if (is_array($tree[$parent_type_id])) {
+            foreach ($tree[$parent_type_id] as $tipo) {
                 $options[] = (object) [
-                    'value' => $tipo->id_tipo,
+                    'value' => $tipo->type_id,
                     'text' => trim(str_repeat('--', $level).' '.$tipo->nome),
                 ];
-                if ($tree[$tipo->id_tipo]) {
-                    $this->_addTiposRecursively($options, $tree, $tipo->id_tipo, $level + 1);
+                if ($tree[$tipo->type_id]) {
+                    $this->_addTiposRecursively($options, $tree, $tipo->type_id, $level + 1);
                 }
             }
         }
-        unset($tree[$parent_id_tipo]);
+        unset($tree[$parent_type_id]);
     }
 }

@@ -29,7 +29,7 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
      */
     public $db_prefix;
     /**
-     * Contains the InterAdminTipo, i.e. the record with an 'id_tipo' equal to this record´s 'id_tipo'.
+     * Contains the InterAdminTipo, i.e. the record with an 'type_id' equal to this record´s 'type_id'.
      *
      * @var InterAdminTipo
      */
@@ -60,10 +60,10 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
     public function getTipo($options = [])
     {
         if (!$this->_tipo) {
-            if (!$this->id_tipo) {
-                $this->id_tipo = jp7_fields_values($this->getTableName(), 'id_arquivo', $this->id_arquivo, 'id_tipo');
+            if (!$this->type_id) {
+                $this->type_id = jp7_fields_values($this->getTableName(), 'id_arquivo', $this->id_arquivo, 'type_id');
             }
-            $this->_tipo = InterAdminTipo::getInstance($this->id_tipo, [
+            $this->_tipo = InterAdminTipo::getInstance($this->type_id, [
                 'db_prefix' => $this->db_prefix,
                 'db' => $this->_db,
                 'class' => $options['class'],
@@ -79,7 +79,7 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
      */
     public function setTipo($tipo)
     {
-        $this->id_tipo = $tipo->id_tipo;
+        $this->type_id = $tipo->type_id;
         $this->_tipo = $tipo;
     }
 
@@ -160,7 +160,7 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
         global $lang;
         // Inserindo no banco de arquivos
         $fieldsValues = [
-            'id_tipo' => $this->id_tipo,
+            'type_id' => $this->type_id,
             'id' => $this->id,
             'tipo' => $this->getExtension(),
             'parte' => intval($this->parte),
@@ -217,11 +217,11 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
     }
     public function getAttributesNames()
     {
-        return ['id_arquivo', 'id_tipo', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
+        return ['id_arquivo', 'type_id', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
     }
     public function getTableName()
     {
-        if ($this->id_tipo) {
+        if ($this->type_id) {
             return $this->getTipo()->getArquivosTableName();
         } else {
             return $this->db_prefix.'_arquivos';

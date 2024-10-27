@@ -7,7 +7,7 @@ class Jp7_Model_BoxesTipo extends Jp7_Model_TipoAbstract
     protected static $_children;
 
     public $attributes = [
-        'id_tipo' => 'Boxes',
+        'type_id' => 'Boxes',
         'nome' => 'Boxes',
         'campos' => 'int_1{,}Largura em Colunas{,}{,}{,}{,}S{,}0{,}S{,}{,}{,}{,}{,}{,}{,}1{,}width{;}char_1{,}Página dos Registros{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}records_page{;}char_key{,}Mostrar{,}{,}{,}{,}{,}0{,}{,}{,}{,}{,}{,}{,}{,}{,}mostrar{;}int_key{,}Ordem{,}{,}{,}{,}{,}0{,}{,}1{,}{,}{,}{,}{,}{,}{,}ordem{;}',
         'children' => '',
@@ -17,7 +17,7 @@ class Jp7_Model_BoxesTipo extends Jp7_Model_TipoAbstract
         'editpage' => 'boxes.php',
         'class' => '',
         'class_tipo' => '',
-        'model_id_tipo' => 0,
+        'model_type_id' => 0,
         'tabela' => 'boxes',
         'icone' => 'layout_content',
     ];
@@ -28,7 +28,7 @@ class Jp7_Model_BoxesTipo extends Jp7_Model_TipoAbstract
 
         if (!self::$_children) {
             $boxesBox = $this->_findChildByModel('BoxesBox');
-            self::$_children = $boxesBox->id_tipo.'{,}Boxes{,}{,}{;}';
+            self::$_children = $boxesBox->type_id.'{,}Boxes{,}{,}{;}';
         }
         $this->children = self::$_children;
     }

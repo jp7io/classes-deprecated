@@ -126,7 +126,7 @@ class Jp7_Interadmin_Search
         }
         $fields = [];
         $fields[] = in_array('id', $columns) ? 'id' : '0 AS id';
-        $fields[] = in_array('id_tipo', $columns) ? 'id_tipo' : '0 AS id_tipo';
+        $fields[] = in_array('type_id', $columns) ? 'type_id' : '0 AS type_id';
         $fields[] = in_array('varchar_key', $columns) ? 'varchar_key' : reset($textColumns).' AS varchar_key';
         if (in_array('text_1', $columns)) {
             $fields[] = 'text_1';
@@ -207,7 +207,7 @@ class Jp7_Interadmin_Search
         if ($extra_where) {
             $where[] = $extra_where;
         }
-        $where[] = 'id_tipo > 0';
+        $where[] = 'type_id > 0';
 
         if ($date_filter) {
             if (in_array('date_publish', $columns)) {
@@ -253,7 +253,7 @@ class Jp7_Interadmin_Search
 
         $hits_field = in_array('hits', $columns) ? ' * IF (hits > 1000, 1.3, 1) ' : '';
 
-        //$hits_field = in_array('id_tipo', $columns) ? ' + IF (id_tipo IN (1, 23), 5, 1) ' : '';
+        //$hits_field = in_array('type_id', $columns) ? ' + IF (type_id IN (1, 23), 5, 1) ' : '';
 
         $sql = 'SELECT '.implode(',', $fields).', '.$match.$hits_field.' AS relevance '.
             'FROM `'.$table.'` '.
@@ -272,7 +272,7 @@ class Jp7_Interadmin_Search
         global $s_allowed_tipos;
         if (is_array($s_allowed_tipos)) {
             if ($s_allowed_tipos) {
-                return 'id_tipo IN ('.implode(',', $s_allowed_tipos).')';
+                return 'type_id IN ('.implode(',', $s_allowed_tipos).')';
             } else {
                 return '0=1';
             }

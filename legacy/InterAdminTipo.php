@@ -166,7 +166,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
     public function getChildren($options = [])
     {
         $this->_whereArrayFix($options['where']); // FIXME
-        $options['where'][] = 'parent_id_tipo = '.$this->id_tipo;
+        $options['where'][] = 'parent_type_id = '.$this->type_id;
         return $this->deprecatedGetChildren($options)->all();
     }
 
@@ -176,7 +176,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
     }
 
     /**
-     * Returns all records having an InterAdminTipo that uses this as a model (model_id_tipo).
+     * Returns all records having an InterAdminTipo that uses this as a model (model_type_id).
      *
      * @param array $options [optional]
      *
@@ -186,11 +186,11 @@ class InterAdminTipo extends Type implements InterAdminAbstract
     {
         $this->_prepareInterAdminsOptions($options, $optionsInstance);
         $tipos = $this->getTiposUsingThisModel();
-        $options['where'][] = 'id_tipo IN ('.implode(',', $tipos).')';
+        $options['where'][] = 'type_id IN ('.implode(',', $tipos).')';
         $rs = $this->_executeQuery($options);
         $records = [];
         foreach ($rs as $row) {
-            $record = InterAdmin::getInstance($row->id, $optionsInstance, $tipos[$row->id_tipo]);
+            $record = InterAdmin::getInstance($row->id, $optionsInstance, $tipos[$row->type_id]);
             $this->_getAttributesFromRow($row, $record, $options);
             $records[] = $record;
         }
@@ -245,16 +245,16 @@ class InterAdminTipo extends Type implements InterAdminAbstract
     }
 
     /**
-     * Retrieves the first child of this InterAdminTipo with the given "model_id_tipo".
+     * Retrieves the first child of this InterAdminTipo with the given "model_type_id".
      *
-     * @param string|int $model_id_tipo
+     * @param string|int $model_type_id
      * @param array      $options       Default array of options. Available keys: fields, where, order, class.
      *
      * @return InterAdminTipo
      */
-    public function getFirstChildByModel($model_id_tipo, $options = [])
+    public function getFirstChildByModel($model_type_id, $options = [])
     {
-        $retorno = $this->getChildrenByModel($model_id_tipo, ['limit' => 1] + $options);
+        $retorno = $this->getChildrenByModel($model_type_id, ['limit' => 1] + $options);
         return $retorno[0];
     }
     /**
@@ -270,22 +270,22 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         return $this->getFirstChild($options);
     }
     /**
-     * Retrieves the children of this InterAdminTipo which have the given model_id_tipo.
+     * Retrieves the children of this InterAdminTipo which have the given model_type_id.
      *
      * @param array $options Default array of options. Available keys: fields, where, order, class.
      *
      * @return Array of InterAdminTipo objects.
      */
-    public function getChildrenByModel($model_id_tipo, $options = [])
+    public function getChildrenByModel($model_type_id, $options = [])
     {
-        $options['where'][] = "model_id_tipo = '".$model_id_tipo."'";
+        $options['where'][] = "model_type_id = '".$model_type_id."'";
         // Necessário enquanto algumas tabelas ainda tem esse campo numérico
-        $options['where'][] = "model_id_tipo != '0'";
+        $options['where'][] = "model_type_id != '0'";
         return $this->getChildren($options);
     }
 
     /**
-     * Creates a record with id_tipo, mostrar, date_insert and date_publish filled.
+     * Creates a record with type_id, mostrar, date_insert and date_publish filled.
      *
      * @param array $attributes Attributes to be merged into the new record.
      *
@@ -327,7 +327,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
 
     public function getTagFilters()
     {
-        return '(tags.id_tipo = '.$this->id_tipo.' AND tags.id = 0)';
+        return '(tags.type_id = '.$this->type_id.' AND tags.id = 0)';
     }
 
     public function getBreadcrumb()
@@ -336,7 +336,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         $parent = $this;
         do {
             $parents[] = $parent;
-        } while (($parent = $parent->getParent()) && $parent->id_tipo);
+        } while (($parent = $parent->getParent()) && $parent->type_id);
         return array_reverse($parents);
     }
 
@@ -369,31 +369,31 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         return empty($tipos) ? null : $tipos[0];
     }
     /**
-     * Retrieves the first Type with the given "model_id_tipo".
+     * Retrieves the first Type with the given "model_type_id".
      *
-     * @param string|int $model_id_tipo
+     * @param string|int $model_type_id
      * @param array      $options       [optional]
      *
      * @return Type
      */
-    public static function findFirstTipoByModel($model_id_tipo, $options = [])
+    public static function findFirstTipoByModel($model_type_id, $options = [])
     {
-        return self::findTiposByModel($model_id_tipo, ['limit' => 1] + $options)[0];
+        return self::findTiposByModel($model_type_id, ['limit' => 1] + $options)[0];
     }
     /**
-     * Retrieves all the Type with the given "model_id_tipo".
+     * Retrieves all the Type with the given "model_type_id".
      *
-     * @param string|int $model_id_tipo
+     * @param string|int $model_type_id
      * @param array      $options       [optional]
      *
      * @return array
      */
-    public static function findTiposByModel($model_id_tipo, $options = [])
+    public static function findTiposByModel($model_type_id, $options = [])
     {
-        $options['where'][] = "model_id_tipo = '".$model_id_tipo."'";
-        if ($model_id_tipo != '0') {
-            // Devido à mudança de int para string do campo model_id_tipo, essa linha é necessária
-            $options['where'][] = "model_id_tipo != '0'";
+        $options['where'][] = "model_type_id = '".$model_type_id."'";
+        if ($model_type_id != '0') {
+            // Devido à mudança de int para string do campo model_type_id, essa linha é necessária
+            $options['where'][] = "model_type_id != '0'";
         }
 
         return self::findTipos($options);
@@ -414,7 +414,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         if (!isset($options['fields'])) {
             $options['fields'] = [];
         }
-        $options['fields'] = array_merge(['id_tipo'], (array) $options['fields']);
+        $options['fields'] = array_merge(['type_id'], (array) $options['fields']);
 
         $options['from'] = $instance->getTableName().' AS main';
         if (empty($options['where'])) {
@@ -431,7 +431,7 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         $tipos = [];
 
         foreach ($rs as $row) {
-            $tipo = self::getInstance($row->id_tipo, [
+            $tipo = self::getInstance($row->type_id, [
                 'db' => isset($options['db']) ? $options['db'] : null,
                 'class' => isset($options['class']) ? $options['class'] : null,
             ]);

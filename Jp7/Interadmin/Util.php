@@ -39,7 +39,7 @@ class Jp7_Interadmin_Util
     {
         $export->_children = [];
         foreach ($tiposChildren as $tipoChildrenArr) {
-            $tipoChildren = $export->getChildrenTipo($tipoChildrenArr['id_tipo']);
+            $tipoChildren = $export->getChildrenTipo($tipoChildrenArr['type_id']);
 
             $children = $tipoChildren->find($options  + [
                 'where' => "deleted = ''",
@@ -53,7 +53,7 @@ class Jp7_Interadmin_Util
                 self::_exportChildren($child, $tiposGrandChildren, $use_id_string, $options);
                 $child->setParent(null);
             }
-            $export->_children[$tipoChildren->id_tipo] = $children;
+            $export->_children[$tipoChildren->type_id] = $children;
         }
         $export->setTipo(null);
     }
@@ -159,8 +159,8 @@ class Jp7_Interadmin_Util
 
     public static function _importChildren($record, $children, $use_id_string, $bind_children)
     {
-        foreach ($children as $child_id_tipo => $tipo_children) {
-            $childTipo = InterAdminTipo::getInstance($child_id_tipo);
+        foreach ($children as $child_type_id => $tipo_children) {
+            $childTipo = InterAdminTipo::getInstance($child_type_id);
             $childTipo->setParent($record);
 
             foreach ($tipo_children as $child) {
@@ -193,13 +193,13 @@ class Jp7_Interadmin_Util
         }
 
         $beforCopyEvent = Interadmin_Event_BeforeCopy::getInstance();
-        $beforCopyEvent->setIdTipo($tipoObj->id_tipo);
+        $beforCopyEvent->setIdTipo($tipoObj->type_id);
         $beforCopyEvent->notify();
 
         $registros = self::export($tipoObj, $ids, $use_id_string);
 
         foreach ($registros as $registro) {
-            if ($tipoObj->id_tipo == $tipoDestino->id_tipo) {
+            if ($tipoObj->type_id == $tipoDestino->type_id) {
                 $registro->setTipo($tipoDestino);
                 if (isset($registro->varchar_key)) {
                     $registro->varchar_key = 'Cópia de '.$registro->varchar_key;
@@ -215,7 +215,7 @@ class Jp7_Interadmin_Util
         if (Interadmin_Event_AfterCopy::getInstance()->hasObservers()) {
             foreach ($returnIds as $returnId) {
                 $afterCopyEvent = Interadmin_Event_AfterCopy::getInstance();
-                $afterCopyEvent->setIdTipo($tipoDestino->id_tipo);
+                $afterCopyEvent->setIdTipo($tipoDestino->type_id);
                 $afterCopyEvent->setId($returnId['id']);
                 $afterCopyEvent->setCopyId($returnId['new_id']);
                 $afterCopyEvent->notify();
@@ -227,11 +227,11 @@ class Jp7_Interadmin_Util
 
     public static function syncTipos($model)
     {
-        $inheritedTipos = InterAdminTipo::findTiposByModel($model->id_tipo, [
+        $inheritedTipos = InterAdminTipo::findTiposByModel($model->type_id, [
             'class' => 'InterAdminTipo',
         ]);
         ?>
-		&bull; <?= $model->id_tipo ?> - <?= $model->nome ?> <br />
+		&bull; <?= $model->type_id ?> - <?= $model->nome ?> <br />
 		<div class="indent">
 			<?php foreach ($inheritedTipos as $tipo) { ?>
 				<?php
@@ -353,7 +353,7 @@ STR;
 
 $phpdoc
 class {$nomeClasse} extends {$prefixoClasse}_InterAdminTipo {
-	const ID_TIPO = {$tipo->id_tipo};
+	const ID_TIPO = {$tipo->type_id};
 }
 STR;
         if ($gerarArquivo) {

@@ -15,10 +15,10 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
         if (!$s_user) {
             $s_user = $s_session['temp_user'];
         }
-        if (!$s_user['id_tipo']) {
+        if (!$s_user['type_id']) {
             return;
         }
-        $userTipo = new Jp7_Interadmin_UserTipo($s_user['id_tipo']);
+        $userTipo = new Jp7_Interadmin_UserTipo($s_user['type_id']);
 
         if (!$userTipo->getCampoUsuario()) {
             throw new Exception('Campo "usuario" não existe no tipo Usuários.');

@@ -7,14 +7,14 @@ class Jp7_Interadmin_JSTree
     public $options = [];
     protected static $permissionsLevel = 3;
 
-    public function __construct($options = [], $root_id_tipo = 0)
+    public function __construct($options = [], $root_type_id = 0)
     {
         global $lang;
 
         $this->options = $options + ['permissions_level' => static::$permissionsLevel];
 
         if (!$options['static']) {
-            $this->addTipo($this->tree, new InterAdminTipo($root_id_tipo));
+            $this->addTipo($this->tree, new InterAdminTipo($root_type_id));
         }
     }
 
@@ -33,7 +33,7 @@ class Jp7_Interadmin_JSTree
         global $lang;
 
         $options = [
-            'fields' => ['nome', 'parent_id_tipo', 'model_id_tipo', 'icone'],
+            'fields' => ['nome', 'parent_type_id', 'model_type_id', 'icone'],
             'use_published_filters' => true,
             'class' => 'InterAdminTipo',
         ];
@@ -69,10 +69,10 @@ class Jp7_Interadmin_JSTree
     {
         $node = (object) [
             'text' => $nome_lang,
-                'id' => $tipo->id_tipo,
+                'id' => $tipo->type_id,
             'data' => [
-                //'id_tipo' => $tipo->id_tipo,
-                'model_id_tipo' => $tipo->model_id_tipo,
+                //'type_id' => $tipo->type_id,
+                'model_type_id' => $tipo->model_type_id,
                 'class' => $tipo->class,
             ],
             'children' => [],
