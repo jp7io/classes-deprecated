@@ -12,17 +12,17 @@ class InterAdminArquivoBanco
      *
      * @param array $fieldsValues
      *
-     * @return string id_arquivo_banco
+     * @return string id_file_banco
      */
     public function addFile($fieldsValues)
     {
-        $id_arquivo_banco = jp7_db_insert($this->getTableName(), 'id_arquivo_banco', '', $fieldsValues);
+        $id_file_banco = jp7_db_insert($this->getTableName(), 'id_file_banco', '', $fieldsValues);
 
-        return str_pad($id_arquivo_banco, 8, '0', STR_PAD_LEFT);
+        return str_pad($id_file_banco, 8, '0', STR_PAD_LEFT);
     }
 
     public function getTableName()
     {
-        return $this->db_prefix.'_arquivos_banco';
+        return $this->db_prefix.'_files_banco';
     }
 }

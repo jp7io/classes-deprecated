@@ -124,7 +124,7 @@ class Jp7_Deprecated
                     $sql_where = str_replace('WHERE ', 'WHERE ('.$alias.".mostrar<>'' OR ".$alias.'.mostrar IS NULL) AND ('.$alias.".deleted_tipo='' OR ".$alias.'.deleted_tipo IS NULL) AND ', $sql_where);
                 } elseif (strpos($value, '_tags') === (mb_strlen($value) - mb_strlen('_tags'))) {
                     // do nothing
-                } elseif (strpos($value, $db_prefix.$lang->prefix.'_arquivos') !== false || strpos($value, $db_prefix.'_arquivos') !== false) {
+                } elseif (strpos($value, $db_prefix.$lang->prefix.'_files') !== false || strpos($value, $db_prefix.'_files') !== false) {
                     $sql_where = str_replace('WHERE ', 'WHERE '.$alias.".mostrar<>'' AND (".$alias.".deleted='' OR ".$alias.'.deleted IS NULL) AND ', $sql_where);
                 } else {
                     $sql_where_replace = ''.
@@ -147,7 +147,7 @@ class Jp7_Deprecated
                     $sql_where = str_replace('WHERE ', "WHERE mostrar<>'' AND (deleted_tipo='' OR deleted_tipo IS NULL) AND ", $sql_where);
                 } elseif (strpos($value, $db_prefix.'_tags') !== false) {
                     // do nothing
-                } elseif (strpos($value, $db_prefix.$lang->prefix.'_arquivos') !== false || strpos($value, $db_prefix.'_arquivos') !== false) {
+                } elseif (strpos($value, $db_prefix.$lang->prefix.'_files') !== false || strpos($value, $db_prefix.'_files') !== false) {
                     $sql_where = str_replace('WHERE ', "WHERE mostrar<>'' AND (deleted LIKE '' OR deleted IS NULL) AND ", $sql_where);
                 } else {
                     $sql_where = str_replace('WHERE ', 'WHERE'.

@@ -370,19 +370,19 @@ STR;
     {
         global $c_interadminConfigPath;
 
-        $arquivo = dirname($c_interadminConfigPath).'/classes/'.str_replace('_', '/', $nomeClasse).'.php';
-        if (!is_file($arquivo)) {
-            @mkdir(dirname($arquivo), 0777, true);
+        $file = dirname($c_interadminConfigPath).'/classes/'.str_replace('_', '/', $nomeClasse).'.php';
+        if (!is_file($file)) {
+            @mkdir(dirname($file), 0777, true);
 
-            $retorno = file_put_contents($arquivo, $conteudo);
-            @chmod($arquivo, 0777);
+            $retorno = file_put_contents($file, $conteudo);
+            @chmod($file, 0777);
             if ($retorno === false) {
-                $avisos['erro'][] = 'Não foi possível gravar arquivo: "'.$arquivo.'". Verifique permissões no diretório.';
+                $avisos['erro'][] = 'Não foi possível gravar arquivo: "'.$file.'". Verifique permissões no diretório.';
             } else {
-                $avisos['sucesso'][] = 'Arquivo "'.$arquivo.'" gerado.';
+                $avisos['sucesso'][] = 'Arquivo "'.$file.'" gerado.';
             }
         } else {
-            $avisos['erro'][] = 'Arquivo "'.$arquivo.'" já existe.';
+            $avisos['erro'][] = 'Arquivo "'.$file.'" já existe.';
         }
 
         return $avisos;

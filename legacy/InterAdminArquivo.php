@@ -20,7 +20,7 @@ use Jp7_Interadmin_Upload as Upload;
 class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
 {
     const DEFAULT_NAMESPACE = '';
-    protected $_primary_key = 'id_arquivo';
+    protected $_primary_key = 'id_file';
 
     /**
      * Table prefix of this record. It is usually formed by 'interadmin_' + 'client name'.
@@ -43,12 +43,12 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
     /**
      * Public Constructor. If $options['fields'] was passed the method $this->getFieldsValues() is called.
      *
-     * @param int   $id_arquivo This record's 'id_arquivo'.
+     * @param int   $id_file This record's 'id_file'.
      * @param array $options    Default array of options. Available keys: db_prefix, fields.
      */
-    public function __construct($id_arquivo = 0, $options = [])
+    public function __construct($id_file = 0, $options = [])
     {
-        $this->id_arquivo = $id_arquivo;
+        $this->id_file = $id_file;
     }
     /**
      * Gets the InterAdminTipo object for this record, which is then cached on the $_tipo property.
@@ -61,7 +61,7 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
     {
         if (!$this->_tipo) {
             if (!$this->type_id) {
-                $this->type_id = jp7_fields_values($this->getTableName(), 'id_arquivo', $this->id_arquivo, 'type_id');
+                $this->type_id = jp7_fields_values($this->getTableName(), 'id_file', $this->id_file, 'type_id');
             }
             $this->_tipo = InterAdminTipo::getInstance($this->type_id, [
                 'db_prefix' => $this->db_prefix,
@@ -148,12 +148,12 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
         return htmlspecialchars($this->getFieldsValues('legenda'));
     }
     /**
-     * Adds this file to the table _arquivos_banco and sets it's $url with the new $id_arquivo_banco.
+     * Adds this file to the table _files_banco and sets it's $url with the new $id_file_banco.
      * '$this->url' needs to have the path to the temporary file and it must have a parent.
      *
-     * @return Url New $url created with the $id_arquivo_banco of the added record.
+     * @return Url New $url created with the $id_file_banco of the added record.
      *
-     * @todo Create a class for _arquivos_banco
+     * @todo Create a class for _files_banco
      */
     public function addToArquivosBanco($uploadPath = 'upload/')
     {
@@ -169,7 +169,7 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
         ];
 
         $banco = new InterAdminArquivoBanco(['db_prefix' => $this->db_prefix]);
-        $id_arquivo_banco = $banco->addFile($fieldsValues);
+        $id_file_banco = $banco->addFile($fieldsValues);
 
         // Descobrindo o caminho da pasta
         $parent = $this->getParent();
@@ -177,7 +177,7 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
             $parent = $parent->getParent();
         }
 
-        $filepath = toId($parent->getTipo()->nome).'/'.$id_arquivo_banco.'.'.$fieldsValues['tipo'];
+        $filepath = toId($parent->getTipo()->nome).'/'.$id_file_banco.'.'.$fieldsValues['tipo'];
 
         // Movendo arquivo temporário
         if (str_starts_with($this->url, '../../upload')) {
@@ -217,14 +217,14 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
     }
     public function getAttributesNames()
     {
-        return ['id_arquivo', 'type_id', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
+        return ['id_file', 'type_id', 'id', 'parte', 'url', 'url_thumb', 'url_zoom', 'nome', 'legenda', 'creditos', 'link', 'link_blank', 'mostrar', 'destaque', 'ordem', 'deleted'];
     }
     public function getTableName()
     {
         if ($this->type_id) {
             return $this->getTipo()->getArquivosTableName();
         } else {
-            return $this->db_prefix.'_arquivos';
+            return $this->db_prefix.'_files';
         }
     }
 

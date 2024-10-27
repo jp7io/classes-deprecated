@@ -309,12 +309,12 @@ class InterAdmin extends Record implements InterAdminAbstract
         if (!class_exists($className)) {
             $className = 'InterAdminArquivo';
         }
-        $arquivo = new $className();
-        $arquivo->setParent($this);
-        $arquivo->setTipo($this->getTipo());
-        $arquivo->mostrar = 'S';
-        $arquivo->setAttributes($attributes);
-        return $arquivo;
+        $file = new $className();
+        $file->setParent($this);
+        $file->setTipo($this->getTipo());
+        $file->mostrar = 'S';
+        $file->setAttributes($attributes);
+        return $file;
     }
     /**
      * Retrieves the uploaded files of this record.
@@ -342,11 +342,11 @@ class InterAdmin extends Record implements InterAdminAbstract
      */
     public function deleteArquivos($options = [])
     {
-        $arquivos = $this->getArquivos($options);
-        foreach ($arquivos as $arquivo) {
-            $arquivo->delete();
+        $files = $this->getArquivos($options);
+        foreach ($files as $file) {
+            $file->delete();
         }
-        return count($arquivos);
+        return count($files);
     }
     /**
      * Retrieves this record´s children for the given $type_id.

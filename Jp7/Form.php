@@ -306,7 +306,7 @@ class Jp7_Form extends Zend_Form
         );
 
         $banco = new InterAdminArquivoBanco();
-        $id_arquivo_banco = $banco->addFile($fieldsValues);*/
+        $id_file_banco = $banco->addFile($fieldsValues);*/
     }
 }
 

@@ -300,8 +300,8 @@ class InterAdminField
                 echo ''.
                 $_tr.
                     $_th.
-                    '<td><input type="text" label="'.$campo_nome.'" name="'.$campo.'['.$j.']"'.(($obrigatorio) ? ' obligatory="yes"' : '').' value="'.$valor.'" xtra="'.$xtra.'" maxlength="255"'.$readonly.' class="inputs_width_file_search"><input type="button" value="Procurar..." style="width:'.($campo_array['sem_creditos'] ? 60 : 80)."px\" onclick=\"interadmin_arquivos_banco(this,'".$campo.'['.$j."]',false,'".$tamanho."')\" /></td>".
-                    '<td rowspan='.($campo_array['sem_creditos'] ? 1 : 2).' align="center" onclick="interadmin_open_original(this);" class="image_preview'.($valor ? '' : ' placeholder').'" style="cursor:pointer">'.interadmin_arquivos_preview($url).'</td>'.
+                    '<td><input type="text" label="'.$campo_nome.'" name="'.$campo.'['.$j.']"'.(($obrigatorio) ? ' obligatory="yes"' : '').' value="'.$valor.'" xtra="'.$xtra.'" maxlength="255"'.$readonly.' class="inputs_width_file_search"><input type="button" value="Procurar..." style="width:'.($campo_array['sem_creditos'] ? 60 : 80)."px\" onclick=\"interadmin_files_banco(this,'".$campo.'['.$j."]',false,'".$tamanho."')\" /></td>".
+                    '<td rowspan='.($campo_array['sem_creditos'] ? 1 : 2).' align="center" onclick="interadmin_open_original(this);" class="image_preview'.($valor ? '' : ' placeholder').'" style="cursor:pointer">'.interadmin_files_preview($url).'</td>'.
                     '<td rowspan='.($campo_array['sem_creditos'] ? 1 : 2).'>'.$S_ajuda.'</td>'.
                 "</tr>\n";
 
@@ -490,8 +490,8 @@ class InterAdminField
                 }
             }
             ?>
-			<div style="width:100%;cursor:pointer;color:#fff;font-size:9px" onclick="interadmin_arquivos_banco_preview('<?php echo $url ?>')">
-				<?php echo @interadmin_arquivos_preview($url, '', true, true);
+			<div style="width:100%;cursor:pointer;color:#fff;font-size:9px" onclick="interadmin_files_banco_preview('<?php echo $url ?>')">
+				<?php echo @interadmin_files_preview($url, '', true, true);
             ?><?php if ($url_size) {
     ?> - <?php echo $url_size ?><?php
 
@@ -583,7 +583,7 @@ class InterAdminField
     ?>
 						<a href="<?php echo $campo['value']->getUrl();
     ?>" target="_blank">
-							<?php echo interadmin_arquivos_preview($url);
+							<?php echo interadmin_files_preview($url);
     ?>
 						</a>
 					<?php
