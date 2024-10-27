@@ -96,7 +96,7 @@ class Jp7_Interadmin_Search
         foreach ($types as $type) {
             $tables[] = $db_prefix.'_'.($type->tabela ?: 'registros');
         }
-        $tables[] = $db_prefix.'_tipos';
+        $tables[] = $db_prefix.'_types';
         return $tables;
     }
 

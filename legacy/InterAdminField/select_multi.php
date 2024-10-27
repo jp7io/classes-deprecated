@@ -91,7 +91,7 @@ function interadmin_select_multi_item_down(campo) {
         <td style="background:#DDD">
             <select name="<?= $campo ?>[<?= $j ?>][]" id="<?= $campo ?>[<?= $j ?>]" select_multi="true" size="10" multiple="multiple"  class="select_multi_half" />
                 <?php
-                $sql = "SELECT campos, tabela FROM " . $db_prefix . "_tipos" .
+                $sql = "SELECT campos, tabela FROM " . $db_prefix . "_types" .
                     " WHERE type_id=" . $campo_nome;
                 $rs = $db->Execute($sql);
                 if ($rs === false) {

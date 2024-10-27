@@ -209,7 +209,7 @@ class InterAdminField
                 } elseif ($xtra) {
                     if ($campo_nome == 'all') {
                         if ($campo_array['where']) {
-                            $sql = 'SELECT type_id,nome FROM '.$db_prefix.'_tipos'.
+                            $sql = 'SELECT type_id,nome FROM '.$db_prefix.'_types'.
                             ' WHERE 1 '.$campo_array['where'].
                             ' ORDER BY ordem,nome';
                             $rs = $db->Execute($sql);
@@ -227,7 +227,7 @@ class InterAdminField
                             ob_end_clean();
                         }
                     } else {
-                        $sql = 'SELECT type_id,nome FROM '.$db_prefix.'_tipos'.
+                        $sql = 'SELECT type_id,nome FROM '.$db_prefix.'_types'.
                         ' WHERE parent_type_id='.$campo_nome.
                         ' ORDER BY ordem,nome';
                         $rs = $db->Execute($sql);
@@ -402,7 +402,7 @@ class InterAdminField
      */
     public static function getSpecialTipoXtras()
     {
-        return ['tipos_multi', 'tipos'];
+        return ['tipos_multi', 'types'];
     }
     /**
      * Retorna os xtra dos campos do tipo special_ que armazenam múltiplos registros.

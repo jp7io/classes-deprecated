@@ -392,7 +392,7 @@ STR;
     {
         global $db, $db_prefix;
 
-        $rs = $db->Execute("CHECKSUM TABLE ".$db_prefix."_tipos");
+        $rs = $db->Execute("CHECKSUM TABLE ".$db_prefix."_types");
         $row = $rs->FetchNextObj();
         return $row->Checksum;
     }

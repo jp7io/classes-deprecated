@@ -120,7 +120,7 @@ class Jp7_Deprecated
             // Com Alias
             foreach ($out[1] as $key => $value) {
                 $alias = $out[2][$key];
-                if (strpos($value, '_tipos') === (mb_strlen($value) - mb_strlen('_tipos'))) {
+                if (strpos($value, '_types') === (mb_strlen($value) - mb_strlen('_types'))) {
                     $sql_where = str_replace('WHERE ', 'WHERE ('.$alias.".mostrar<>'' OR ".$alias.'.mostrar IS NULL) AND ('.$alias.".deleted_tipo='' OR ".$alias.'.deleted_tipo IS NULL) AND ', $sql_where);
                 } elseif (strpos($value, '_tags') === (mb_strlen($value) - mb_strlen('_tags'))) {
                     // do nothing
@@ -143,7 +143,7 @@ class Jp7_Deprecated
             // Sem Alias
             preg_match_all('([ ,]+['.$db_prefix.'][^ ,]+)', $sql_from, $out, PREG_PATTERN_ORDER);
             foreach ($out[0] as $key => $value) {
-                if (strpos($value, $db_prefix.'_tipos') !== false) {
+                if (strpos($value, $db_prefix.'_types') !== false) {
                     $sql_where = str_replace('WHERE ', "WHERE mostrar<>'' AND (deleted_tipo='' OR deleted_tipo IS NULL) AND ", $sql_where);
                 } elseif (strpos($value, $db_prefix.'_tags') !== false) {
                     // do nothing
@@ -344,7 +344,7 @@ class Jp7_Deprecated
             $sql = 'SELECT '.$fields.
             ' FROM '.$table.
             ' WHERE '.$table_id_name."='".$table_id_value."'";
-            if (!$GLOBALS['jp7_app'] && strpos($table, '_tipos') === false) {
+            if (!$GLOBALS['jp7_app'] && strpos($table, '_types') === false) {
                 $sql .= ''.
                         (($GLOBALS['c_publish'] && !$s_session['preview']) ? " AND publish <> ''" : '').
                         " AND (deleted = '' OR deleted IS NULL)".
