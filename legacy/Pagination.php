@@ -292,7 +292,9 @@ class Pagination
             // Combo
             $this->htm_combo = '<div class="text">Página</div>'.
                 '<select onchange="location=\''.$this->request_uri.'?'.$parameters.$this->query_string.'&p_page=\'+this[selectedIndex].value">'."\n".
-                '<script>jp7_num_combo(1,'.$this->total.','.$page.')</script>'.
+                implode("\n", array_map(function ($i) use ($page) {
+                    return '<option value="'.$i.'"'.($i == $page ? ' selected' : '').'>'.$i.'</option>';
+                }, range(1, $this->total))).
                 '</select>'."\n".'<div class="text">de '.$this->total.'</div>'."\n";
 
             // Buttons
