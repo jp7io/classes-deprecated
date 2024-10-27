@@ -67,9 +67,9 @@ class InterAdminField
             $valor_default = $campo['default'];
             $readonly = $campo['readonly'];
             if ($campo['tipo_de_campo']) {
-                $tipo_de_campo = $campo['tipo_de_campo'].'_';
+                $type_de_campo = $campo['tipo_de_campo'].'_';
             } else {
-                $tipo_de_campo = $campo['tipo'];
+                $type_de_campo = $campo['tipo'];
             }
             $campo = $campo['tipo'];
         }
@@ -79,7 +79,7 @@ class InterAdminField
             $valor = $GLOBALS[$campo];
         }
         if (!$valor && !$id) {
-            if (strpos($tipo_de_campo, 'select_') === 0 && $valor_default && !is_numeric($valor_default)) {
+            if (strpos($type_de_campo, 'select_') === 0 && $valor_default && !is_numeric($valor_default)) {
                 $valor_default_arr = [];
                 $valor_string_arr = jp7_explode(',', $valor_default);
                 foreach ($valor_string_arr as $_value) {
@@ -110,7 +110,7 @@ class InterAdminField
             $readonly = ' disabled="disabled"';
         }
 
-        if (strpos($tipo_de_campo, 'tit_') === 0) {
+        if (strpos($type_de_campo, 'tit_') === 0) {
             if ($tit_start) {
                 echo '</tbody>';
                 $tit_start = false;
@@ -118,7 +118,7 @@ class InterAdminField
             echo $_tr.'<th colspan="4" class="inserir_tit_'.(($xtra == 'hidden') ? 'closed' : 'opened').'" onclick="interadmin_showTitContent(this)">'.$campo_nome.'</th></tr><tbody'.(($xtra == 'hidden') ? ' style="display:none"' : '').'>';
             $tit_start = true;
         // TEXT
-        } elseif (strpos($tipo_de_campo, 'text_') === 0) {
+        } elseif (strpos($type_de_campo, 'text_') === 0) {
             $form = '<textarea'.(($xtra) ? ' textarea_trigger="true"' : '').' name="'.$campo.'[]" id="'.$campo.'_'.$j.'"'.
                 ' label="'.$campo_nome.'"'.
                 (($obrigatorio) ? ' obligatory="yes"' : '').' rows='.($tamanho + (($xtra) ? ((($xtra == 'html_light' && $tamanho <= 5) || $quantidade > 1) ? 2 : 5) : 0)).(($xtra) ? ' wrap="off"' : '').
@@ -127,19 +127,19 @@ class InterAdminField
                 $form .= '<script type="text/javascript">interadmin_iframes['.$iframes_i."]='".$campo.'_'.$iframes_i++."'</script>";
             }
         // CHAR
-        } elseif (strpos($tipo_de_campo, 'char_') === 0) {
+        } elseif (strpos($type_de_campo, 'char_') === 0) {
             if ($xtra && !$id) {
                 $GLOBALS[$campo] = 'S';
             }
             $form = jp7_db_checkbox($campo.'['.$j.']', 'S', $campo, $readonly, '', ($valor) ? $valor : null);
         // SELECT_MULTI
-        } elseif (strpos($tipo_de_campo, 'select_multi_') === 0) {
+        } elseif (strpos($type_de_campo, 'select_multi_') === 0) {
             if (!$readonly_hidden) {
                 $form = '<div class="select_multi">';
                 ob_start();
 
                 $temp_campo_nome = self::getCampoHeader([
-                    'tipo' => $tipo_de_campo,
+                    'tipo' => $type_de_campo,
                     'nome' => $campo_nome,
                     'label' => $campo_array['label'],
                 ]);
@@ -163,7 +163,7 @@ class InterAdminField
                 $campo_nome = $temp_campo_nome;
             }
         // SELECT
-        } elseif (strpos($tipo_de_campo, 'select_') === 0) {
+        } elseif (strpos($type_de_campo, 'select_') === 0) {
             if (!$readonly_hidden) {
                 if ($campo_array['label']) {
                     $campo_nome_2 = $campo_array['label'];
@@ -176,7 +176,7 @@ class InterAdminField
                 '<option value="0">--------------------</option>';
                 if ($xtra == 'radio') {
                     $temp_campo_nome = self::getCampoHeader([
-                        'tipo' => $tipo_de_campo,
+                        'tipo' => $type_de_campo,
                         'nome' => $campo_nome,
                         'label' => $campo_array['label'],
                     ]);
@@ -190,11 +190,11 @@ class InterAdminField
                     '<option value="0">Mínimo de 3 caracteres para começar a busca...</option>';
                     //interadmin_combo($valor, (is_numeric($campo_nome)) ? $campo_nome : 0, 0, "", "", "combo", $campo . "[".$j."]", $temp_campo_nome, $obrigatorio);
                     if ($valor) {
-                        $tipoObj = new InterAdminTipo($campo_nome);
+                        $typeObj = new InterAdminTipo($campo_nome);
                         $options = [
                             'where' => ' AND id='.$valor,
                         ];
-                        $rows = $tipoObj->find($options);
+                        $rows = $typeObj->find($options);
                         foreach ($rows as $row) {
                             $form .= '<option value="'.$row->id.'" value="'.$row->id.'"'.(($row->id == $valor) ? ' selected' : '').'>'.toHTML($row->getStringValue()).'</option>';
                         }
@@ -248,18 +248,18 @@ class InterAdminField
                 $form .= '</select>';
                 $campo_nome = $campo_nome_2;
             }
-        } elseif (strpos($tipo_de_campo, 'int_') === 0 || strpos($tipo_de_campo, 'float_') === 0) {
+        } elseif (strpos($type_de_campo, 'int_') === 0 || strpos($type_de_campo, 'float_') === 0) {
             $onkeypress = " onkeypress=\"return DFonlyThisChars(true,false,' -.,()',event)\"";
             if ($campo == 'int_key' && !$valor && $quantidade > 1) {
                 $valor = $registros + 1 + $j;
             }
-            if (strpos($tipo_de_campo, 'float_') === 0 && $xtra == 'moeda') {
+            if (strpos($type_de_campo, 'float_') === 0 && $xtra == 'moeda') {
                 $valor = number_format((float) $valor, '2', ',', '.');
             }
             $form = '<input type="text" name="'.$campo.'[]" label="'.$campo_nome.'" value="'.$valor.'" maxlength="255"'.(($obrigatorio) ? ' obligatory="yes"' : '').' style="width:'.(($tamanho) ? $tamanho.'em' : '70px').'"'.$readonly.$onkeypress.' />';
         } else {
             $onkeypress = '';
-            if (strpos($tipo_de_campo, 'varchar_') === 0) {
+            if (strpos($type_de_campo, 'varchar_') === 0) {
                 switch ($xtra) {
                     case 'id': // ID
                         $onkeypress = " onkeypress=\"return DFonlyThisChars(true,true,'_.',event)\" onblur=\"if (this.value) ajax_function(this,'interadmin_inserir_checkuniqueid.php?type_id=".$GLOBALS['type_id'].'&campo='.$campo.'&valor_atual='.$valor."&valor='+value,interadmin_inserir_checkUniqueId)\"";
@@ -285,7 +285,7 @@ class InterAdminField
                         break;
                 }
             }
-            $form = '<input type="'.((strpos($tipo_de_campo, 'password_') === 0) ? 'password'.($is->ch ? '" minlength="6" autocomplete="off' : '') : 'text').'" name="'.$campo.'[]" label="'.$campo_nome.'" value="'.htmlspecialchars($valor).'" title="'.$ajuda.'" maxlength="'.(($tamanho) ? $tamanho : 255).'"'.(($obrigatorio) ? ' obligatory="yes"' : '').$readonly.' class="inputs_width"'.(($tamanho) ? ' style="width:'.$tamanho.'em"' : '').$onkeypress.' xtra="'.$xtra.'" />'.$form_xtra;
+            $form = '<input type="'.((strpos($type_de_campo, 'password_') === 0) ? 'password'.($is->ch ? '" minlength="6" autocomplete="off' : '') : 'text').'" name="'.$campo.'[]" label="'.$campo_nome.'" value="'.htmlspecialchars($valor).'" title="'.$ajuda.'" maxlength="'.(($tamanho) ? $tamanho : 255).'"'.(($obrigatorio) ? ' obligatory="yes"' : '').$readonly.' class="inputs_width"'.(($tamanho) ? ' style="width:'.$tamanho.'em"' : '').$onkeypress.' xtra="'.$xtra.'" />'.$form_xtra;
         }
         $form .= '<input type="hidden" name="'.$campo.'_xtra[]" value="'.$xtra.'"'.$readonly.' />';
         if ($readonly && $valor_default) {
@@ -293,8 +293,8 @@ class InterAdminField
         }
 
         if ($campo_nome) {
-            if (strpos($tipo_de_campo, 'tit_') === 0) {
-            } elseif (strpos($tipo_de_campo, 'file_') === 0) {
+            if (strpos($type_de_campo, 'tit_') === 0) {
+            } elseif (strpos($type_de_campo, 'file_') === 0) {
                 $url = $valor ?: DEFAULT_PATH.'/img/px.png';
 
                 echo ''.
@@ -311,7 +311,7 @@ class InterAdminField
                         '<td><input type="text" name="'.$campo.'_text[]" value="'.$GLOBALS[$campo.'_text'].'" maxlength="255"'.$readonly.' class="inputs_width_file" /></td>'.
                     "</tr>\n";
                 }
-            } elseif (strpos($tipo_de_campo, 'date_') === 0) {
+            } elseif (strpos($type_de_campo, 'date_') === 0) {
                 $S = ''.
                 $_tr.
                     $_th.
@@ -330,7 +330,7 @@ class InterAdminField
                     '<td>'.$S_ajuda.'</td>'.
                 '</tr>';
                 echo $S;
-            } elseif (strpos($tipo_de_campo, 'password_') === 0 && $valor) { // &&$xtra
+            } elseif (strpos($type_de_campo, 'password_') === 0 && $valor) { // &&$xtra
                 $form = preg_replace('/value="[^"]+"/', 'value="" disabled', $form, 1);
 
                 echo ''.
@@ -346,7 +346,7 @@ class InterAdminField
                     '</td>'.
                     '<td>'.$S_ajuda.'</td>'.
                 "</tr>\n";
-            } elseif (strpos($tipo_de_campo, 'plugin_') === 0) {
+            } elseif (strpos($type_de_campo, 'plugin_') === 0) {
                 $plugin_function = 'interadmin_plugin_'.$xtra;
                 $plugin_include = '../../plugins/'.$xtra.'.php';
                 if (file_exists($plugin_include)) {
@@ -359,7 +359,7 @@ class InterAdminField
                 } else {
                     echo 'Função '.$plugin_function.' não encontrada.<br />';
                 }
-            } elseif (strpos($tipo_de_campo, 'special_') === 0 || strpos($tipo_de_campo, 'func_') === 0) {
+            } elseif (strpos($type_de_campo, 'special_') === 0 || strpos($type_de_campo, 'func_') === 0) {
                 if (is_callable($campo_nome)) {
                     echo call_user_func($campo_nome, $campo_array, $valor);
                 } else {
@@ -368,7 +368,7 @@ class InterAdminField
             } else {
                 if (!$readonly_hidden) {
                     echo ''.
-                    '<tr class="'.($campo_array['nome_id'] ?  $campo_array['nome_id']  :  toId($campo_nome)).'-tr" '.(($s_session['mode'] == 'light' && strpos($tipo_de_campo, 'text_') === 0 && $xtra) ? ' style="display:none"' : '').'>'.
+                    '<tr class="'.($campo_array['nome_id'] ?  $campo_array['nome_id']  :  toId($campo_nome)).'-tr" '.(($s_session['mode'] == 'light' && strpos($type_de_campo, 'text_') === 0 && $xtra) ? ' style="display:none"' : '').'>'.
                         '<th title="'.$campo.' ('.(($campo_array['nome_id']) ?  $campo_array['nome_id']  :  toId($campo_nome)).')'.'"'.(($obrigatorio || $readonly) ? ' class="'.(($obrigatorio) ? 'obrigatorio' : '').(($readonly) ? ' disabled' : '').'"' : '').'>'.$campo_nome.':</th>'.
                         '<td colspan="2">'.$form.'</td>'.
                         '<td>'.$S_ajuda.'</td>'.

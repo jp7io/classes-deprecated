@@ -71,53 +71,53 @@ class Jp7_Model_TipoAbstract extends InterAdminTipo
     /**
      * Trigger executado após inserir um tipo com esse modelo.
      *
-     * @param InterAdminTipo $tipo
+     * @param InterAdminTipo $type
      */
-    public function createChildren(InterAdminTipo $tipo)
+    public function createChildren(InterAdminTipo $type)
     {
     }
     /**
      * Helper for creating children Tipos for Boxes, Settings and Introduction.
      *
-     * @param InterAdminTipo $tipo
+     * @param InterAdminTipo $type
      */
-    public function createBoxesSettingsAndIntroduction(InterAdminTipo $tipo)
+    public function createBoxesSettingsAndIntroduction(InterAdminTipo $type)
     {
-        if (!$tipo->type_id) {
+        if (!$type->type_id) {
             throw new Exception('Tipo deveria ter type_id.');
         }
-        if (!$tipo->getFirstChildByModel('Introduction')) {
-            $introduction = $tipo->createChild('Introduction');
+        if (!$type->getFirstChildByModel('Introduction')) {
+            $introduction = $type->createChild('Introduction');
             $introduction->nome = 'Introdução';
             $introduction->ordem = -60;
             $introduction->save();
         }
-        if (!$tipo->getFirstChildByModel('Images')) {
-            $images = $tipo->createChild('Images');
+        if (!$type->getFirstChildByModel('Images')) {
+            $images = $type->createChild('Images');
             $images->nome = 'Images';
             $images->ordem = -50;
             $images->save();
         }
-        if ($tipo->model_type_id !== 'Videos' && !$tipo->getFirstChildByModel('ContentVideos')) {
-            $videos = $tipo->createChild('ContentVideos');
+        if ($type->model_type_id !== 'Videos' && !$type->getFirstChildByModel('ContentVideos')) {
+            $videos = $type->createChild('ContentVideos');
             $videos->nome = 'Vídeos';
             $videos->ordem = -40;
             $videos->save();
         }
-        if ($tipo->model_type_id !== 'Files' && !$tipo->getFirstChildByModel('ContentFiles')) {
-            $files = $tipo->createChild('ContentFiles');
+        if ($type->model_type_id !== 'Files' && !$type->getFirstChildByModel('ContentFiles')) {
+            $files = $type->createChild('ContentFiles');
             $files->nome = 'Arquivos para Download';
             $files->ordem = -30;
             $files->save();
         }
-        if (!$tipo->getFirstChildByModel('Boxes')) {
-            $boxes = $tipo->createChild('Boxes');
+        if (!$type->getFirstChildByModel('Boxes')) {
+            $boxes = $type->createChild('Boxes');
             $boxes->nome = 'Boxes';
             $boxes->ordem = -20;
             $boxes->save();
         }
-        if (!$tipo->getFirstChildByModel('Settings')) {
-            $settings = $tipo->createChild('Settings');
+        if (!$type->getFirstChildByModel('Settings')) {
+            $settings = $type->createChild('Settings');
             $settings->nome = 'Configurações';
             $settings->ordem = -10;
             $settings->save();

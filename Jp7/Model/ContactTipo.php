@@ -20,12 +20,12 @@ class Jp7_Model_ContactTipo extends Jp7_Model_TipoAbstract
         'texto' => 'Contém as mensagens recebidas através do formulário de contato.',
     ];
 
-    public function createChildren(InterAdminTipo $tipo)
+    public function createChildren(InterAdminTipo $type)
     {
-        parent::createBoxesSettingsAndIntroduction($tipo);
+        parent::createBoxesSettingsAndIntroduction($type);
 
-        if (!$tipo->getFirstChildByModel('ContactRecipients')) {
-            $recipients = $tipo->createChild('ContactRecipients');
+        if (!$type->getFirstChildByModel('ContactRecipients')) {
+            $recipients = $type->createChild('ContactRecipients');
             $recipients->nome = 'Destinatários';
             $recipients->ordem = -5;
             $recipients->save();

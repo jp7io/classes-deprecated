@@ -12,9 +12,9 @@ class Jp7_Interadmin_Soap_Generic
      */
     public function get($className, $options = [])
     {
-        $tipo = Jp7_Interadmin_Soap::getClassTipo($className);
+        $type = Jp7_Interadmin_Soap::getClassTipo($className);
 
-        return $tipo->find($options);
+        return $type->find($options);
     }
 
     /**

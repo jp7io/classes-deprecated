@@ -11,7 +11,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
     /**
      * @var InterAdminTipo
      */
-    protected static $tipo;
+    protected static $type;
     /**
      * @var InterAdmin
      */
@@ -106,19 +106,19 @@ class Jp7_Controller_Action extends Zend_Controller_Action
          */
         $metas = Zend_Registry::get('metas');
 
-        $tipo = static::getTipo();
+        $type = static::getTipo();
 
         $record = static::getRecord();
 
         // View
         $this->view->config = $config;
         $this->view->lang = $lang;
-        $this->view->tipo = $tipo;
+        $this->view->tipo = $type;
         $this->view->record = $record;
 
         // Boxes editáveis pelo InterAdmin
-        if ($tipo instanceof InterAdminTipo) {
-            $boxTipo = $tipo->getFirstChildByModel('Boxes');
+        if ($type instanceof InterAdminTipo) {
+            $boxTipo = $type->getFirstChildByModel('Boxes');
             if ($boxTipo) {
                 Jp7_Box_Manager::setView($this->view);
                 Jp7_Box_Manager::setRecordMode($record);
@@ -172,11 +172,11 @@ class Jp7_Controller_Action extends Zend_Controller_Action
     {
         if ($settings = static::getSettings()) {
             $metas = Zend_Registry::get('metas');
-            $tipo = static::getTipo();
+            $type = static::getTipo();
             $record = static::getRecord();
             if (!$settings->title) {
-                if ($tipo->nome != 'Home') {
-                    $metas['keywords'] = $tipo->nome.','.$metas['keywords'];
+                if ($type->nome != 'Home') {
+                    $metas['keywords'] = $type->nome.','.$metas['keywords'];
                 }
                 if ($record instanceof InterAdmin) {
                     $metas['keywords'] = $record->varchar_key.','.$metas['keywords'];
@@ -225,8 +225,8 @@ class Jp7_Controller_Action extends Zend_Controller_Action
      */
     public function forwardToTemplate()
     {
-        if ($tipo = static::getTipo()) {
-            if ($template = $tipo->template) {
+        if ($type = static::getTipo()) {
+            if ($template = $type->template) {
                 $templateArr = explode('/', $template);
                 if (count($templateArr) > 2) {
                     list($module, $controller, $action) = $templateArr;
@@ -236,8 +236,8 @@ class Jp7_Controller_Action extends Zend_Controller_Action
                 if ($action == '$action') {
                     $action = $this->_getParam('action');
                 } elseif ($this->_getParam('action') != 'index') {
-                    $tipos = static::getTiposArray();
-                    if (!$tipos['action']) {
+                    $types = static::getTiposArray();
+                    if (!$types['action']) {
                         return false; // won't forward unexistent actions
                     }
                 }
@@ -264,34 +264,34 @@ class Jp7_Controller_Action extends Zend_Controller_Action
      */
     public static function getTipo()
     {
-        if (!isset(static::$tipo)) {
-            $tipos = static::getTiposArray();
-            static::$tipo = end($tipos);
+        if (!isset(static::$type)) {
+            $types = static::getTiposArray();
+            static::$type = end($types);
         }
 
-        return static::$tipo;
+        return static::$type;
     }
 
     public static function getTiposArray()
     {
-        $tipo = static::getRootTipo();
+        $type = static::getRootTipo();
         $path = static::getTiposPath();
 
         $array = [
-            'root' => $tipo,
+            'root' => $type,
         ];
         foreach ($path as $key => $directory) {
-            $tipo = $tipo->getFirstChild([
+            $type = $type->getFirstChild([
                 'fields' => ['template', 'nome'],
                 'where' => ["type_id_string = '".toId($directory)."'"],
             ]);
-            if (toSeo($tipo->nome) != $directory) {
-                $tipo = null;
+            if (toSeo($type->nome) != $directory) {
+                $type = null;
             }
-            if (!$tipo) {
+            if (!$type) {
                 break;
             }
-            $array[$key] = $tipo;
+            $array[$key] = $type;
         }
 
         return $array;
@@ -322,11 +322,11 @@ class Jp7_Controller_Action extends Zend_Controller_Action
     /**
      * Sets the InterAdminTipo for this controller.
      *
-     * @param InterAdminTipo $tipo
+     * @param InterAdminTipo $type
      */
-    public static function setTipo(InterAdminTipo $tipo = null)
+    public static function setTipo(InterAdminTipo $type = null)
     {
-        static::$tipo = $tipo;
+        static::$type = $type;
     }
 
     public static function getRecord()
@@ -396,8 +396,8 @@ class Jp7_Controller_Action extends Zend_Controller_Action
 
     public static function getSettings()
     {
-        if ($tipo = static::getTipo()) {
-            $settingsTipo = $tipo->getFirstChildByModel('Settings');
+        if ($type = static::getTipo()) {
+            $settingsTipo = $type->getFirstChildByModel('Settings');
             if ($settingsTipo instanceof InterAdminTipo) {
                 return $settingsTipo->findFirst([
                     'fields' => ['title', 'keywords', 'description', 'overwrite_keywords'],

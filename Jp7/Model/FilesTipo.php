@@ -21,9 +21,9 @@ class Jp7_Model_FilesTipo extends Jp7_Model_TipoAbstract
         'icone' => 'page_white_put',
     ];
 
-    public function createChildren(InterAdminTipo $tipo)
+    public function createChildren(InterAdminTipo $type)
     {
-        parent::createBoxesSettingsAndIntroduction($tipo);
+        parent::createBoxesSettingsAndIntroduction($type);
     }
 
     public function getEditorFields(Jp7_Box_BoxAbstract $box)

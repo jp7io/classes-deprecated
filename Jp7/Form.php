@@ -137,10 +137,10 @@ class Jp7_Form extends Zend_Form
         // @todo Falta select_multi
         // Relacionamentos
         if ($field['nome'] instanceof InterAdminTipo) {
-            $tipo = $field['nome'];
+            $type = $field['nome'];
 
             if (is_numeric($value)) {
-                $value = $tipo->findById($value);
+                $value = $type->findById($value);
             }
             if ($value instanceof InterAdminAbstract) {
                 return $value->getStringValue();
@@ -161,7 +161,7 @@ class Jp7_Form extends Zend_Form
     /**
      * Create an array of elements from an InterAdminTipo.
      *
-     * @param InterAdminTipo $tipo
+     * @param InterAdminTipo $type
      *
      * @return array
      */

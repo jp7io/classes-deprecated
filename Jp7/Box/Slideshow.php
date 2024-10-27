@@ -5,8 +5,8 @@ class Jp7_Box_Slideshow extends Jp7_Box_BoxAbstract
     public function prepareData()
     {
         $this->items = [];
-        if ($tipo = $this->view->tipo) {
-            if ($slideshowTipo = $tipo->getFirstChildByModel('Slideshow')) {
+        if ($type = $this->view->tipo) {
+            if ($slideshowTipo = $type->getFirstChildByModel('Slideshow')) {
                 $this->view->headScript()->appendFile(DEFAULT_PATH.'/js/jquery/jquery.jp7.js');
 
                 $this->items = $slideshowTipo->find([

@@ -86,8 +86,8 @@ class Jp7_Form_Element_FilePreview extends Zend_Form_Element_File
     public function getFileClass()
     {
         if ($this->_fileClass === null) {
-            $tipoClass = InterAdminTipo::getDefaultClass();
-            $namespace = @constant($tipoClass.'::DEFAULT_NAMESPACE');
+            $typeClass = InterAdminTipo::getDefaultClass();
+            $namespace = @constant($typeClass.'::DEFAULT_NAMESPACE');
             $this->_fileClass = $namespace.'InterAdminFieldFile';
         }
 

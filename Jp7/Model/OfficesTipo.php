@@ -21,9 +21,9 @@ class Jp7_Model_OfficesTipo extends Jp7_Model_TipoAbstract
         'disparo' => 'Jp7_Model_OfficesTipo::checkLatLng',
     ];
 
-    public function createChildren(InterAdminTipo $tipo)
+    public function createChildren(InterAdminTipo $type)
     {
-        parent::createBoxesSettingsAndIntroduction($tipo);
+        parent::createBoxesSettingsAndIntroduction($type);
     }
 
     /**
@@ -33,8 +33,8 @@ class Jp7_Model_OfficesTipo extends Jp7_Model_TipoAbstract
     {
         if ($from == 'edit' || $from == 'insert') {
             if ($id && $type_id) {
-                $tipo = InterAdminTipo::getInstance($type_id);
-                $registro = $tipo->findById($id, [
+                $type = InterAdminTipo::getInstance($type_id);
+                $registro = $type->findById($id, [
                     'fields' => '*',
                     'fields_alias' => true,
                 ]);

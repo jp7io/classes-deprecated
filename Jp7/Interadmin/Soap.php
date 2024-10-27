@@ -22,13 +22,13 @@ class Jp7_Interadmin_Soap
     {
         if (self::isDynamicClass($type)) {
             $type_id = preg_replace('/[a-zA-Z_]*/', '', $type);
-            $tipo = new InterAdminTipo($type_id);
+            $type = new InterAdminTipo($type_id);
         } else {
-            $tipoName = $type.'Tipo';
-            $tipo = new $tipoName();
+            $typeName = $type.'Tipo';
+            $type = new $typeName();
         }
 
-        return $tipo;
+        return $type;
     }
     /**
      * @param string $message

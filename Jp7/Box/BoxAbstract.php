@@ -225,11 +225,11 @@ abstract class Jp7_Box_BoxAbstract
 		<?php
         return ob_get_clean();
     }
-    public function tiposOptions($tipos, $value, $show_orphan = false)
+    public function tiposOptions($types, $value, $show_orphan = false)
     {
         $tree = [];
-        foreach ($tipos as $tipo) {
-            $tree[$tipo->parent_type_id][] = $tipo;
+        foreach ($types as $type) {
+            $tree[$type->parent_type_id][] = $type;
         }
         $options = [];
         $this->_addTiposRecursively($options, $tree);
@@ -245,13 +245,13 @@ abstract class Jp7_Box_BoxAbstract
     protected function _addTiposRecursively(&$options, &$tree, $parent_type_id = 0, $level = 0)
     {
         if (is_array($tree[$parent_type_id])) {
-            foreach ($tree[$parent_type_id] as $tipo) {
+            foreach ($tree[$parent_type_id] as $type) {
                 $options[] = (object) [
-                    'value' => $tipo->type_id,
-                    'text' => trim(str_repeat('--', $level).' '.$tipo->nome),
+                    'value' => $type->type_id,
+                    'text' => trim(str_repeat('--', $level).' '.$type->nome),
                 ];
-                if ($tree[$tipo->type_id]) {
-                    $this->_addTiposRecursively($options, $tree, $tipo->type_id, $level + 1);
+                if ($tree[$type->type_id]) {
+                    $this->_addTiposRecursively($options, $tree, $type->type_id, $level + 1);
                 }
             }
         }

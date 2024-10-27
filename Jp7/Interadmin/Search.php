@@ -92,9 +92,9 @@ class Jp7_Interadmin_Search
         ];
 
         $tables = [];
-        $tipos = InterAdminTipo::findTipos($options);
-        foreach ($tipos as $tipo) {
-            $tables[] = $db_prefix.'_'.($tipo->tabela ?: 'registros');
+        $types = InterAdminTipo::findTipos($options);
+        foreach ($types as $type) {
+            $tables[] = $db_prefix.'_'.($type->tabela ?: 'registros');
         }
         $tables[] = $db_prefix.'_tipos';
         return $tables;

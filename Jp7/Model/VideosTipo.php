@@ -23,9 +23,9 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract
         'icone' => 'film',
     ];
 
-    public function createChildren(InterAdminTipo $tipo)
+    public function createChildren(InterAdminTipo $type)
     {
-        parent::createBoxesSettingsAndIntroduction($tipo);
+        parent::createBoxesSettingsAndIntroduction($type);
     }
 
     public function getEditorFields(Jp7_Box_BoxAbstract $box)
@@ -78,8 +78,8 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract
         global $interadminObj;
 
         if ($from == 'edit' || $from == 'insert') {
-            $tipo = InterAdminTipo::getInstance($type_id);
-            $registro = $tipo->findById($id, [
+            $type = InterAdminTipo::getInstance($type_id);
+            $registro = $type->findById($id, [
                 'fields' => ['video', 'thumb', 'title', 'duration'],
             ]);
 

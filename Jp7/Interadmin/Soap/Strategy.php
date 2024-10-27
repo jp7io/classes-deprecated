@@ -48,15 +48,15 @@ class Jp7_Interadmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
                     ]);
                 } else {
                     if ($isDynamicClass || is_subclass_of($type, 'InterAdmin')) {
-                        $tipo = Jp7_Interadmin_Soap::getClassTipo($type);
+                        $type = Jp7_Interadmin_Soap::getClassTipo($type);
 
-                        $tipo->getFieldsAlias();
-                        $campos = $tipo->getFields();
+                        $type->getFieldsAlias();
+                        $campos = $type->getFields();
 
                         $elements = [];
                         foreach ($campos as $campo) {
                             if (strpos($campo['tipo'], 'tit_') === false && strpos($campo['tipo'], 'func_') === false) {
-                                $elements[$campo['nome_id']] = $this->_getCampoType($tipo, $campo);
+                                $elements[$campo['nome_id']] = $this->_getCampoType($type, $campo);
                             }
                         }
 
@@ -99,13 +99,13 @@ class Jp7_Interadmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
         }
     }
 
-    protected function _getCampoType($tipo, $campo)
+    protected function _getCampoType($type, $campo)
     {
         if (strpos($campo['tipo'], 'special_') === 0 && $campo['xtra']) {
             $isMulti = in_array($campo['xtra'], InterAdminField::getSpecialMultiXtras());
             $isTipo = in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras());
 
-            $retorno = $this->_getCampoTypeClass($tipo->getCampoTipo($campo), $isTipo, $isMulti);
+            $retorno = $this->_getCampoTypeClass($type->getCampoTipo($campo), $isTipo, $isMulti);
         } elseif (strpos($campo['tipo'], 'select_') === 0) {
             $isMulti = (strpos($campo['tipo'], 'select_multi') === 0);
             $isTipo = in_array($campo['xtra'], InterAdminField::getSelectTipoXtras());

@@ -75,12 +75,12 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
     /**
      * Sets the InterAdminTipo object for this record, changing the $_tipo property.
      *
-     * @param InterAdminTipo $tipo
+     * @param InterAdminTipo $type
      */
-    public function setTipo($tipo)
+    public function setTipo($type)
     {
-        $this->type_id = $tipo->type_id;
-        $this->_tipo = $tipo;
+        $this->type_id = $type->type_id;
+        $this->_tipo = $type;
     }
 
     public function getType($options = [])
@@ -90,11 +90,11 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
     /**
      * Sets the Type object for this record, changing the $_tipo property.
      *
-     * @param Type $tipo
+     * @param Type $type
      */
-    public function setType($tipo)
+    public function setType($type)
     {
-        $this->setTipo($tipo);
+        $this->setTipo($type);
     }
 
     /**
@@ -107,9 +107,9 @@ class InterAdminArquivo extends RecordAbstract implements InterAdminAbstract
     public function getParent($options = [])
     {
         if (!$this->_parent) {
-            $tipo = $this->getTipo();
+            $type = $this->getTipo();
             if ($this->id || $this->getFieldsValues('id')) {
-                $this->_parent = InterAdmin::getInstance($this->id, $options, $tipo);
+                $this->_parent = InterAdmin::getInstance($this->id, $options, $type);
             }
         }
 

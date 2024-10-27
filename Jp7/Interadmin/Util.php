@@ -8,52 +8,52 @@ class Jp7_Interadmin_Util
     /**
      * Exports records and their children.
      *
-     * @param InterAdminTipo $tipoObj InterAdminTipo where the records are.
+     * @param InterAdminTipo $typeObj InterAdminTipo where the records are.
      * @param array          $ids     Array de IDs.
      *
      * @return array InterAdmin[]
      */
-    public static function export(InterAdminTipo $tipoObj, array $ids, $use_id_string = false)
+    public static function export(InterAdminTipo $typeObj, array $ids, $use_id_string = false)
     {
         $options = [
             'class' => 'InterAdmin',
             'fields_alias' => false,
         ];
 
-        $exports = $tipoObj->find($options + [
+        $exports = $typeObj->find($options + [
             'where' => 'id IN('.implode(',', $ids).')',
         ]);
         if ($use_id_string) {
-            self::_prepareForIdString($exports, $tipoObj);
+            self::_prepareForIdString($exports, $typeObj);
         }
 
-        $tiposChildren = $tipoObj->getInterAdminsChildren();
+        $typesChildren = $typeObj->getInterAdminsChildren();
         foreach ($exports as $export) {
-            self::_exportChildren($export, $tiposChildren, $use_id_string, $options);
+            self::_exportChildren($export, $typesChildren, $use_id_string, $options);
         }
 
         return $exports;
     }
 
-    protected static function _exportChildren($export, $tiposChildren, $use_id_string, $options)
+    protected static function _exportChildren($export, $typesChildren, $use_id_string, $options)
     {
         $export->_children = [];
-        foreach ($tiposChildren as $tipoChildrenArr) {
-            $tipoChildren = $export->getChildrenTipo($tipoChildrenArr['type_id']);
+        foreach ($typesChildren as $typeChildrenArr) {
+            $typeChildren = $export->getChildrenTipo($typeChildrenArr['type_id']);
 
-            $children = $tipoChildren->find($options  + [
+            $children = $typeChildren->find($options  + [
                 'where' => "deleted = ''",
             ]);
             if ($use_id_string) {
-                self::_prepareForIdString($children, $tipoChildren);
+                self::_prepareForIdString($children, $typeChildren);
             }
 
-            $tiposGrandChildren = $tipoChildren->getInterAdminsChildren();
+            $typesGrandChildren = $typeChildren->getInterAdminsChildren();
             foreach ($children as $child) {
-                self::_exportChildren($child, $tiposGrandChildren, $use_id_string, $options);
+                self::_exportChildren($child, $typesGrandChildren, $use_id_string, $options);
                 $child->setParent(null);
             }
-            $export->_children[$tipoChildren->type_id] = $children;
+            $export->_children[$typeChildren->type_id] = $children;
         }
         $export->setTipo(null);
     }
@@ -61,13 +61,13 @@ class Jp7_Interadmin_Util
     /**
      * @return void
      */
-    protected static function _prepareForIdString($records, $tipo)
+    protected static function _prepareForIdString($records, $type)
     {
         foreach ($records as $record) {
             $record->_relations = [];
         }
 
-        foreach ($tipo->getRelationships() as $relation => $data) {
+        foreach ($type->getRelationships() as $relation => $data) {
             if ($data['type'] || $data['multi']) {
                 continue;
             }
@@ -113,18 +113,18 @@ class Jp7_Interadmin_Util
      * Imports records and their children with a new ID.
      *
      * @param array          $records
-     * @param InterAdminTipo $tipoObj
+     * @param InterAdminTipo $typeObj
      * @param InterAdmin     $parent
      * @param bool           $import_children defaults to TRUE
      * @param bool           $use_id_string   defaults to FALSE
      * @param bool           $bind_children   Children 1 has a relationship with Children 2, when copying, this relationship needs to be recreated
      */
-    public static function import(array $records, InterAdminTipo $tipoObj, InterAdmin $parent = null, $import_children = true, $use_id_string = false, $bind_children = false)
+    public static function import(array $records, InterAdminTipo $typeObj, InterAdmin $parent = null, $import_children = true, $use_id_string = false, $bind_children = false)
     {
         $returnIds = [];
         foreach ($records as $record) {
             $oldId = $record->id;
-            $record->setTipo($tipoObj);
+            $record->setTipo($typeObj);
             $children = $record->_children;
             $relations = $record->_relations;
             self::prepareNewRecord($record, $parent);
@@ -159,11 +159,11 @@ class Jp7_Interadmin_Util
 
     public static function _importChildren($record, $children, $use_id_string, $bind_children)
     {
-        foreach ($children as $child_type_id => $tipo_children) {
+        foreach ($children as $child_type_id => $type_children) {
             $childTipo = InterAdminTipo::getInstance($child_type_id);
             $childTipo->setParent($record);
 
-            foreach ($tipo_children as $child) {
+            foreach ($type_children as $child) {
                 $child->setTipo($childTipo);
                 $grandChildren = $child->_children;
                 $childRelations = $child->_relations;
@@ -180,7 +180,7 @@ class Jp7_Interadmin_Util
         }
     }
 
-    public static function copy(InterAdminTipo $tipoObj, array $ids, InterAdminTipo $tipoDestino, InterAdmin $parent = null)
+    public static function copy(InterAdminTipo $typeObj, array $ids, InterAdminTipo $typeDestino, InterAdmin $parent = null)
     {
         global $use_id_string, $bind_children; // FIXME usado no intermail
         global $s_user;
@@ -188,19 +188,19 @@ class Jp7_Interadmin_Util
         $use_id_string = false;
         $bind_children = false;
 
-        if ($tipoDestino->getInterAdminsTableName() != $tipoObj->getInterAdminsTableName()) {
+        if ($typeDestino->getInterAdminsTableName() != $typeObj->getInterAdminsTableName()) {
             throw new Exception('Não é possível copiar para tipos com tabela customizada.');
         }
 
         $beforCopyEvent = Interadmin_Event_BeforeCopy::getInstance();
-        $beforCopyEvent->setIdTipo($tipoObj->type_id);
+        $beforCopyEvent->setIdTipo($typeObj->type_id);
         $beforCopyEvent->notify();
 
-        $registros = self::export($tipoObj, $ids, $use_id_string);
+        $registros = self::export($typeObj, $ids, $use_id_string);
 
         foreach ($registros as $registro) {
-            if ($tipoObj->type_id == $tipoDestino->type_id) {
-                $registro->setTipo($tipoDestino);
+            if ($typeObj->type_id == $typeDestino->type_id) {
+                $registro->setTipo($typeDestino);
                 if (isset($registro->varchar_key)) {
                     $registro->varchar_key = 'Cópia de '.$registro->varchar_key;
                 }
@@ -209,13 +209,13 @@ class Jp7_Interadmin_Util
         }
 
         $oldLogUser = InterAdmin::setLogUser($s_user['login'].' - combo copy');
-        $returnIds = self::import($registros, $tipoDestino, $parent, true, $use_id_string, $bind_children);
+        $returnIds = self::import($registros, $typeDestino, $parent, true, $use_id_string, $bind_children);
         InterAdmin::setLogUser($oldLogUser);
 
         if (Interadmin_Event_AfterCopy::getInstance()->hasObservers()) {
             foreach ($returnIds as $returnId) {
                 $afterCopyEvent = Interadmin_Event_AfterCopy::getInstance();
-                $afterCopyEvent->setIdTipo($tipoDestino->type_id);
+                $afterCopyEvent->setIdTipo($typeDestino->type_id);
                 $afterCopyEvent->setId($returnId['id']);
                 $afterCopyEvent->setCopyId($returnId['new_id']);
                 $afterCopyEvent->notify();
@@ -233,11 +233,11 @@ class Jp7_Interadmin_Util
         ?>
 		&bull; <?= $model->type_id ?> - <?= $model->nome ?> <br />
 		<div class="indent">
-			<?php foreach ($inheritedTipos as $tipo) { ?>
+			<?php foreach ($inheritedTipos as $type) { ?>
 				<?php
-                $tipo->syncInheritance();
-                $tipo->saveRaw();
-                self::syncTipos($tipo);
+                $type->syncInheritance();
+                $type->saveRaw();
+                self::syncTipos($type);
                 ?>
 			<?php } ?>
 		</div>
@@ -267,13 +267,13 @@ class Jp7_Interadmin_Util
         return $retorno;
     }
 
-    protected static function _getTipoPhpDocCampo($tipo, $campo)
+    protected static function _getTipoPhpDocCampo($type, $campo)
     {
         if (strpos($campo['tipo'], 'special_') === 0 && $campo['xtra']) {
             $isMulti = in_array($campo['xtra'], InterAdminField::getSpecialMultiXtras());
             $isTipo = in_array($campo['xtra'], InterAdminField::getSpecialTipoXtras());
 
-            $retorno = self::_getCampoTypeClass($tipo->getCampoTipo($campo), $isTipo, $isMulti);
+            $retorno = self::_getCampoTypeClass($type->getCampoTipo($campo), $isTipo, $isMulti);
         } elseif (strpos($campo['tipo'], 'select_') === 0) {
             $isMulti = (strpos($campo['tipo'], 'select_multi') === 0);
             $isTipo = in_array($campo['xtra'], InterAdminField::getSelectTipoXtras());
@@ -292,18 +292,18 @@ class Jp7_Interadmin_Util
         return $retorno;
     }
 
-    public static function gerarClasseInterAdmin(InterAdminTipo $tipo, $gerarArquivo = true, $nomeClasse = '')
+    public static function gerarClasseInterAdmin(InterAdminTipo $type, $gerarArquivo = true, $nomeClasse = '')
     {
         global $config;
         $prefixoClasse = ucfirst($config->name_id);
 
         if (!$nomeClasse) {
-            $nomeClasse = $tipo->class;
+            $nomeClasse = $type->class;
         }
 
         $phpdoc = '/**'."\r\n";
-        foreach ($tipo->getFields() as $campo) {
-            $phpdoc .= ' * @property '.self::_getTipoPhpDocCampo($tipo, $campo).' $'.$campo['nome_id']."\r\n";
+        foreach ($type->getFields() as $campo) {
+            $phpdoc .= ' * @property '.self::_getTipoPhpDocCampo($type, $campo).' $'.$campo['nome_id']."\r\n";
         }
         $phpdoc .= ' * @property Jp7_Date date_publish'."\r\n";
         $phpdoc .= ' */';
@@ -323,16 +323,16 @@ STR;
         }
     }
 
-    public static function gerarClasseInterAdminTipo(InterAdminTipo $tipo, $gerarArquivo = true, $nomeClasse = '', $nomeClasseInterAdmin = '')
+    public static function gerarClasseInterAdminTipo(InterAdminTipo $type, $gerarArquivo = true, $nomeClasse = '', $nomeClasseInterAdmin = '')
     {
         global $config;
         $prefixoClasse = ucfirst($config->name_id);
 
         if (!$nomeClasse) {
-            $nomeClasse = $tipo->class_tipo;
+            $nomeClasse = $type->class_tipo;
         }
         if (!$nomeClasseInterAdmin) {
-            $nomeClasseInterAdmin = $tipo->class;
+            $nomeClasseInterAdmin = $type->class;
         }
         if (!$nomeClasseInterAdmin) {
             $constname = InterAdminTipo::getDefaultClass().'::DEFAULT_NAMESPACE';
@@ -353,7 +353,7 @@ STR;
 
 $phpdoc
 class {$nomeClasse} extends {$prefixoClasse}_InterAdminTipo {
-	const ID_TIPO = {$tipo->type_id};
+	const ID_TIPO = {$type->type_id};
 }
 STR;
         if ($gerarArquivo) {

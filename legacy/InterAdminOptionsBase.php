@@ -159,23 +159,23 @@ class InterAdminOptionsBase
         return $this;
     }
 
-    public function join($alias, $tipo, $on)
+    public function join($alias, $type, $on)
     {
-        $this->options['joins'][$alias] = ['INNER', $tipo, $on];
+        $this->options['joins'][$alias] = ['INNER', $type, $on];
 
         return $this;
     }
 
-    public function leftJoin($alias, $tipo, $on)
+    public function leftJoin($alias, $type, $on)
     {
-        $this->options['joins'][$alias] = ['LEFT', $tipo, $on];
+        $this->options['joins'][$alias] = ['LEFT', $type, $on];
 
         return $this;
     }
 
-    public function rightJoin($alias, $tipo, $on)
+    public function rightJoin($alias, $type, $on)
     {
-        $this->options['joins'][$alias] = ['RIGHT', $tipo, $on];
+        $this->options['joins'][$alias] = ['RIGHT', $type, $on];
 
         return $this;
     }

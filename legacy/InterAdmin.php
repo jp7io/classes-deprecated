@@ -185,11 +185,11 @@ class InterAdmin extends Record implements InterAdminAbstract
     /**
      * Sets the InterAdminTipo object for this record, changing the $_tipo property.
      *
-     * @param InterAdminTipo $tipo
+     * @param InterAdminTipo $type
      */
-    public function setTipo(InterAdminTipo $tipo = null)
+    public function setTipo(InterAdminTipo $type = null)
     {
-        return $this->setType($tipo);
+        return $this->setType($type);
     }
 
     /**
@@ -292,8 +292,8 @@ class InterAdmin extends Record implements InterAdminAbstract
     public function deleteChildrenForever($type_id, $options = [])
     {
         if ($type_id) {
-            $tipo = $this->getChildrenTipo($type_id);
-            return $tipo->deleteInterAdminsForever($options);
+            $type = $this->getChildrenTipo($type_id);
+            return $type->deleteInterAdminsForever($options);
         }
     }
     /**

@@ -75,7 +75,7 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract
 				<select class="selectbox" obligatory="yes" label="Seção" name="<?php echo $this->id_box;
         ?>[section][]">
 					<?php
-                    $tipos = InterAdminTipo::findTipos([
+                    $types = InterAdminTipo::findTipos([
                         'fields' => ['nome'],
                         'where' => [
                             "campos LIKE '%}title{%'",
@@ -86,7 +86,7 @@ class Jp7_Box_Content extends Jp7_Box_BoxAbstract
                         'use_published_filters' => true,
                     ]);
         ?>
-					<?php echo $this->tiposOptions($tipos, $this->params->section, true);
+					<?php echo $this->tiposOptions($types, $this->params->section, true);
         ?>
 				</select>
 			</div>

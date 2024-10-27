@@ -185,12 +185,12 @@ class InterAdminTipo extends Type implements InterAdminAbstract
     public function getInterAdminsUsingThisModel($options = [])
     {
         $this->_prepareInterAdminsOptions($options, $optionsInstance);
-        $tipos = $this->getTiposUsingThisModel();
-        $options['where'][] = 'type_id IN ('.implode(',', $tipos).')';
+        $types = $this->getTiposUsingThisModel();
+        $options['where'][] = 'type_id IN ('.implode(',', $types).')';
         $rs = $this->_executeQuery($options);
         $records = [];
         foreach ($rs as $row) {
-            $record = InterAdmin::getInstance($row->id, $optionsInstance, $tipos[$row->type_id]);
+            $record = InterAdmin::getInstance($row->id, $optionsInstance, $types[$row->type_id]);
             $this->_getAttributesFromRow($row, $record, $options);
             $records[] = $record;
         }
@@ -364,9 +364,9 @@ class InterAdminTipo extends Type implements InterAdminAbstract
      */
     public static function findFirstTipo($options = [])
     {
-        $tipos = self::findTipos(['limit' => 1] + $options);
+        $types = self::findTipos(['limit' => 1] + $options);
 
-        return empty($tipos) ? null : $tipos[0];
+        return empty($types) ? null : $types[0];
     }
     /**
      * Retrieves the first Type with the given "model_type_id".
@@ -428,17 +428,17 @@ class InterAdminTipo extends Type implements InterAdminAbstract
         $options['campos'] = $instance->getAttributesCampos();
 
         $rs = $instance->_executeQuery($options);
-        $tipos = [];
+        $types = [];
 
         foreach ($rs as $row) {
-            $tipo = self::getInstance($row->type_id, [
+            $type = self::getInstance($row->type_id, [
                 'db' => isset($options['db']) ? $options['db'] : null,
                 'class' => isset($options['class']) ? $options['class'] : null,
             ]);
-            $instance->_getAttributesFromRow($row, $tipo, $options);
-            $tipos[] = $tipo;
+            $instance->_getAttributesFromRow($row, $type, $options);
+            $types[] = $type;
         }
 
-        return $tipos;
+        return $types;
     }
 }

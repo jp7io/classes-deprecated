@@ -3,7 +3,7 @@
 class Jp7_Interadmin_JSTree
 {
     public $tree = [];
-    public $tipos = [];
+    public $types = [];
     public $options = [];
     protected static $permissionsLevel = 3;
 
@@ -48,37 +48,37 @@ class Jp7_Interadmin_JSTree
             $options['fields'][] = 'nome'.$lang->prefix;
         }
 
-        $tipos = $parentTipo->getChildren($options);
-        foreach ($tipos as $tipo) {
+        $types = $parentTipo->getChildren($options);
+        foreach ($types as $type) {
             // Criando o Node JSON
-            $nome_lang = ($lang->prefix && $tipo->{'nome'.$lang->prefix}) ? $tipo->{'nome'.$lang->prefix} : $tipo->nome;
-            $node = $this->createTipoNode($nome_lang, $tipo);
+            $nome_lang = ($lang->prefix && $type->{'nome'.$lang->prefix}) ? $type->{'nome'.$lang->prefix} : $type->nome;
+            $node = $this->createTipoNode($nome_lang, $type);
             if (!$node) {
                 continue;
             }
             $tree[] = $node;
             // Aqui entra a recursão
-            $this->addTipo($node->children, $tipo, $nivel + 1);
+            $this->addTipo($node->children, $type, $nivel + 1);
             if (count($node->children) == 0) {
                 unset($node->children); // Bug jsTree progressive_render
             }
         }
     }
 
-    public function createTipoNode($nome_lang, $tipo)
+    public function createTipoNode($nome_lang, $type)
     {
         $node = (object) [
             'text' => $nome_lang,
-                'id' => $tipo->type_id,
+                'id' => $type->type_id,
             'data' => [
-                //'type_id' => $tipo->type_id,
-                'model_type_id' => $tipo->model_type_id,
-                'class' => $tipo->class,
+                //'type_id' => $type->type_id,
+                'model_type_id' => $type->model_type_id,
+                'class' => $type->class,
             ],
             'children' => [],
         ];
-        if ($tipo->icone) {
-            $node->icon = $this->getIconeUrl($tipo->icone);
+        if ($type->icone) {
+            $node->icon = $this->getIconeUrl($type->icone);
         }
 
         return $node;

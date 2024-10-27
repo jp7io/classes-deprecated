@@ -296,8 +296,8 @@ class Jp7_Collections
         if (count($array) > 0) {
             $first = reset($array);
 
-            $tipo = $first->getTipo();
-            $retornos = $tipo->find([
+            $type = $first->getTipo();
+            $retornos = $type->find([
                 'class' => 'InterAdmin',
                 'fields' => $fields,
                 'fields_alias' => $fields_alias,
