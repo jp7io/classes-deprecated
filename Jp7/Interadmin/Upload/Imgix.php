@@ -7,6 +7,7 @@ class Jp7_Interadmin_Upload_Imgix extends Jp7_Interadmin_Upload_AdapterAbstract
 
     public function __construct($config)
     {
+        $this->config = $config;
         parent::__construct($config);
     }
 

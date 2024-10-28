@@ -12,7 +12,7 @@ class Jp7_Interadmin_Upload
     /**
      * @var AdapterInterface
      */
-    protected $config;
+    private $config;
 
     public function __construct($config, $adapter = null)
     {
@@ -86,12 +86,13 @@ class Jp7_Interadmin_Upload
     {
         $imagecache = $this->config->imagecache ?? null;
         if (empty($this->adapter)) {
-            if (empty($imagecache))
+            if (empty($imagecache)) {
                 $this->adapter = new Jp7_Interadmin_Upload_Legacy($this->config);
-            } elseif ($imagecache === 'imgix') {
+            } elseif ($imagecache == 'imgix') {
                 $this->adapter = new Jp7_Interadmin_Upload_Imgix($this->config);
             } elseif ($imagecache) {
                 $this->adapter = new Jp7_Interadmin_Upload_Intervention($this->config);
+            }
         }
         return $this->adapter;
     }
