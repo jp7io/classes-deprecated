@@ -22,7 +22,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract
         'template' => '',
         'editpage' => '',
         'class' => '',
-        'class_tipo' => '',
+        'class_type' => '',
         'model_type_id' => 0,
         'tabela' => '',
         'unico' => 'S',

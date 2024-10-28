@@ -329,7 +329,7 @@ STR;
         $prefixoClasse = ucfirst($config->name_id);
 
         if (!$nomeClasse) {
-            $nomeClasse = $type->class_tipo;
+            $nomeClasse = $type->class_type;
         }
         if (!$nomeClasseInterAdmin) {
             $nomeClasseInterAdmin = $type->class;

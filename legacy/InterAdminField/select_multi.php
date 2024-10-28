@@ -98,7 +98,7 @@ function interadmin_select_multi_item_down(campo) {
                     throw new Jp7_Interadmin_Exception($db->ErrorMsg());
                 }
                 while ($row = $rs->FetchNextObj()) {
-                    $campos = interadmin_tipos_campos($row->campos);
+                    $campos = interadmin_types_fields($row->campos);
                     $selectMultiTabela = $row->tabela;
                 }
                 $rs->Close();

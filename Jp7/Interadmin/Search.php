@@ -94,7 +94,7 @@ class Jp7_Interadmin_Search
         $tables = [];
         $types = InterAdminTipo::findTipos($options);
         foreach ($types as $type) {
-            $tables[] = $db_prefix.'_'.($type->tabela ?: 'registros');
+            $tables[] = $db_prefix.'_'.($type->tabela ?: 'records');
         }
         $tables[] = $db_prefix.'_types';
         return $tables;
@@ -228,8 +228,8 @@ class Jp7_Interadmin_Search
 
         if (!$s_session['deleted']) {
             $deleted_column = in_array('deleted', $columns) ? 'deleted' : '';
-            if (!$deleted_column && in_array('deleted_tipo', $columns)) {
-                $deleted_column = 'deleted_tipo';
+            if (!$deleted_column && in_array('deleted_type', $columns)) {
+                $deleted_column = 'deleted_type';
             }
             if ($deleted_column) {
                 $where[] = $deleted_column." = ''";

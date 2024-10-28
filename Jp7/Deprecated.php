@@ -121,7 +121,7 @@ class Jp7_Deprecated
             foreach ($out[1] as $key => $value) {
                 $alias = $out[2][$key];
                 if (strpos($value, '_types') === (mb_strlen($value) - mb_strlen('_types'))) {
-                    $sql_where = str_replace('WHERE ', 'WHERE ('.$alias.".mostrar<>'' OR ".$alias.'.mostrar IS NULL) AND ('.$alias.".deleted_tipo='' OR ".$alias.'.deleted_tipo IS NULL) AND ', $sql_where);
+                    $sql_where = str_replace('WHERE ', 'WHERE ('.$alias.".mostrar<>'' OR ".$alias.'.mostrar IS NULL) AND ('.$alias.".deleted_type='' OR ".$alias.'.deleted_type IS NULL) AND ', $sql_where);
                 } elseif (strpos($value, '_tags') === (mb_strlen($value) - mb_strlen('_tags'))) {
                     // do nothing
                 } elseif (strpos($value, $db_prefix.$lang->prefix.'_files') !== false || strpos($value, $db_prefix.'_files') !== false) {
@@ -144,7 +144,7 @@ class Jp7_Deprecated
             preg_match_all('([ ,]+['.$db_prefix.'][^ ,]+)', $sql_from, $out, PREG_PATTERN_ORDER);
             foreach ($out[0] as $key => $value) {
                 if (strpos($value, $db_prefix.'_types') !== false) {
-                    $sql_where = str_replace('WHERE ', "WHERE mostrar<>'' AND (deleted_tipo='' OR deleted_tipo IS NULL) AND ", $sql_where);
+                    $sql_where = str_replace('WHERE ', "WHERE mostrar<>'' AND (deleted_type='' OR deleted_type IS NULL) AND ", $sql_where);
                 } elseif (strpos($value, $db_prefix.'_tags') !== false) {
                     // do nothing
                 } elseif (strpos($value, $db_prefix.$lang->prefix.'_files') !== false || strpos($value, $db_prefix.'_files') !== false) {

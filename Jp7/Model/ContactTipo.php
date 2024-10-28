@@ -12,7 +12,7 @@ class Jp7_Model_ContactTipo extends Jp7_Model_TipoAbstract
         'template' => 'contact/$action',
         'editpage' => '',
         'class' => '',
-        'class_tipo' => '',
+        'class_type' => '',
         'model_type_id' => 0,
         'tabela' => '',
         'layout' => 4,

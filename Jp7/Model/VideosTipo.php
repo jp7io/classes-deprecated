@@ -12,7 +12,7 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract
         'template' => 'videos/index',
         'editpage' => '',
         'class' => '',
-        'class_tipo' => '',
+        'class_type' => '',
         'model_type_id' => 0,
         'tabela' => '',
         'layout' => Jp7_Box_Manager::COL_2_LEFT,

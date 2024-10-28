@@ -80,8 +80,8 @@ class Jp7_Interadmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
                             'parent_type_id' => 'xsd:int',
                             'model_type_id' => 'xsd:int',
                             'class' => 'xsd:string',
-                            'class_tipo' => 'xsd:string',
-                            'deleted_tipo' => 'xsd:boolean',
+                            'class_type' => 'xsd:string',
+                            'deleted_type' => 'xsd:boolean',
                             'mostrar' => 'xsd:boolean',
                         ]);
                     }
