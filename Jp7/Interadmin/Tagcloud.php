@@ -16,7 +16,7 @@ class Jp7_Interadmin_Tagcloud
             ' ON registros.id = tags.parent_id'.
             ' WHERE registros.hits > 0'.
             " AND registros.char_key <> ''".
-            " AND registros.deleted = ''".
+            " AND registros.deleted_at IS NULL".
             " AND (registros.date_publish <= '".$DbNow."' OR registros.date_publish IS NULL)".
             " AND (registros.date_expire > '".$DbNow."' OR registros.date_expire IS NULL OR registros.date_expire='0000-00-00 00:00:00')".
             ' GROUP BY registros.id'.

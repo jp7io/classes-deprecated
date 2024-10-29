@@ -121,17 +121,17 @@ class Jp7_Deprecated
             foreach ($out[1] as $key => $value) {
                 $alias = $out[2][$key];
                 if (strpos($value, '_types') === (mb_strlen($value) - mb_strlen('_types'))) {
-                    $sql_where = str_replace('WHERE ', 'WHERE ('.$alias.".mostrar<>'' OR ".$alias.'.mostrar IS NULL) AND ('.$alias.".deleted_type='' OR ".$alias.'.deleted_type IS NULL) AND ', $sql_where);
+                    $sql_where = str_replace('WHERE ', 'WHERE ('.$alias.".mostrar<>'' OR ".$alias.'.mostrar IS NULL) AND '.$alias.'.deleted_at IS NULL AND ', $sql_where);
                 } elseif (strpos($value, '_tags') === (mb_strlen($value) - mb_strlen('_tags'))) {
                     // do nothing
                 } elseif (strpos($value, $db_prefix.$lang->prefix.'_files') !== false || strpos($value, $db_prefix.'_files') !== false) {
-                    $sql_where = str_replace('WHERE ', 'WHERE '.$alias.".mostrar<>'' AND (".$alias.".deleted='' OR ".$alias.'.deleted IS NULL) AND ', $sql_where);
+                    $sql_where = str_replace('WHERE ', 'WHERE '.$alias.".mostrar<>'' AND ".$alias.'.deleted_at IS NULL AND ', $sql_where);
                 } else {
                     $sql_where_replace = ''.
                             'WHERE ('.$alias.".date_publish<='".$DbNow."' OR ".$alias.'.date_publish IS NULL)'.
                             ' AND ('.$alias.".date_expire>'".$DbNow."' OR ".$alias.'.date_expire IS NULL OR '.$alias.".date_expire='0000-00-00 00:00:00')".
                             ' AND ('.$alias.".char_key<>'' OR ".$alias.'.char_key IS NULL)'.
-                            ' AND ('.$alias.".deleted='' OR ".$alias.'.deleted IS NULL)'.
+                            ' AND '.$alias.'.deleted_at IS NULL'.
                             ((config('interadmin.preview') && empty($s_session['preview'])) ? ' AND ('.$alias.".publish<>'' OR ".$alias.'.publish IS NULL)' : '').' AND ';
                     $sql_where = str_replace('WHERE ', $sql_where_replace, $sql_where);
                 }
@@ -144,16 +144,16 @@ class Jp7_Deprecated
             preg_match_all('([ ,]+['.$db_prefix.'][^ ,]+)', $sql_from, $out, PREG_PATTERN_ORDER);
             foreach ($out[0] as $key => $value) {
                 if (strpos($value, $db_prefix.'_types') !== false) {
-                    $sql_where = str_replace('WHERE ', "WHERE mostrar<>'' AND (deleted_type='' OR deleted_type IS NULL) AND ", $sql_where);
+                    $sql_where = str_replace('WHERE ', "WHERE mostrar<>'' AND deleted_at IS NULL AND ", $sql_where);
                 } elseif (strpos($value, $db_prefix.'_tags') !== false) {
                     // do nothing
                 } elseif (strpos($value, $db_prefix.$lang->prefix.'_files') !== false || strpos($value, $db_prefix.'_files') !== false) {
-                    $sql_where = str_replace('WHERE ', "WHERE mostrar<>'' AND (deleted LIKE '' OR deleted IS NULL) AND ", $sql_where);
+                    $sql_where = str_replace('WHERE ', "WHERE mostrar<>'' AND deleted_at IS NULL AND ", $sql_where);
                 } else {
                     $sql_where = str_replace('WHERE ', 'WHERE'.
                             " date_publish <= '".$DbNow."'".
                             " AND char_key <> ''".
-                            " AND (deleted LIKE '' OR deleted IS NULL)".
+                            " AND deleted_at IS NULL".
                             " AND (date_expire > '".$DbNow."' OR date_expire IS NULL OR date_expire = '0000-00-00 00:00:00')".
                             ((config('interadmin.preview') && empty($s_session['preview'])) ? " AND (publish <> '' OR publish IS NULL)" : '').' AND ', $sql_where);
                 }
@@ -246,7 +246,7 @@ class Jp7_Deprecated
         ' WHERE type_id='.$type_id.
         " AND char_key<>''".
         ((!empty($s_session['preview']) || !config('interadmin.preview')) ? '' : " AND publish<>''").
-        " AND (deleted='' OR deleted IS NULL)".
+        " AND deleted_at IS NULL".
         " AND date_publish<='".date('Y/m/d H:i:s')."'".
         $sql_where.
         ' ORDER BY '.$order;
@@ -347,7 +347,7 @@ class Jp7_Deprecated
             if (!$GLOBALS['jp7_app'] && strpos($table, '_types') === false) {
                 $sql .= ''.
                         (($GLOBALS['c_publish'] && !$s_session['preview']) ? " AND publish <> ''" : '').
-                        " AND (deleted = '' OR deleted IS NULL)".
+                        " AND deleted_at IS NULL)".
                         " AND date_publish <= '".date('Y/m/d H:i:s')."'";
             }
             $rs = $db->Execute($sql);
