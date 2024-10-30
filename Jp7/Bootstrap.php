@@ -193,7 +193,7 @@ class Jp7_Bootstrap
         }
         // Permite o uso de templates no _default
         $view->setScriptPath(array_merge(
-            [APPLICATION_PATH.'/../vendor/jp7internet/_default/application/views/scripts'],
+            [APPLICATION_PATH.'/../vendor/jp7io/_default/application/views/scripts'],
             //array(. '/institucional/application/modules/default/views/scripts'),
             $view->getScriptPaths()
         ));
@@ -217,7 +217,7 @@ class Jp7_Bootstrap
             $metas['google-site-verification'] = $config->google_site_verification;
         }
 
-        defined('DEFAULT_PATH') || define('DEFAULT_PATH', $config->path.'/vendor/jp7internet/_default');
+        defined('DEFAULT_PATH') || define('DEFAULT_PATH', $config->path.'/vendor/jp7io/_default');
 
         // JS
         $scripts = [

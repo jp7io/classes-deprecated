@@ -43,6 +43,6 @@ class InterAdminHandler
     protected function renderCustomPage($e)
     {
         // TODO: Replace this iframe with a custom error page
-        echo '<iframe style="height:100%;width:100%;position:absolute;top:0;left:0;" frameborder="0" src="/vendor/jp7internet/_default/index_manutencao.htm"/>';
+        echo '<iframe style="height:100%;width:100%;position:absolute;top:0;left:0;" frameborder="0" src="/vendor/jp7io/_default/index_manutencao.htm"/>';
     }
 }

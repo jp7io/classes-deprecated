@@ -227,7 +227,7 @@ class Jp7_Interadmin_Search
         }
 
         if (!$s_session['deleted']) {
-            $deleted_column = in_array('deleted', $columns) ? 'deleted' : '';
+            $deleted_column = in_array('deleted_at', $columns) ? 'deleted_at' : '';
             if (!$deleted_column && in_array('deleted_at', $columns)) {
                 $deleted_column = 'deleted_at';
             }

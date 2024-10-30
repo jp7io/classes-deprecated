@@ -21,7 +21,7 @@ class Jp7_Interadmin_Soap_Options
                         'date_insert',
                         'date_modify',
                         'date_publish',
-                        'deleted',
+                        'deleted_at',
                         'publish',
                     ]);
                 }

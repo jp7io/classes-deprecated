@@ -67,7 +67,7 @@ class Jp7_Interadmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
                             'date_insert' => 'xsd:dateTime',
                             'date_modify' => 'xsd:dateTime',
                             'date_publish' => 'xsd:dateTime',
-                            'deleted' => 'xsd:boolean',
+                            'deleted_at' => 'xsd:boolean',
                             'publish' => 'xsd:boolean',
                         ];
 
