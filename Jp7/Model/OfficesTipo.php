@@ -17,7 +17,7 @@ class Jp7_Model_OfficesTipo extends Jp7_Model_TipoAbstract
         'tabela' => '',
         'layout' => Jp7_Box_Manager::COL_3,
         'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
-        'editar' => 'S',
+        'editar' => 1,
         'disparo' => 'Jp7_Model_OfficesTipo::checkLatLng',
     ];
 

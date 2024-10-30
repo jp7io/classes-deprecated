@@ -42,7 +42,7 @@ class Jp7_Interadmin_Util
             $typeChildren = $export->getChildrenTipo($typeChildrenArr['type_id']);
 
             $children = $typeChildren->find($options  + [
-                'where' => "deleted = ''",
+                'where' => "deleted_at = ''",
             ]);
             if ($use_id_string) {
                 self::_prepareForIdString($children, $typeChildren);
@@ -99,7 +99,7 @@ class Jp7_Interadmin_Util
             }
             $related = $query->select('id')
                 ->where('id_string', $id_string)
-                ->orderByRaw("deleted = '' DESC")
+                ->orderByRaw("deleted_at = '' DESC")
                 ->first();
 
             if ($related) {

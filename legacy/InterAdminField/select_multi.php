@@ -126,7 +126,7 @@ function interadmin_select_multi_item_down(campo) {
                         " WHERE type_id=" . $campo_nome .
                         " AND id IN (" . trim($valor, ', ') . ")" .
                         $sql_where .
-                        " AND deleted=''" .
+                        " AND deleted_at=''" .
                         " ORDER BY FIND_IN_SET(id,'" . trim($valor, ', ') . "')";
                     $rs = $db->Execute($sql);
                     if ($rs === false) {

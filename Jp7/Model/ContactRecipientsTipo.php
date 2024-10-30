@@ -19,7 +19,7 @@ class Jp7_Model_ContactRecipientsTipo extends Jp7_Model_TipoAbstract
         'model_type_id' => 0,
         'tabela' => '',
         'texto' => 'Usuários que receberão um e-mail de aviso a cada mensagem recebida através da página de contato.',
-        'editar' => 'S',
+        'editar' => 1,
         'icone' => 'email',
     ];
 }

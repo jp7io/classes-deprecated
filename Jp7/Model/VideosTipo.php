@@ -17,7 +17,7 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract
         'tabela' => '',
         'layout' => Jp7_Box_Manager::COL_2_LEFT,
         'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
-        'editar' => 'S',
+        'editar' => 1,
         'texto' => 'Cadastro de vídeos do YouTube e Vimeo.',
         'disparo' => 'Jp7_Model_VideosTipo::checkThumb',
         'icone' => 'film',

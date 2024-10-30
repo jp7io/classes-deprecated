@@ -17,7 +17,7 @@ class Jp7_Model_IntroductionTipo extends Jp7_Model_TipoAbstract
         'class_type' => '',
         'model_type_id' => 0,
         'tabela' => '',
-        'editar' => 'S',
+        'editar' => 1,
         'icone' => 'page_white_text',
     ];
 }
