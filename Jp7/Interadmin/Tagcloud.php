@@ -10,18 +10,18 @@ class Jp7_Interadmin_Tagcloud
         global $db, $db_prefix, $lang;
         $DbNow = $db->BindTimeStamp(date('Y-m-d H:i:s'));
         $tags_arr = [];
-        $sql = 'SELECT registros.id, registros.hits'.
-            ' FROM '.$db_prefix.$lang->prefix.' AS registros'.
-            ' INNER JOIN '.$db_prefix.$lang->prefix.'_tags AS tags'.
-            ' ON registros.id = tags.parent_id'.
-            ' WHERE registros.hits > 0'.
-            " AND registros.char_key <> ''".
-            " AND registros.deleted_at IS NULL".
-            " AND (registros.date_publish <= '".$DbNow."' OR registros.date_publish IS NULL)".
-            " AND (registros.date_expire > '".$DbNow."' OR registros.date_expire IS NULL OR registros.date_expire='0000-00-00 00:00:00')".
-            ' GROUP BY registros.id'.
-            ' ORDER BY DATE(registros.date_hit) DESC, HOUR(registros.date_hit) DESC, registros.hits DESC'.
-            ' LIMIT '.$this->limit * 2;
+        $sql = 'SELECT registros.id, registros.hits' .
+            ' FROM ' . $db_prefix . $lang->prefix . ' AS registros' .
+            ' INNER JOIN ' . $db_prefix . $lang->prefix . '_tags AS tags' .
+            ' ON registros.id = tags.parent_id' .
+            ' WHERE registros.hits > 0' .
+            " AND registros.char_key <> ''" .
+            " AND registros.deleted_at IS NULL" .
+            " AND (registros.publish_at <= '" . $DbNow . "' OR registros.publish_at IS NULL)" .
+            " AND (registros.expire_at > '" . $DbNow . "' OR registros.expire_at IS NULL OR registros.expire_at='0000-00-00 00:00:00')" .
+            ' GROUP BY registros.id' .
+            ' ORDER BY DATE(registros.date_hit) DESC, HOUR(registros.date_hit) DESC, registros.hits DESC' .
+            ' LIMIT ' . $this->limit * 2;
 
         $rs = $db->Execute($sql);
         if ($rs === false) {
@@ -36,7 +36,7 @@ class Jp7_Interadmin_Tagcloud
 
         $tags_arr_unique = [];
         foreach ($tags_arr as $tag) {
-            $tag_key = ($tag->id) ? $tag->type_id.';'.$tag->id : $tag->type_id;
+            $tag_key = ($tag->id) ? $tag->type_id . ';' . $tag->id : $tag->type_id;
             $tags_arr_unique[$tag_key]['obj'] = $tag;
             $tags_arr_unique[$tag_key]['hits'] += $tag->interadmin->hits;
         }

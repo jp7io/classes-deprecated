@@ -18,8 +18,8 @@ class Jp7_Model_BoxesTipo extends Jp7_Model_TipoAbstract
         'class' => '',
         'class_type' => '',
         'model_type_id' => 0,
-        'tabela' => 'boxes',
-        'icone' => 'layout_content',
+        'table' => 'boxes',
+        'icon' => 'layout_content',
     ];
 
     public function __construct()
@@ -28,7 +28,7 @@ class Jp7_Model_BoxesTipo extends Jp7_Model_TipoAbstract
 
         if (!self::$_children) {
             $boxesBox = $this->_findChildByModel('BoxesBox');
-            self::$_children = $boxesBox->type_id.'{,}Boxes{,}{,}{;}';
+            self::$_children = $boxesBox->type_id . '{,}Boxes{,}{,}{;}';
         }
         $this->children = self::$_children;
     }

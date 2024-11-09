@@ -25,7 +25,7 @@ class Jp7_Box_PageContent extends Jp7_Box_BoxAbstract
     }
     protected function _getEditorControls($hasFields = true)
     {
-        // não tem icones, não pode ser deletado
+        // não tem icons, não pode ser deletado
     }
     protected function _getEditorFields()
     {

@@ -16,7 +16,7 @@ class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract
         'class' => '',
         'class_type' => '',
         'model_type_id' => 0,
-        'tabela' => '',
+        'table' => '',
         'layout' => Jp7_Box_Manager::COL_2_LEFT,
         'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
         'editar' => 1,
@@ -31,10 +31,10 @@ class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract
             $videos = $this->_findChildByModel('ContentVideos');
             $contentFiles = $this->_findChildByModel('ContentFiles');
 
-            self::$_children = $contentSubitem->type_id.'{,}Subitens{,}{,}{;}'.
-                $images->type_id.'{,}Imagens{,}{,}{;}'.
-                $videos->type_id.'{,}Vídeos{,}{,}{;}'.
-                $contentFiles->type_id.'{,}Arquivos para Download{,}{,}{;}';
+            self::$_children = $contentSubitem->type_id . '{,}Subitens{,}{,}{;}' .
+                $images->type_id . '{,}Imagens{,}{,}{;}' .
+                $videos->type_id . '{,}Vídeos{,}{,}{;}' .
+                $contentFiles->type_id . '{,}Arquivos para Download{,}{,}{;}';
         }
         $this->children = self::$_children;
     }
@@ -47,12 +47,12 @@ class Jp7_Model_ContentTipo extends Jp7_Model_TipoAbstract
     public function getEditorFields(Jp7_Box_BoxAbstract $box)
     {
         ob_start();
-        ?>
-		<div class="fields">
-			<?php echo parent::_getEditorImageFields($box, true);
-        ?>
-		</div>
-		<?php
+?>
+        <div class="fields">
+            <?php echo parent::_getEditorImageFields($box, true);
+            ?>
+        </div>
+<?php
         return ob_get_clean();
     }
 

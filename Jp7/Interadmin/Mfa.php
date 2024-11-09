@@ -82,8 +82,8 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
 
         $dbToken = $this->getValidMfaToken([
             'where' => [
-                "md5(id) = '".$mfaCookie['id']."'",
-                "md5(date_publish) = '".$mfaCookie['timestamp']."'",
+                "md5(id) = '" . $mfaCookie['id'] . "'",
+                "md5(publish_at) = '" . $mfaCookie['timestamp'] . "'",
             ],
         ]);
 
@@ -110,7 +110,7 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
         $mfaToken = $this->createMfaTokens();
 
         $mfaToken->code = $code;
-        $mfaToken->date_publish = new Jp7_Date();
+        $mfaToken->publish_at = new Jp7_Date();
         $mfaToken->user_agent = $_SERVER['HTTP_USER_AGENT'];
         $mfaToken->publish = 'S';
         $mfaToken->save();
@@ -121,10 +121,10 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
     public function getValidMfaToken($options)
     {
         $options = InterAdmin::mergeOptions([
-            'fields' => ['date_publish'],
+            'fields' => ['publish_at'],
             'fields_alias' => true,
             'where' => [
-                "date_publish >= '".new Jp7_Date('-15 days')."'",
+                "publish_at >= '" . new Jp7_Date('-15 days') . "'",
             ],
             'use_published_filters' => true,
         ], $options);
@@ -169,10 +169,10 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
 
         $cookie = [
             'id' => md5($mfaToken->id),
-            'timestamp' => md5($mfaToken->date_publish),
+            'timestamp' => md5($mfaToken->publish_at),
         ];
 
-        setcookie('mfa['.$this->getCliente().']['.$cookieKey.']', serialize($cookie), strtotime('+15 days'), '/');
+        setcookie('mfa[' . $this->getCliente() . '][' . $cookieKey . ']', serialize($cookie), strtotime('+15 days'), '/');
     }
 
     public function saveSession()
@@ -182,7 +182,7 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
         $s_session['user'] = $s_session['temp_user'];
         unset($s_session['temp_user']);
 
-        setcookie($s_interadmin_cliente.'['.$jp7_app.']', serialize($s_session['temp_cookie']), strtotime('+1 month'), '/');
+        setcookie($s_interadmin_cliente . '[' . $jp7_app . ']', serialize($s_session['temp_cookie']), strtotime('+1 month'), '/');
         unset($s_session['temp_cookie']);
     }
 
@@ -202,8 +202,8 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
 
         $issuer = $this->getIssuer();
 
-        $body = 'Token de acesso - '.$issuer.':<br><br>';
-        $body .= '<div style="background:#ccc;font-size:24px;display:inline-block;padding: 10px;">'.$secret.'</div>';
+        $body = 'Token de acesso - ' . $issuer . ':<br><br>';
+        $body .= '<div style="background:#ccc;font-size:24px;display:inline-block;padding: 10px;">' . $secret . '</div>';
         $body .= '<br><br>';
         $body .= 'Obrigado por solicitar o seu token de acesso.';
 
@@ -213,7 +213,7 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
         ];
 
         Mail::send('emails.default', $data, function ($message) use ($issuer) {
-            $message->subject($issuer.' Token')
+            $message->subject($issuer . ' Token')
                 ->from(env('MAIL_ADDRESS'), $issuer)
                 ->to($this->email);
         });
@@ -230,10 +230,10 @@ class Jp7_Interadmin_Mfa extends Jp7_Interadmin_User
     {
         if (!self::$issuer) {
             global $config, $c_interadmin_app_title;
-            self::$issuer = $c_interadmin_app_title.' - '.$config->name;
+            self::$issuer = $c_interadmin_app_title . ' - ' . $config->name;
 
             if ($config->server->type != InterSite::PRODUCAO) {
-                self::$issuer .= ' ('.$config->server->type.')';
+                self::$issuer .= ' (' . $config->server->type . ')';
             }
         }
 

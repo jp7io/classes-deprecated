@@ -15,7 +15,7 @@ class Jp7_NewsController extends __Controller_Action
             Jp7_Cache_Output::getInstance()->start((string) $id);
 
             $record = $newsTipo->findById($id, [
-                'fields' => ['*', 'date_publish'],
+                'fields' => ['*', 'publish_at'],
             ]);
             if (!$record) {
                 $this->_redirect($newsTipo->getUrl());
@@ -33,22 +33,22 @@ class Jp7_NewsController extends __Controller_Action
             $archive = $this->_getParam('archive');
 
             // Irá cachear uma página diferente para cada registro
-            Jp7_Cache_Output::getInstance()->start($archive.$this->_getParam('p_page'));
+            Jp7_Cache_Output::getInstance()->start($archive . $this->_getParam('p_page'));
 
             $options = [
-                'fields' => ['*', 'date_publish'],
+                'fields' => ['*', 'publish_at'],
             ];
             if ($archive) {
                 $archiveArr = array_map('intval', explode('/', $archive));
                 if (checkdate($archiveArr[1], 1, $archiveArr[0])) {
-                    $this->view->archive = new Jp7_Date($archiveArr[0].'-'.$archiveArr[1].'-01');
-                    $options['where'][] = 'YEAR(date_publish) = '.$archiveArr[0];
-                    $options['where'][] = 'MONTH(date_publish) = '.$archiveArr[1];
+                    $this->view->archive = new Jp7_Date($archiveArr[0] . '-' . $archiveArr[1] . '-01');
+                    $options['where'][] = 'YEAR(publish_at) = ' . $archiveArr[0];
+                    $options['where'][] = 'MONTH(publish_at) = ' . $archiveArr[1];
                 }
             }
 
             global $config;
-            $paginationClassName = ucfirst($config->name_id.'_Pagination');
+            $paginationClassName = ucfirst($config->name_id . '_Pagination');
             if (class_exists($paginationClassName)) {
                 $pagination = new $paginationClassName([
                     'records' => $newsTipo->count($options),

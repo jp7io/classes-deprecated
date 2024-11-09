@@ -17,8 +17,8 @@ class Jp7_Model_ImagesTipo extends Jp7_Model_TipoAbstract
         'class' => '',
         'class_type' => '',
         'model_type_id' => 0,
-        'tabela' => '',
+        'table' => '',
         'editar' => 1,
-        'icone' => 'picture',
+        'icon' => 'picture',
     ];
 }

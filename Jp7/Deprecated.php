@@ -30,10 +30,10 @@ class Jp7_Deprecated
             $fields_arr_db[] = (strpos($field, '_') === 0) ? mb_substr($field, 1) : $field;
         }
         foreach ($fields_arr_db as $field_db) {
-            eval("global \$".$field_db.';');
+            eval("global \$" . $field_db . ';');
         }
         // Update Concatenado (_)
-        $sql = 'SELECT '.implode(',', $fields_arr_db).' FROM '.$table.' WHERE '.$table_id_name.'='.$table_id_value;
+        $sql = 'SELECT ' . implode(',', $fields_arr_db) . ' FROM ' . $table . ' WHERE ' . $table_id_name . '=' . $table_id_value;
         $rs = $db->Execute($sql);
         if ($rs === false) {
             throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -42,21 +42,21 @@ class Jp7_Deprecated
             foreach ($fields_arr as $field) {
                 if (strpos($field, '_') === 0) {
                     $field = mb_substr($field, 1);
-                    eval("\$".$field.'.="'.$row[$field].'";');
+                    eval("\$" . $field . '.="' . $row[$field] . '";');
                 }
             }
         }
         $rs->Close();
         // Update
-        $sql = 'UPDATE '.$table.' SET ';
+        $sql = 'UPDATE ' . $table . ' SET ';
         for ($i = 0; $i < count($fields_arr_db); $i++) {
             $field_value = ${$fields_arr_db[$i]};
-            $sql .= $fields_arr_db[$i]."='".$field_value."'";
+            $sql .= $fields_arr_db[$i] . "='" . $field_value . "'";
             if ($i != count($fields_arr_db) - 1) {
                 $sql .= ',';
             }
         }
-        $sql .= ' WHERE '.$table_id_name.'='.$table_id_value;
+        $sql .= ' WHERE ' . $table_id_name . '=' . $table_id_value;
         $rs = $db->Execute($sql);
         if ($rs === false) {
             throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -121,49 +121,49 @@ class Jp7_Deprecated
             foreach ($out[1] as $key => $value) {
                 $alias = $out[2][$key];
                 if (strpos($value, '_types') === (mb_strlen($value) - mb_strlen('_types'))) {
-                    $sql_where = str_replace('WHERE ', 'WHERE ('.$alias.".mostrar<>'' OR ".$alias.'.mostrar IS NULL) AND '.$alias.'.deleted_at IS NULL AND ', $sql_where);
+                    $sql_where = str_replace('WHERE ', 'WHERE (' . $alias . ".mostrar<>'' OR " . $alias . '.mostrar IS NULL) AND ' . $alias . '.deleted_at IS NULL AND ', $sql_where);
                 } elseif (strpos($value, '_tags') === (mb_strlen($value) - mb_strlen('_tags'))) {
                     // do nothing
-                } elseif (strpos($value, $db_prefix.$lang->prefix.'_files') !== false || strpos($value, $db_prefix.'_files') !== false) {
-                    $sql_where = str_replace('WHERE ', 'WHERE '.$alias.".mostrar<>'' AND ".$alias.'.deleted_at IS NULL AND ', $sql_where);
+                } elseif (strpos($value, $db_prefix . $lang->prefix . '_files') !== false || strpos($value, $db_prefix . '_files') !== false) {
+                    $sql_where = str_replace('WHERE ', 'WHERE ' . $alias . ".mostrar<>'' AND " . $alias . '.deleted_at IS NULL AND ', $sql_where);
                 } else {
-                    $sql_where_replace = ''.
-                            'WHERE ('.$alias.".date_publish<='".$DbNow."' OR ".$alias.'.date_publish IS NULL)'.
-                            ' AND ('.$alias.".date_expire>'".$DbNow."' OR ".$alias.'.date_expire IS NULL OR '.$alias.".date_expire='0000-00-00 00:00:00')".
-                            ' AND ('.$alias.".char_key<>'' OR ".$alias.'.char_key IS NULL)'.
-                            ' AND '.$alias.'.deleted_at IS NULL'.
-                            ((config('interadmin.preview') && empty($s_session['preview'])) ? ' AND ('.$alias.".publish<>'' OR ".$alias.'.publish IS NULL)' : '').' AND ';
+                    $sql_where_replace = '' .
+                        'WHERE (' . $alias . ".publish_at<='" . $DbNow . "' OR " . $alias . '.publish_at IS NULL)' .
+                        ' AND (' . $alias . ".expire_at>'" . $DbNow . "' OR " . $alias . '.expire_at IS NULL OR ' . $alias . ".expire_at='0000-00-00 00:00:00')" .
+                        ' AND (' . $alias . ".char_key<>'' OR " . $alias . '.char_key IS NULL)' .
+                        ' AND ' . $alias . '.deleted_at IS NULL' .
+                        ((config('interadmin.preview') && empty($s_session['preview'])) ? ' AND (' . $alias . ".publish<>'' OR " . $alias . '.publish IS NULL)' : '') . ' AND ';
                     $sql_where = str_replace('WHERE ', $sql_where_replace, $sql_where);
                 }
                 if ($c_path_upload) {
-                    $sql_select = preg_replace('/([ ,])'.$alias.'.file_([0-9])/', '\1REPLACE('.$alias.'.file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2', $sql_select);
+                    $sql_select = preg_replace('/([ ,])' . $alias . '.file_([0-9])/', '\1REPLACE(' . $alias . '.file_\2,\'../../upload/\',\'' . $c_path_upload . '\') AS file_\2', $sql_select);
                 }
             }
         } else {
             // Sem Alias
-            preg_match_all('([ ,]+['.$db_prefix.'][^ ,]+)', $sql_from, $out, PREG_PATTERN_ORDER);
+            preg_match_all('([ ,]+[' . $db_prefix . '][^ ,]+)', $sql_from, $out, PREG_PATTERN_ORDER);
             foreach ($out[0] as $key => $value) {
-                if (strpos($value, $db_prefix.'_types') !== false) {
+                if (strpos($value, $db_prefix . '_types') !== false) {
                     $sql_where = str_replace('WHERE ', "WHERE mostrar<>'' AND deleted_at IS NULL AND ", $sql_where);
-                } elseif (strpos($value, $db_prefix.'_tags') !== false) {
+                } elseif (strpos($value, $db_prefix . '_tags') !== false) {
                     // do nothing
-                } elseif (strpos($value, $db_prefix.$lang->prefix.'_files') !== false || strpos($value, $db_prefix.'_files') !== false) {
+                } elseif (strpos($value, $db_prefix . $lang->prefix . '_files') !== false || strpos($value, $db_prefix . '_files') !== false) {
                     $sql_where = str_replace('WHERE ', "WHERE mostrar<>'' AND deleted_at IS NULL AND ", $sql_where);
                 } else {
-                    $sql_where = str_replace('WHERE ', 'WHERE'.
-                            " date_publish <= '".$DbNow."'".
-                            " AND char_key <> ''".
-                            " AND deleted_at IS NULL".
-                            " AND (date_expire > '".$DbNow."' OR date_expire IS NULL OR date_expire = '0000-00-00 00:00:00')".
-                            ((config('interadmin.preview') && empty($s_session['preview'])) ? " AND (publish <> '' OR publish IS NULL)" : '').' AND ', $sql_where);
+                    $sql_where = str_replace('WHERE ', 'WHERE' .
+                        " publish_at <= '" . $DbNow . "'" .
+                        " AND char_key <> ''" .
+                        " AND deleted_at IS NULL" .
+                        " AND (expire_at > '" . $DbNow . "' OR expire_at IS NULL OR expire_at = '0000-00-00 00:00:00')" .
+                        ((config('interadmin.preview') && empty($s_session['preview'])) ? " AND (publish <> '' OR publish IS NULL)" : '') . ' AND ', $sql_where);
                 }
             }
             if ($c_path_upload) {
-                $sql_select = preg_replace('/([ ,])file_([0-9])/', '\1REPLACE(file_\2,\'../../upload/\',\''.$c_path_upload.'\') AS file_\2', $sql_select);
+                $sql_select = preg_replace('/([ ,])file_([0-9])/', '\1REPLACE(file_\2,\'../../upload/\',\'' . $c_path_upload . '\') AS file_\2', $sql_select);
             }
         }
         // Join
-        $sql = $sql_select.$sql_from.$sql_where.$sql_final;
+        $sql = $sql_select . $sql_from . $sql_where . $sql_final;
         // Debug - After SQL injection
         if ($debugger->debugSql) {
             $debugger->showSql($sql, null, $sql_debug);
@@ -202,7 +202,7 @@ class Jp7_Deprecated
         }
 
         if (!empty($rs) && $sql) {
-            eval("global \$".$rs.";\$".$rs."=\$rs_pre;");
+            eval("global \$" . $rs . ";\$" . $rs . "=\$rs_pre;");
         } else {
             return $rs_pre;
         }
@@ -214,7 +214,7 @@ class Jp7_Deprecated
      * @param int    $type_id   ID of the type.
      * @param int    $id        ID of the current item.
      * @param string $type      Type of the list, the available values are: "combo" or "list", the default value is "list".
-     * @param string $order     SQL string to be placed after the "ORDER BY" statement, the default value is "int_key,date_publish,varchar_key".
+     * @param string $order     SQL string to be placed after the "ORDER BY" statement, the default value is "int_key,publish_at,varchar_key".
      * @param string $field     Name of the field which will be used as label on the list, the default value is "varchar_key".
      * @param string $sql_where Additional SQL string to be placed after the "WHERE" statement, it must start with "AND ", the default value is "".
      * @param bool   $seo.
@@ -229,27 +229,27 @@ class Jp7_Deprecated
      *
      * @version (2009/06/13)
      */
-    public static function interadmin_list($table, $type_id, $id, $type = 'list', $order = 'int_key,date_publish,varchar_key', $field = 'varchar_key', $sql_where = '', $seo = false)
+    public static function interadmin_list($table, $type_id, $id, $type = 'list', $order = 'int_key,publish_at,varchar_key', $field = 'varchar_key', $sql_where = '', $seo = false)
     {
         global $db, $s_session, $l_selecione, $config;
         //global $id;
         if ($type == 'list') {
-            $S = ''.
-                    "<div class=\"lista\">\n".
-                    "<ul class=\"nivel-3\">\n";
+            $S = '' .
+                "<div class=\"lista\">\n" .
+                "<ul class=\"nivel-3\">\n";
         } elseif ($type == 'combo') {
-            $S = ''.
-                    '<option value="">'.$l_selecione."</option>\n".
-                    "<option value=\"\">--------------------</option>\n";
+            $S = '' .
+                '<option value="">' . $l_selecione . "</option>\n" .
+                "<option value=\"\">--------------------</option>\n";
         }
-        $sql = 'SELECT id,'.$field.' AS field FROM '.$table.
-        ' WHERE type_id='.$type_id.
-        " AND char_key<>''".
-        ((!empty($s_session['preview']) || !config('interadmin.preview')) ? '' : " AND publish<>''").
-        " AND deleted_at IS NULL".
-        " AND date_publish<='".date('Y/m/d H:i:s')."'".
-        $sql_where.
-        ' ORDER BY '.$order;
+        $sql = 'SELECT id,' . $field . ' AS field FROM ' . $table .
+            ' WHERE type_id=' . $type_id .
+            " AND char_key<>''" .
+            ((!empty($s_session['preview']) || !config('interadmin.preview')) ? '' : " AND publish<>''") .
+            " AND deleted_at IS NULL" .
+            " AND publish_at<='" . date('Y/m/d H:i:s') . "'" .
+            $sql_where .
+            ' ORDER BY ' . $order;
         $rs = $db->Execute($sql);
         if ($rs === false) {
             throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -257,23 +257,23 @@ class Jp7_Deprecated
         while ($row = $rs->FetchNextObj()) {
             if ($seo) {
                 if ($type == 'combo') {
-                    $S .= '<option value="'.toSeo($row->field).'"'.((toId($row->field) == $id) ? ' selected="selected" class="on"' : '').'>'.toHTML($row->field)."</option>\n";
+                    $S .= '<option value="' . toSeo($row->field) . '"' . ((toId($row->field) == $id) ? ' selected="selected" class="on"' : '') . '>' . toHTML($row->field) . "</option>\n";
                 } else {
-                    $S .= '<li'.(($row->id == $id) ? ' class="on"' : '').'><a href="?id='.$row->id.'">'.toHTML($row->field)."</a></li>\n";
+                    $S .= '<li' . (($row->id == $id) ? ' class="on"' : '') . '><a href="?id=' . $row->id . '">' . toHTML($row->field) . "</a></li>\n";
                 }
             } else {
                 if ($type == 'combo') {
-                    $S .= '<option value="'.$row->id.'"'.(($row->id == $id) ? ' selected="selected" class="on"' : '').'>'.toHTML($row->field)."</option>\n";
+                    $S .= '<option value="' . $row->id . '"' . (($row->id == $id) ? ' selected="selected" class="on"' : '') . '>' . toHTML($row->field) . "</option>\n";
                 } else {
-                    $S .= '<li'.(($row->id == $id) ? ' class="on"' : '').'><a href="?id='.$row->id.'">'.toHTML($row->field)."</a></li>\n";
+                    $S .= '<li' . (($row->id == $id) ? ' class="on"' : '') . '><a href="?id=' . $row->id . '">' . toHTML($row->field) . "</a></li>\n";
                 }
             }
         }
         $rs->Close();
         if ($type == 'list') {
-            $S .= ''.
-                    "</ul>\n".
-                    "</div>\n";
+            $S .= '' .
+                "</ul>\n" .
+                "</div>\n";
         }
 
         return $S;
@@ -313,7 +313,7 @@ class Jp7_Deprecated
         if (is_numeric($table_or_id)) {
             // ($id,$field)
             global $db_prefix, $lang;
-            $table = $db_prefix.$lang->prefix.'_registros';
+            $table = $db_prefix . $lang->prefix . '_registros';
             $table_id_name = 'id';
             $table_id_value = $table_or_id;
             $fields = $field_or_id;
@@ -341,14 +341,14 @@ class Jp7_Deprecated
             $fields_arr = explode(',', $fields);
         }
         if ($table_id_value) {
-            $sql = 'SELECT '.$fields.
-            ' FROM '.$table.
-            ' WHERE '.$table_id_name."='".$table_id_value."'";
+            $sql = 'SELECT ' . $fields .
+                ' FROM ' . $table .
+                ' WHERE ' . $table_id_name . "='" . $table_id_value . "'";
             if (!$GLOBALS['jp7_app'] && strpos($table, '_types') === false) {
-                $sql .= ''.
-                        (($GLOBALS['c_publish'] && !$s_session['preview']) ? " AND publish <> ''" : '').
-                        " AND deleted_at IS NULL)".
-                        " AND date_publish <= '".date('Y/m/d H:i:s')."'";
+                $sql .= '' .
+                    (($GLOBALS['c_publish'] && !$s_session['preview']) ? " AND publish <> ''" : '') .
+                    " AND deleted_at IS NULL)" .
+                    " AND publish_at <= '" . date('Y/m/d H:i:s') . "'";
             }
             $rs = $db->Execute($sql);
             if ($rs === false) {
@@ -384,12 +384,12 @@ class Jp7_Deprecated
             while (($file = readdir($handle)) !== false) {
                 if (($file != '.') && ($file != '..')) {
                     if (is_dir($file)) {
-                        @copyDir($from_path.'/'.$file, $to_path.'/'.$file);
+                        @copyDir($from_path . '/' . $file, $to_path . '/' . $file);
                         chdir($from_path);
                     }
                     if (is_file($file)) {
-                        copy($from_path.'/'.$file, $to_path.'/'.$file);
-                        unlink($from_path.'/'.$file);
+                        copy($from_path . '/' . $file, $to_path . '/' . $file);
+                        unlink($from_path . '/' . $file);
                     }
                 }
             }
@@ -423,7 +423,7 @@ class Jp7_Deprecated
         //global $HTTP_ACCEPT;
         global $is, $path, $publish, $s_session, $config;
         $path = dirname($_SERVER['SCRIPT_NAME']);
-        $path = jp7_path('http://'.$_SERVER['HTTP_HOST'].$path);
+        $path = jp7_path('http://' . $_SERVER['HTTP_HOST'] . $path);
         // Publish Check
         $admin_time = @filemtime('interadmin.log');
         $index_time = @filemtime('site/home/index_P.htm');
@@ -434,11 +434,11 @@ class Jp7_Deprecated
         //if(strpos($_SERVER['HTTP_ACCEPT'],"/vnd.wap")!==false)header("Location: ".$path."wap/home/index.php");
         //elseif($is->v<4&&!$is->robot)header("Location: /_default/oldbrowser.htm");
         //else{
-        $path = $path.(($lang && $lang != $config->lang_default) ? $lang : 'site').'/home/'.(($publish || !$admin_time || !$index_time) ? 'index.php' : 'index_P.htm').(($s_session['preview']) ? '?s_interadmin_preview='.$s_session['preview'] : '');
+        $path = $path . (($lang && $lang != $config->lang_default) ? $lang : 'site') . '/home/' . (($publish || !$admin_time || !$index_time) ? 'index.php' : 'index_P.htm') . (($s_session['preview']) ? '?s_interadmin_preview=' . $s_session['preview'] : '');
         @ini_set('allow_url_fopen', '1');
         //if(!@include $path.(($s_session['preview'])?"&":"?")."HTTP_USER_AGENT=".urlencode($_SERVER['HTTP_USER_AGENT']))header("Location: ".$path);
-        if (!@readfile($path.((!empty($s_session['preview'])) ? '&' : '?').'HTTP_USER_AGENT='.urlencode($_SERVER['HTTP_USER_AGENT']))) {
-            header('Location: '.$path);
+        if (!@readfile($path . ((!empty($s_session['preview'])) ? '&' : '?') . 'HTTP_USER_AGENT=' . urlencode($_SERVER['HTTP_USER_AGENT']))) {
+            header('Location: ' . $path);
         }
         //}
     }
@@ -473,39 +473,39 @@ class Jp7_Deprecated
             global $is;
             $S2 = '';
             foreach ($parameters as $key => $value) {
-                $S2 .= '<param name="'.$key.'" value="'.$value."\" />\n";
+                $S2 .= '<param name="' . $key . '" value="' . $value . "\" />\n";
             }
-            $S = ''.
-                    '<object'.(($id) ? ' id="'.$id.'"' : '').
-                    ' type="application/x-shockwave-flash"'.
-                    //(($is->ie&&$is->win)?" codebase=\"http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0\"":"").
-            ' data="'.$src.'"'.
-            (($w && $h) ? ' width="'.$w.'" height="'.$h.'"' : '').
-            (($xtra) ? ' '.$xtra : '').">\n";
-            $S .= ''.
-                    "<param name=\"pluginurl\" value=\"http://www.macromedia.com/go/getflashplayer\" />\n".
-                    '<param name="movie" value="'.$src."\" />\n".
-                    "<param name=\"quality\" value=\"high\" />\n".
-                    $S2.
-                    '</object>';
+            $S = '' .
+                '<object' . (($id) ? ' id="' . $id . '"' : '') .
+                ' type="application/x-shockwave-flash"' .
+                //(($is->ie&&$is->win)?" codebase=\"http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0\"":"").
+                ' data="' . $src . '"' .
+                (($w && $h) ? ' width="' . $w . '" height="' . $h . '"' : '') .
+                (($xtra) ? ' ' . $xtra : '') . ">\n";
+            $S .= '' .
+                "<param name=\"pluginurl\" value=\"http://www.macromedia.com/go/getflashplayer\" />\n" .
+                '<param name="movie" value="' . $src . "\" />\n" .
+                "<param name=\"quality\" value=\"high\" />\n" .
+                $S2 .
+                '</object>';
             if ($is->ie && $is->win) {
                 if ($id) {
-                    $S .= ''.
-                            "<script type=\"text/vbscript\" language=\"vbscript\">\n".
-                            "on error resume next\n".
-                            'sub '.$id."_FSCommand(ByVal command,ByVal args)\n".
-                            "call flash_DoFSCommand(command,args)\n".
-                            "end sub\n".
-                            "</script>\n";
+                    $S .= '' .
+                        "<script type=\"text/vbscript\" language=\"vbscript\">\n" .
+                        "on error resume next\n" .
+                        'sub ' . $id . "_FSCommand(ByVal command,ByVal args)\n" .
+                        "call flash_DoFSCommand(command,args)\n" .
+                        "end sub\n" .
+                        "</script>\n";
                 }
             } else {
                 if ($id) {
-                    $S .= ''.
-                            "<script type=\"text/javascript\">\n".
-                            'function '.$id."_DoFSCommand(command,args){\n".
-                            "flash_DoFSCommand(command,args)\n".
-                            "}\n".
-                            "</script>\n";
+                    $S .= '' .
+                        "<script type=\"text/javascript\">\n" .
+                        'function ' . $id . "_DoFSCommand(command,args){\n" .
+                        "flash_DoFSCommand(command,args)\n" .
+                        "}\n" .
+                        "</script>\n";
                 }
             }
 
@@ -516,7 +516,7 @@ class Jp7_Deprecated
                 $h = '';
             }
 
-            return '<img src="'.$src.'"'.(($w && $h) ? ' width='.$w.' height='.$h : '').' border="0" alt="'.$alt.'"'.(($id) ? ' name="'.$id.'"' : '').(($xtra) ? ' '.$xtra : '').'/>';
+            return '<img src="' . $src . '"' . (($w && $h) ? ' width=' . $w . ' height=' . $h : '') . ' border="0" alt="' . $alt . '"' . (($id) ? ' name="' . $id . '"' : '') . (($xtra) ? ' ' . $xtra : '') . '/>';
         }
     }
 
@@ -626,8 +626,8 @@ class Jp7_Deprecated
                 }
                 if ($hideProtectedVars) {
                     foreach ($value as $valueKey => $valueValue) {
-                        if (strpos($valueKey, chr(0).chr(42).chr(0)) === 0) {
-                            $array[$key][mb_substr($valueKey, 2).':protected'] = '*PROTECTED*';
+                        if (strpos($valueKey, chr(0) . chr(42) . chr(0)) === 0) {
+                            $array[$key][mb_substr($valueKey, 2) . ':protected'] = '*PROTECTED*';
                             unset($array[$key][$valueKey]); // Retira os valores protected
                         }
                     }
@@ -641,7 +641,7 @@ class Jp7_Deprecated
             $S = print_r($var, true);
         }
 
-        $S = '<pre style="text-align:left">'.$S.'</pre>';
+        $S = '<pre style="text-align:left">' . $S . '</pre>';
 
         if ($return) {
             return $S;
@@ -668,7 +668,7 @@ class Jp7_Deprecated
     public static function jp7_db_select($table, $table_id_name, $table_id_value, $var_prefix = '', $returnValues = false)
     {
         global $db, $jp7_app;
-        $sql = 'SELECT * FROM '.$table.' WHERE '.$table_id_name.'='.$table_id_value;
+        $sql = 'SELECT * FROM ' . $table . ' WHERE ' . $table_id_name . '=' . $table_id_value;
         $rs = $db->Execute($sql);
         if ($rs === false) {
             throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -684,7 +684,7 @@ class Jp7_Deprecated
             $meta_cols = $db->MetaColumns($table, false);
             foreach ($meta_cols as $meta) {
                 $name = $meta->name;
-                $array[$var_prefix.$name] = $row->$name;
+                $array[$var_prefix . $name] = $row->$name;
             }
         }
         $rs->Close();
@@ -719,7 +719,7 @@ class Jp7_Deprecated
         $table_columns_num = count($table_columns);
         if ($table_id_value) {
             // Update
-            $sql = 'UPDATE '.$table.' SET ';
+            $sql = 'UPDATE ' . $table . ' SET ';
             $j = 0;
             foreach ($table_columns as $table_field_name) {
                 if ($data) {
@@ -729,24 +729,24 @@ class Jp7_Deprecated
                     $var_isset = array_key_exists($table_field_name, $var_prefix);
                     $table_field_value = $var_prefix[$table_field_name];
                 } else {
-                    $var_isset = isset($GLOBALS[$var_prefix.$table_field_name]);
-                    $table_field_value = $GLOBALS[$var_prefix.$table_field_name];
+                    $var_isset = isset($GLOBALS[$var_prefix . $table_field_name]);
+                    $table_field_value = $GLOBALS[$var_prefix . $table_field_name];
                 }
                 if (!$var_check || $var_isset) {
                     //se for definido valor ou campo for inteiro
                     if (($table_field_value !== '' && !is_null($table_field_value)) || strpos($table_field_name, 'int_') === 0) {
-                        $sql .= ((!$j) ? ' ' : ',').''.$table_field_name.'='.toBase($table_field_value, $force_magic_quotes_gpc);
+                        $sql .= ((!$j) ? ' ' : ',') . '' . $table_field_name . '=' . toBase($table_field_value, $force_magic_quotes_gpc);
                         //se não for definido valor e for mysql salva branco
                     } elseif (($table_field_value === '' || is_null($table_field_value)) && ($GLOBALS['db_type'] == '' || $GLOBALS['db_type'] == 'mysql')) {
-                        $sql .= ((!$j) ? ' ' : ',').''.$table_field_name."=''";
+                        $sql .= ((!$j) ? ' ' : ',') . '' . $table_field_name . "=''";
                         //se não for definido valor e for != de mysql
                     } else {
-                        $sql .= ((!$j) ? ' ' : ',').''.$table_field_name.'=NULL';
+                        $sql .= ((!$j) ? ' ' : ',') . '' . $table_field_name . '=NULL';
                     }
                     $j++;
                 }
             }
-            $sql .= ' WHERE '.$table_id_name.'='.$table_id_value;
+            $sql .= ' WHERE ' . $table_id_name . '=' . $table_id_value;
             $rs = $db->Execute($sql);
             if ($rs === false) {
                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -760,23 +760,23 @@ class Jp7_Deprecated
                 if (is_array($var_prefix)) {
                     $table_field_value = $var_prefix[$table_field_name];
                 } else {
-                    $table_field_value = $GLOBALS[$var_prefix.$table_field_name];
+                    $table_field_value = $GLOBALS[$var_prefix . $table_field_name];
                 }
-                $sql_campos = ' '.$table_field_name.' '.(($i == $table_columns_num) ? ') ' : ",\n");
+                $sql_campos = ' ' . $table_field_name . ' ' . (($i == $table_columns_num) ? ') ' : ",\n");
                 //se for definido valor
                 $valores = '';
                 if (($table_field_value !== '' && !is_null($table_field_value)) || strpos($table_field_name, 'int_') === 0) {
-                    $valores .= toBase($table_field_value, $force_magic_quotes_gpc).(($i == $table_columns_num) ? ')' : ",\n");
+                    $valores .= toBase($table_field_value, $force_magic_quotes_gpc) . (($i == $table_columns_num) ? ')' : ",\n");
                     //se não for definido valor e for mysql salva branco
                 } elseif (($table_field_value === '' || is_null($table_field_value)) && ($GLOBALS['db_type'] == '' || $GLOBALS['db_type'] == 'mysql')) {
-                    $valores .= "''".(($i == $table_columns_num) ? ')' : ",\n");
+                    $valores .= "''" . (($i == $table_columns_num) ? ')' : ",\n");
                     //se não for definido valor e for != de mysql
                 } else {
-                    $valores .= 'NULL'.(($i == $table_columns_num) ? ')' : ",\n");
+                    $valores .= 'NULL' . (($i == $table_columns_num) ? ')' : ",\n");
                 }
                 $i++;
             }
-            $sql = 'INSERT INTO '.$table.' ('.$sql_campos.'VALUES ('.$valores;//echo $sql ."<br /><hr /><br />";
+            $sql = 'INSERT INTO ' . $table . ' (' . $sql_campos . 'VALUES (' . $valores; //echo $sql ."<br /><hr /><br />";
             $rs = $db->Execute($sql);
             if ($rs === false) {
                 throw new Jp7_Interadmin_Exception($db->ErrorMsg());
@@ -784,7 +784,7 @@ class Jp7_Deprecated
 
             // Last ID
             if (!is_array($var_prefix)) {
-                $GLOBALS[$var_prefix.$table_id_name] = $db->Insert_ID();
+                $GLOBALS[$var_prefix . $table_id_name] = $db->Insert_ID();
             }
 
             return $db->Insert_ID();

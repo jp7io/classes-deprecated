@@ -12,7 +12,7 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract
 
         if ($newsTipo) {
             $options = [
-                'fields' => ['title', 'image', 'date_publish'],
+                'fields' => ['title', 'image', 'publish_at'],
                 'fields_alias' => true, // Não dá para garantir que está true por padrão
                 'limit' => $this->params->limit,
             ];
@@ -21,7 +21,7 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract
             }
 
             global $lang;
-            $this->title = ($this->params->{'title'.$lang->prefix}) ? $this->params->{'title'.$lang->prefix} : $newsTipo->getNome();
+            $this->title = ($this->params->{'title' . $lang->prefix}) ? $this->params->{'title' . $lang->prefix} : $newsTipo->getNome();
             $this->news = $newsTipo->find($options);
 
             $this->_prepareDataImages();
@@ -41,49 +41,49 @@ class Jp7_Box_News extends Jp7_Box_BoxAbstract
     {
         global $config;
         ob_start();
-        ?>
-		<div class="fields">
-			<?php foreach ($config->langs as $key => $lang) {
-    ?>
-				<?php
-                $sufix = ($lang->default) ? '' : '_'.$key;
-    ?>
-				<div class="field">
-					<label>
-						<?php if (count($config->langs) > 1) {
-    ?>
-							<img src="<?= DEFAULT_PATH ?>/img/icons/<?php echo $key;
-    ?>.png" style="vertical-align:middle;" />
-						<?php
-}
-    ?>
-					Título:</label>
-					<input type="text" class="textbox" label="Título" placeholder="Automático"
-						name="<?php echo $this->id_box;
-    ?>[title<?php echo $sufix;
-    ?>][]"
-						value="<?php echo $this->params->{'title'.$sufix};
-    ?>"	/>
-				</div>
-			<?php
-}
-        ?>
+?>
+        <div class="fields">
+            <?php foreach ($config->langs as $key => $lang) {
+            ?>
+                <?php
+                $sufix = ($lang->default) ? '' : '_' . $key;
+                ?>
+                <div class="field">
+                    <label>
+                        <?php if (count($config->langs) > 1) {
+                        ?>
+                            <img src="<?= DEFAULT_PATH ?>/img/icons/<?php echo $key;
+                                                                    ?>.png" style="vertical-align:middle;" />
+                        <?php
+                        }
+                        ?>
+                        Título:</label>
+                    <input type="text" class="textbox" label="Título" placeholder="Automático"
+                        name="<?php echo $this->id_box;
+                                ?>[title<?php echo $sufix;
+            ?>][]"
+                        value="<?php echo $this->params->{'title' . $sufix};
+                                ?>" />
+                </div>
+            <?php
+            }
+            ?>
 
-			<div class="field">
-				<label>Destaques:</label>
-				<?php echo $this->checkbox('featured');
-        ?>
-			</div>
-			<div class="field">
-				<label>Limite:</label>
-				<?php echo $this->numericField('limit', 'Limite', 'Todos');
-        ?>
-			</div>
+            <div class="field">
+                <label>Destaques:</label>
+                <?php echo $this->checkbox('featured');
+                ?>
+            </div>
+            <div class="field">
+                <label>Limite:</label>
+                <?php echo $this->numericField('limit', 'Limite', 'Todos');
+                ?>
+            </div>
 
-			<?php $this->_getEditorFieldsImages();
-        ?>
-		</div>
-		<?php
+            <?php $this->_getEditorFieldsImages();
+            ?>
+        </div>
+<?php
         return ob_get_clean();
     }
 }

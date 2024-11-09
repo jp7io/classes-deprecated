@@ -33,7 +33,7 @@ class Jp7_Interadmin_JSTree
         global $lang;
 
         $options = [
-            'fields' => ['nome', 'parent_type_id', 'model_type_id', 'icone'],
+            'fields' => ['nome', 'parent_type_id', 'model_type_id', 'icon'],
             'use_published_filters' => true,
             'class' => 'InterAdminTipo',
         ];
@@ -45,13 +45,13 @@ class Jp7_Interadmin_JSTree
             $options = InterAdmin::mergeOptions($this->options, $options);
         }
         if ($lang->prefix) {
-            $options['fields'][] = 'nome'.$lang->prefix;
+            $options['fields'][] = 'nome' . $lang->prefix;
         }
 
         $types = $parentTipo->getChildren($options);
         foreach ($types as $type) {
             // Criando o Node JSON
-            $nome_lang = ($lang->prefix && $type->{'nome'.$lang->prefix}) ? $type->{'nome'.$lang->prefix} : $type->nome;
+            $nome_lang = ($lang->prefix && $type->{'nome' . $lang->prefix}) ? $type->{'nome' . $lang->prefix} : $type->nome;
             $node = $this->createTipoNode($nome_lang, $type);
             if (!$node) {
                 continue;
@@ -69,7 +69,7 @@ class Jp7_Interadmin_JSTree
     {
         $node = (object) [
             'text' => $nome_lang,
-                'id' => $type->type_id,
+            'id' => $type->type_id,
             'data' => [
                 //'type_id' => $type->type_id,
                 'model_type_id' => $type->model_type_id,
@@ -77,8 +77,8 @@ class Jp7_Interadmin_JSTree
             ],
             'children' => [],
         ];
-        if ($type->icone) {
-            $node->icon = $this->getIconeUrl($type->icone);
+        if ($type->icon) {
+            $node->icon = $this->getIconeUrl($type->icon);
         }
 
         return $node;
@@ -89,15 +89,15 @@ class Jp7_Interadmin_JSTree
         return json_encode($this->tree);
     }
 
-    public function addNode($label, $callback = '', $icone = '')
+    public function addNode($label, $callback = '', $icon = '')
     {
-        $node = $this->createNode($label, $callback, $icone);
+        $node = $this->createNode($label, $callback, $icon);
         $this->tree[] = $node;
 
         return $node;
     }
 
-    public function createNode($label, $callback = '', $icone = '')
+    public function createNode($label, $callback = '', $icon = '')
     {
         $node = (object) [
             'text' => $label,
@@ -105,15 +105,15 @@ class Jp7_Interadmin_JSTree
                 'callback' => $callback,
             ]
         ];
-        if ($icone) {
-            $node->icon = $this->getIconeUrl($icone);
+        if ($icon) {
+            $node->icon = $this->getIconeUrl($icon);
         }
 
         return $node;
     }
 
-    public function getIconeUrl($icone)
+    public function getIconeUrl($icon)
     {
-        return DEFAULT_PATH.'/img/icons/'.$icone.'.png';
+        return DEFAULT_PATH . '/img/icons/' . $icon . '.png';
     }
 }

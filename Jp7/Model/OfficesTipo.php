@@ -14,7 +14,7 @@ class Jp7_Model_OfficesTipo extends Jp7_Model_TipoAbstract
         'class' => '',
         'class_type' => '',
         'model_type_id' => 0,
-        'tabela' => '',
+        'table' => '',
         'layout' => Jp7_Box_Manager::COL_3,
         'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
         'editar' => 1,
@@ -46,7 +46,7 @@ class Jp7_Model_OfficesTipo extends Jp7_Model_TipoAbstract
                             $registro->city,
                         ]);
                         if ($registro->state) {
-                            $fullAddress .= ' - '.$registro->state->sigla;
+                            $fullAddress .= ' - ' . $registro->state->sigla;
                         }
                         $location = Jp7_GoogleMaps::getLatLngByEndereco($fullAddress);
                         if ($location) {

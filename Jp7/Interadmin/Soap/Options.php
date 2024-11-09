@@ -8,7 +8,7 @@ class Jp7_Interadmin_Soap_Options
         if ($this) {
             // Where
             if ($this->where) {
-                $where = '('.$this->where.')';
+                $where = '(' . $this->where . ')';
             }
             // Fields
             $fields = [];
@@ -18,9 +18,9 @@ class Jp7_Interadmin_Soap_Options
                 if (in_array('*', $fields)) {
                     $fields = array_merge($fields, [
                         'parent_id',
-                        'date_insert',
-                        'date_modify',
-                        'date_publish',
+                        'created_at',
+                        'updated_at',
+                        'publish_at',
                         'deleted_at',
                         'publish',
                     ]);

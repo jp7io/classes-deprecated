@@ -14,13 +14,13 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract
         'class' => '',
         'class_type' => '',
         'model_type_id' => 0,
-        'tabela' => '',
+        'table' => '',
         'layout' => Jp7_Box_Manager::COL_2_LEFT,
         'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
         'editar' => 1,
         'texto' => 'Cadastro de vídeos do YouTube e Vimeo.',
         'disparo' => 'Jp7_Model_VideosTipo::checkThumb',
-        'icone' => 'film',
+        'icon' => 'film',
     ];
 
     public function createChildren(InterAdminTipo $type)
@@ -31,32 +31,32 @@ class Jp7_Model_VideosTipo extends Jp7_Model_TipoAbstract
     public function getEditorFields(Jp7_Box_BoxAbstract $box)
     {
         ob_start();
-        ?>
-		<div class="fields">
-			<?php if (Jp7_Box_Manager::getRecordMode()) {
-    ?>
-				<div class="group">
-					<div class="group-label">Vídeo</div>
-					<div class="group-fields">
-						<div class="field">
-							<label>Dimensões:</label>
-							<?php echo $box->numericField('videoWidth', 'Largura', '620');
-    ?> x
-							<?php echo $box->numericField('videoHeight', 'Altura', '380');
-    ?> px
-						</div>
-					</div>
-				</div>
-			<?php
-} else {
-    ?>
-				<?php echo parent::_getEditorImageFields($box, false, 310, 230);
-    ?>
-			<?php
-}
-        ?>
-		</div>
-		<?php
+?>
+        <div class="fields">
+            <?php if (Jp7_Box_Manager::getRecordMode()) {
+            ?>
+                <div class="group">
+                    <div class="group-label">Vídeo</div>
+                    <div class="group-fields">
+                        <div class="field">
+                            <label>Dimensões:</label>
+                            <?php echo $box->numericField('videoWidth', 'Largura', '620');
+                            ?> x
+                            <?php echo $box->numericField('videoHeight', 'Altura', '380');
+                            ?> px
+                        </div>
+                    </div>
+                </div>
+            <?php
+            } else {
+            ?>
+                <?php echo parent::_getEditorImageFields($box, false, 310, 230);
+                ?>
+            <?php
+            }
+            ?>
+        </div>
+<?php
         return ob_get_clean();
     }
 

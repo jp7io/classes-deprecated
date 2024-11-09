@@ -21,7 +21,7 @@ class Jp7_Interadmin_Util
         ];
 
         $exports = $typeObj->find($options + [
-            'where' => 'id IN('.implode(',', $ids).')',
+            'where' => 'id IN(' . implode(',', $ids) . ')',
         ]);
         if ($use_id_string) {
             self::_prepareForIdString($exports, $typeObj);
@@ -72,7 +72,7 @@ class Jp7_Interadmin_Util
                 continue;
             }
             foreach ($records as $record) {
-                $fk = $record->{$relation.'_id'};
+                $fk = $record->{$relation . '_id'};
                 $query = (clone $data['query']);
                 $related = $query->select('id_string')->find($fk);
                 if ($related && $related->id_string) {
@@ -95,7 +95,7 @@ class Jp7_Interadmin_Util
         foreach ($relations as $relation => $id_string) {
             $query = clone $relationships[$relation]['query'];
             if ($bind_children) {
-                $query->orderByRaw('parent_id = '.$record->parent_id.' DESC');
+                $query->orderByRaw('parent_id = ' . $record->parent_id . ' DESC');
             }
             $related = $query->select('id')
                 ->where('id_string', $id_string)
@@ -103,7 +103,7 @@ class Jp7_Interadmin_Util
                 ->first();
 
             if ($related) {
-                $column = array_search($relation.'_id', $aliases);
+                $column = array_search($relation . '_id', $aliases);
                 $record->$column = $related->id;
             }
         }
@@ -202,13 +202,13 @@ class Jp7_Interadmin_Util
             if ($typeObj->type_id == $typeDestino->type_id) {
                 $registro->setTipo($typeDestino);
                 if (isset($registro->varchar_key)) {
-                    $registro->varchar_key = 'Cópia de '.$registro->varchar_key;
+                    $registro->varchar_key = 'Cópia de ' . $registro->varchar_key;
                 }
             }
             $registro->publish = '';
         }
 
-        $oldLogUser = InterAdmin::setLogUser($s_user['login'].' - combo copy');
+        $oldLogUser = InterAdmin::setLogUser($s_user['login'] . ' - combo copy');
         $returnIds = self::import($registros, $typeDestino, $parent, true, $use_id_string, $bind_children);
         InterAdmin::setLogUser($oldLogUser);
 
@@ -230,18 +230,18 @@ class Jp7_Interadmin_Util
         $inheritedTipos = InterAdminTipo::findTiposByModel($model->type_id, [
             'class' => 'InterAdminTipo',
         ]);
-        ?>
-		&bull; <?= $model->type_id ?> - <?= $model->nome ?> <br />
-		<div class="indent">
-			<?php foreach ($inheritedTipos as $type) { ?>
-				<?php
+?>
+        &bull; <?= $model->type_id ?> - <?= $model->nome ?> <br />
+        <div class="indent">
+            <?php foreach ($inheritedTipos as $type) { ?>
+                <?php
                 $type->syncInheritance();
                 $type->saveRaw();
                 self::syncTipos($type);
                 ?>
-			<?php } ?>
-		</div>
-		<?php
+            <?php } ?>
+        </div>
+<?php
     }
 
     /**
@@ -301,11 +301,11 @@ class Jp7_Interadmin_Util
             $nomeClasse = $type->class;
         }
 
-        $phpdoc = '/**'."\r\n";
+        $phpdoc = '/**' . "\r\n";
         foreach ($type->getFields() as $campo) {
-            $phpdoc .= ' * @property '.self::_getTipoPhpDocCampo($type, $campo).' $'.$campo['nome_id']."\r\n";
+            $phpdoc .= ' * @property ' . self::_getTipoPhpDocCampo($type, $campo) . ' $' . $campo['nome_id'] . "\r\n";
         }
-        $phpdoc .= ' * @property Jp7_Date date_publish'."\r\n";
+        $phpdoc .= ' * @property Jp7_Date publish_at' . "\r\n";
         $phpdoc .= ' */';
 
         $conteudo = <<<STR
@@ -335,17 +335,17 @@ STR;
             $nomeClasseInterAdmin = $type->class;
         }
         if (!$nomeClasseInterAdmin) {
-            $constname = InterAdminTipo::getDefaultClass().'::DEFAULT_NAMESPACE';
+            $constname = InterAdminTipo::getDefaultClass() . '::DEFAULT_NAMESPACE';
             if (defined($constname)) {
-                $nomeClasseInterAdmin = constant($constname).'InterAdmin';
+                $nomeClasseInterAdmin = constant($constname) . 'InterAdmin';
             } else {
                 $nomeClasseInterAdmin = 'InterAdmin';
             }
         }
-        $phpdoc = '/**'."\r\n";
-        $phpdoc .= ' * @method '.$nomeClasseInterAdmin.'[] find'."\r\n";
-        $phpdoc .= ' * @method '.$nomeClasseInterAdmin.' findFirst'."\r\n";
-        $phpdoc .= ' * @method '.$nomeClasseInterAdmin.' findById'."\r\n";
+        $phpdoc = '/**' . "\r\n";
+        $phpdoc .= ' * @method ' . $nomeClasseInterAdmin . '[] find' . "\r\n";
+        $phpdoc .= ' * @method ' . $nomeClasseInterAdmin . ' findFirst' . "\r\n";
+        $phpdoc .= ' * @method ' . $nomeClasseInterAdmin . ' findById' . "\r\n";
         $phpdoc .= ' */';
 
         $conteudo = <<<STR
@@ -370,19 +370,19 @@ STR;
     {
         global $c_interadminConfigPath;
 
-        $file = dirname($c_interadminConfigPath).'/classes/'.str_replace('_', '/', $nomeClasse).'.php';
+        $file = dirname($c_interadminConfigPath) . '/classes/' . str_replace('_', '/', $nomeClasse) . '.php';
         if (!is_file($file)) {
             @mkdir(dirname($file), 0777, true);
 
             $retorno = file_put_contents($file, $conteudo);
             @chmod($file, 0777);
             if ($retorno === false) {
-                $avisos['erro'][] = 'Não foi possível gravar arquivo: "'.$file.'". Verifique permissões no diretório.';
+                $avisos['erro'][] = 'Não foi possível gravar arquivo: "' . $file . '". Verifique permissões no diretório.';
             } else {
-                $avisos['sucesso'][] = 'Arquivo "'.$file.'" gerado.';
+                $avisos['sucesso'][] = 'Arquivo "' . $file . '" gerado.';
             }
         } else {
-            $avisos['erro'][] = 'Arquivo "'.$file.'" já existe.';
+            $avisos['erro'][] = 'Arquivo "' . $file . '" já existe.';
         }
 
         return $avisos;
@@ -392,7 +392,7 @@ STR;
     {
         global $db, $db_prefix;
 
-        $rs = $db->Execute("CHECKSUM TABLE ".$db_prefix."_types");
+        $rs = $db->Execute("CHECKSUM TABLE " . $db_prefix . "_types");
         $row = $rs->FetchNextObj();
         return $row->Checksum;
     }

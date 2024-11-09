@@ -16,8 +16,8 @@ class Jp7_Model_IntroductionTipo extends Jp7_Model_TipoAbstract
         'class' => '',
         'class_type' => '',
         'model_type_id' => 0,
-        'tabela' => '',
+        'table' => '',
         'editar' => 1,
-        'icone' => 'page_white_text',
+        'icon' => 'page_white_text',
     ];
 }

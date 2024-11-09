@@ -11,9 +11,9 @@ class Jp7_Box_NewsArchive extends Jp7_Box_BoxAbstract
         if ($type && $type->model_type_id == 'News') {
             $this->tipo = $type;
             $this->archives = $type->find([
-                'fields' => ['date_publish'],
-                'group' => 'MONTH(date_publish), YEAR(date_publish)',
-                'order' => 'date_publish DESC',
+                'fields' => ['publish_at'],
+                'group' => 'MONTH(publish_at), YEAR(publish_at)',
+                'order' => 'publish_at DESC',
             ]);
         }
     }

@@ -14,7 +14,7 @@ class Jp7_Model_ContactTipo extends Jp7_Model_TipoAbstract
         'class' => '',
         'class_type' => '',
         'model_type_id' => 0,
-        'tabela' => '',
+        'table' => '',
         'layout' => 4,
         'layout_registros' => 4,
         'texto' => 'Contém as mensagens recebidas através do formulário de contato.',
@@ -35,12 +35,12 @@ class Jp7_Model_ContactTipo extends Jp7_Model_TipoAbstract
     public function getEditorFields(Jp7_Box_BoxAbstract $box)
     {
         ob_start();
-        ?>
-		<div class="fields">
-			<?php echo parent::_getEditorImageFields($box);
-        ?>
-		</div>
-		<?php
+?>
+        <div class="fields">
+            <?php echo parent::_getEditorImageFields($box);
+            ?>
+        </div>
+<?php
         return ob_get_clean();
     }
 

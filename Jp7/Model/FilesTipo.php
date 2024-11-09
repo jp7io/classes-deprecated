@@ -14,11 +14,11 @@ class Jp7_Model_FilesTipo extends Jp7_Model_TipoAbstract
         'class' => '',
         'class_type' => '',
         'model_type_id' => 0,
-        'tabela' => '',
+        'table' => '',
         'layout' => Jp7_Box_Manager::COL_2_LEFT,
         'layout_registros' => Jp7_Box_Manager::COL_2_LEFT,
         'editar' => 1,
-        'icone' => 'page_white_put',
+        'icon' => 'page_white_put',
     ];
 
     public function createChildren(InterAdminTipo $type)
@@ -29,12 +29,12 @@ class Jp7_Model_FilesTipo extends Jp7_Model_TipoAbstract
     public function getEditorFields(Jp7_Box_BoxAbstract $box)
     {
         ob_start();
-        ?>
-		<div class="fields">
-			<?php echo parent::_getEditorImageFields($box);
-        ?>
-		</div>
-		<?php
+?>
+        <div class="fields">
+            <?php echo parent::_getEditorImageFields($box);
+            ?>
+        </div>
+<?php
         return ob_get_clean();
     }
 

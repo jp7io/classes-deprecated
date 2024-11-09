@@ -64,9 +64,9 @@ class Jp7_Interadmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
                             'id' => 'xsd:int',
                             'type_id' => 'xsd:int',
                             'parent_id' => 'xsd:int',
-                            'date_insert' => 'xsd:dateTime',
-                            'date_modify' => 'xsd:dateTime',
-                            'date_publish' => 'xsd:dateTime',
+                            'created_at' => 'xsd:dateTime',
+                            'updated_at' => 'xsd:dateTime',
+                            'publish_at' => 'xsd:dateTime',
                             'deleted_at' => 'xsd:boolean',
                             'publish' => 'xsd:boolean',
                         ];
@@ -149,15 +149,15 @@ class Jp7_Interadmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
         return $retorno;
     }
 
-     /**
-      * Append the complex type definition to the WSDL via the context access.
-      *
-      * @param  string $arrayType
-      * @param  string $childTypeName
-      */
-     protected function _addElementFromWsdlAndChildTypes($arrayType, $childTypeName)
-     {
-         /* Código da ZEND - Não Alterar */
+    /**
+     * Append the complex type definition to the WSDL via the context access.
+     *
+     * @param  string $arrayType
+     * @param  string $childTypeName
+     */
+    protected function _addElementFromWsdlAndChildTypes($arrayType, $childTypeName)
+    {
+        /* Código da ZEND - Não Alterar */
         if (!in_array($arrayType, $this->getContext()->getTypes())) {
             $dom = $this->getContext()->toDomDocument();
 
@@ -178,5 +178,5 @@ class Jp7_Interadmin_Soap_Strategy extends  Zend_Soap_Wsdl_Strategy_ArrayOfTypeS
             $this->getContext()->getSchema()->appendChild($complexType);
             $this->getContext()->addType($arrayType);
         }
-     }
+    }
 }

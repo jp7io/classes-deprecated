@@ -24,8 +24,8 @@ class Jp7_Feed extends Zend_Feed_Writer_Feed
      * 	'category' => null, // array('term' => , slug)
      * 	'description' => 'resumo', // string
      * 	'id' => link value, // valid URI/IRI
-     * 	'date_modified' => 'date_modify', // Timestamp value
-     * 	'date_created' => 'date_publish' // Timestamp value
+     * 	'date_modified' => 'updated_at', // Timestamp value
+     * 	'date_created' => 'publish_at' // Timestamp value
      * )
      *
      * @param string $category [optional]
@@ -43,19 +43,19 @@ class Jp7_Feed extends Zend_Feed_Writer_Feed
             'category' => null, // array('term' => , slug)
             'description' => 'resumo', // string
             'id' => 'this.link', // valid URI/IRI
-            'date_modified' => 'date_modify', // Timestamp value
-            'date_created' => 'date_publish', // Timestamp value
+            'date_modified' => 'updated_at', // Timestamp value
+            'date_created' => 'publish_at', // Timestamp value
         ], $helpers);
 
         if (mb_substr($helpers['id'], 0, 5) == 'this.') {
-            $methodId = 'get'.ucfirst(mb_strtolower(ltrim($helpers['id'], 'this.')));
+            $methodId = 'get' . ucfirst(mb_strtolower(ltrim($helpers['id'], 'this.')));
         }
 
         foreach ($interAdmins as $entryData) {
             if ($entryData instanceof InterAdmin) {
                 $entry = $this->createEntry();
                 $entry->setTitle($entryData->{$helpers['title']});
-            $entry->setLink($entryData->{$helpers['link']} ? $entryData->{$helpers['link']} : $entryData->getUrl());
+                $entry->setLink($entryData->{$helpers['link']} ? $entryData->{$helpers['link']} : $entryData->getUrl());
                 if ($category) {
                     $entry->addCategory(['term' => $category]);
                 }

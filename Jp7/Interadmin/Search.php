@@ -59,9 +59,9 @@ class Jp7_Interadmin_Search
     //)
     public function getIndexSql($table, $columns, $drop = false)
     {
-        $sql = 'ALTER TABLE '.$table.' '.
-            ($drop ? 'DROP INDEX `interadmin_search` ,' : '').
-            'ADD FULLTEXT `interadmin_search` ('.implode(',', $columns).')';
+        $sql = 'ALTER TABLE ' . $table . ' ' .
+            ($drop ? 'DROP INDEX `interadmin_search` ,' : '') .
+            'ADD FULLTEXT `interadmin_search` (' . implode(',', $columns) . ')';
 
         return $sql;
     }
@@ -77,7 +77,7 @@ class Jp7_Interadmin_Search
             }
         }
 
-        return '('.implode("\n) UNION ALL (\n", $sqls).') ORDER BY relevance DESC LIMIT 10000';
+        return '(' . implode("\n) UNION ALL (\n", $sqls) . ') ORDER BY relevance DESC LIMIT 10000';
     }
 
     public function getTables()
@@ -85,8 +85,8 @@ class Jp7_Interadmin_Search
         global $db_prefix;
 
         $options = [
-            'fields' => 'tabela',
-            'group' => 'tabela',
+            'fields' => 'table',
+            'group' => 'table',
             'where' => $this->getTipoFilter(),
             'class' => 'InterAdminTipo',
         ];
@@ -94,9 +94,9 @@ class Jp7_Interadmin_Search
         $tables = [];
         $types = InterAdminTipo::findTipos($options);
         foreach ($types as $type) {
-            $tables[] = $db_prefix.'_'.($type->tabela ?: 'records');
+            $tables[] = $db_prefix . '_' . ($type->table ?: 'records');
         }
-        $tables[] = $db_prefix.'_types';
+        $tables[] = $db_prefix . '_types';
         return $tables;
     }
 
@@ -127,7 +127,7 @@ class Jp7_Interadmin_Search
         $fields = [];
         $fields[] = in_array('id', $columns) ? 'id' : '0 AS id';
         $fields[] = in_array('type_id', $columns) ? 'type_id' : '0 AS type_id';
-        $fields[] = in_array('varchar_key', $columns) ? 'varchar_key' : reset($textColumns).' AS varchar_key';
+        $fields[] = in_array('varchar_key', $columns) ? 'varchar_key' : reset($textColumns) . ' AS varchar_key';
         if (in_array('text_1', $columns)) {
             $fields[] = 'text_1';
         } elseif (in_array('texto', $columns)) {
@@ -157,22 +157,22 @@ class Jp7_Interadmin_Search
             }
 
             if ($isNegative) {
-                $where[] = 'CONCAT('.implode(',', $textColumns).") NOT LIKE '%".$word."%'";
+                $where[] = 'CONCAT(' . implode(',', $textColumns) . ") NOT LIKE '%" . $word . "%'";
                 if ($isQuoted) {
-                    $word = '"'.$word.'"';
+                    $word = '"' . $word . '"';
                 }
-                $search = preg_replace('/(^|[ ])-'.preg_quote($word).'([ ]|$)/', '\1\2', $search);
+                $search = preg_replace('/(^|[ ])-' . preg_quote($word) . '([ ]|$)/', '\1\2', $search);
                 unset($words[$key]);
                 continue;
             } elseif ($isQuoted) {
-                $where[] = 'CONCAT('.implode(',', $textColumns).") LIKE '%".$word."%'";
+                $where[] = 'CONCAT(' . implode(',', $textColumns) . ") LIKE '%" . $word . "%'";
             }
             if (mb_strlen($word) < 2 || in_array($word, $short_words)) {
                 unset($words[$key]);
             }
         }
         $search = trim($search);
-        $match = 'MATCH ('.implode(',', $textColumns).") AGAINST ('".addslashes($search)."'".($this->booleanMode ? ' IN BOOLEAN MODE' : '').')';
+        $match = 'MATCH (' . implode(',', $textColumns) . ") AGAINST ('" . addslashes($search) . "'" . ($this->booleanMode ? ' IN BOOLEAN MODE' : '') . ')';
 
         if ($words) {
             $words = array_unique($words);
@@ -187,9 +187,9 @@ class Jp7_Interadmin_Search
                 if (mb_strlen($word) > 4) {
                     $like = [];
                     foreach ($plural as $word) {
-                        $like[] = reset($textColumns)." LIKE '%".str_replace('*', '%', addslashes($word))."%'";
+                        $like[] = reset($textColumns) . " LIKE '%" . str_replace('*', '%', addslashes($word)) . "%'";
                     }
-                    $match .= ' + ('.implode(' OR ', $like).') * '.$weight;
+                    $match .= ' + (' . implode(' OR ', $like) . ') * ' . $weight;
                 } else {
                     $regex = implode('|', $plural);
                     $regex = addcslashes($regex, '[]()+?.');
@@ -197,7 +197,7 @@ class Jp7_Interadmin_Search
                     $regex = str_replace('*', '[[:alnum:]]*', $regex);
                     //$match .= " + (" . reset($textColumns) . " REGEXP '(^|[^a-zA-Z])(" . $regex . ")([^a-zA-Z]|$)') * " . $weight;
                     // [[:<:]] é igual \b - Início e fim de uma palavra
-                    $match .= ' + ('.reset($textColumns)." REGEXP '[[:<:]]".$regex."[[:>:]]') * ".$weight;
+                    $match .= ' + (' . reset($textColumns) . " REGEXP '[[:<:]]" . $regex . "[[:>:]]') * " . $weight;
                 }
             }
             //$match .= " + (CONCAT(" . implode(',', $textColumns) . ") LIKE '%" . addslashes($search) . "%') * 5";
@@ -210,12 +210,12 @@ class Jp7_Interadmin_Search
         $where[] = 'type_id > 0';
 
         if ($date_filter) {
-            if (in_array('date_publish', $columns)) {
+            if (in_array('publish_at', $columns)) {
                 $date_filters = [
-                    'day' => 'date_publish >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)',
-                    'week' => 'date_publish >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)',
-                    'month' => 'date_publish >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)',
-                    'year' => 'date_publish >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)',
+                    'day' => 'publish_at >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)',
+                    'week' => 'publish_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)',
+                    'month' => 'publish_at >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)',
+                    'year' => 'publish_at >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)',
                 ];
 
                 if ($date_filters[$date_filter]) {
@@ -232,7 +232,7 @@ class Jp7_Interadmin_Search
                 $deleted_column = 'deleted_at';
             }
             if ($deleted_column) {
-                $where[] = $deleted_column." = ''";
+                $where[] = $deleted_column . " = ''";
             }
         }
         //"CONCAT(" . implode(',', $textColumns) . ") LIKE '%" . $word . "%'"
@@ -246,8 +246,8 @@ class Jp7_Interadmin_Search
             if (in_array('publish', $columns)) {
                 $where[] = "publish <> ''";
             }
-            if (in_array('date_expire', $columns)) {
-                $where[] = "(date_expire > '".date('c')."' OR date_expire = '0000-00-00 00:00:00')";
+            if (in_array('expire_at', $columns)) {
+                $where[] = "(expire_at > '" . date('c') . "' OR expire_at = '0000-00-00 00:00:00')";
             }
         }
 
@@ -255,9 +255,9 @@ class Jp7_Interadmin_Search
 
         //$hits_field = in_array('type_id', $columns) ? ' + IF (type_id IN (1, 23), 5, 1) ' : '';
 
-        $sql = 'SELECT '.implode(',', $fields).', '.$match.$hits_field.' AS relevance '.
-            'FROM `'.$table.'` '.
-            'WHERE '.implode(' AND ', $where).' '.
+        $sql = 'SELECT ' . implode(',', $fields) . ', ' . $match . $hits_field . ' AS relevance ' .
+            'FROM `' . $table . '` ' .
+            'WHERE ' . implode(' AND ', $where) . ' ' .
             'HAVING relevance > 0';
 
         return $sql;
@@ -272,7 +272,7 @@ class Jp7_Interadmin_Search
         global $s_allowed_tipos;
         if (is_array($s_allowed_tipos)) {
             if ($s_allowed_tipos) {
-                return 'type_id IN ('.implode(',', $s_allowed_tipos).')';
+                return 'type_id IN (' . implode(',', $s_allowed_tipos) . ')';
             } else {
                 return '0=1';
             }
