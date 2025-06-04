@@ -149,7 +149,9 @@ class Pagination
 
         // Se $show_first_and_last for TRUE irá sempre mostrar a página [1] .... [4] [5] ....[1000]
         // Se $show_first_and_last for FALSE irá mostrar só um range [2][3][4][5][6]
-        if (!empty($show_first_and_last)) {
+        if (empty($show_first_and_last)) {
+            $show_first_and_last = false;
+        } else {
             $numbers_limit -= 1;
         }
 
@@ -186,34 +188,34 @@ class Pagination
                 // Pages...
                 if ($show_first_and_last && $min > 1) {
                     $this->htm_numbers_extra .= $this->_createLink(1, 1, '');
-                    $this->htm_numbers_extra .= '<li class="separator">'.$separador.'</li>';
+                    $this->htm_numbers_extra .= '<li class="separator">'.$separator.'</li>';
                     if ($min > 2) {
                         $this->htm_numbers_extra .= $this->_createLink(2, 2, '');
-                        $this->htm_numbers_extra .= '<li class="separator">'.$separador.'</li>';
+                        $this->htm_numbers_extra .= '<li class="separator">'.$separator.'</li>';
                     }
                     if ($min > 3) {
                         $this->htm_numbers_extra .= '<li class="gap"><span>...</span></li>';
-                        $this->htm_numbers_extra .= '<li class="separator">'.$separador.'</li>';
+                        $this->htm_numbers_extra .= '<li class="separator">'.$separator.'</li>';
                     }
                 }
                 for ($i = $min; $i <= $max; $i++) {
                     $this->htm_numbers .= $this->_createLink($i, $i, ($i == $page) ? ' class="on"' : '');
                     $this->htm_numbers_extra .= $this->_createLink($i, $i, ($i == $page) ? ' class="on"' : '');
                     if ($i != $max) {
-                        $this->htm_numbers .= '<li class="separator">'.$separador.'</li>';
-                        $this->htm_numbers_extra .= '<li class="separator">'.$separador.'</li>';
+                        $this->htm_numbers .= '<li class="separator">'.$separator.'</li>';
+                        $this->htm_numbers_extra .= '<li class="separator">'.$separator.'</li>';
                     }
                 }
                 if ($show_first_and_last && $max < $this->total) {
                     if ($max < $this->total - 2) {
-                        $this->htm_numbers_extra .= '<li class="separator">'.$separador.'</li>';
+                        $this->htm_numbers_extra .= '<li class="separator">'.$separator.'</li>';
                         $this->htm_numbers_extra .= '<li class="gap"><span>...</span></li>';
                     }
                     if ($max < $this->total - 1) {
-                        $this->htm_numbers_extra .= '<li class="separator">'.$separador.'</li>';
+                        $this->htm_numbers_extra .= '<li class="separator">'.$separator.'</li>';
                         $this->htm_numbers_extra .= $this->_createLink($this->total - 1, $this->total - 1, '');
                     }
-                    $this->htm_numbers_extra .= '<li class="separator">'.$separador.'</li>';
+                    $this->htm_numbers_extra .= '<li class="separator">'.$separator.'</li>';
                     $this->htm_numbers_extra .= $this->_createLink($this->total, $this->total, '');
                 }
                 // Next

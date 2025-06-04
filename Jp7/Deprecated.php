@@ -661,7 +661,7 @@ class Jp7_Deprecated
      *
      * @return NULL Nothing is returned, but the function creates global variables.
      *
-     * @version (2006/08/23)
+     * @version (2025/06/04)
      */
     public static function jp7_db_select($table, $table_id_name, $table_id_value, $var_prefix = '', $returnValues = false)
     {
@@ -672,19 +672,23 @@ class Jp7_Deprecated
             throw new Jp7_Interadmin_Exception($db->ErrorMsg());
         }
 
-        if ($returnValues) {
-            $array = [];
-        } else {
-            $array = &$GLOBALS;
-        }
+        $array = [];
 
         while ($row = $rs->FetchNextObj()) {
             $meta_cols = $db->MetaColumns($table, false);
             foreach ($meta_cols as $meta) {
                 $name = $meta->name;
-                $array[$var_prefix.$name] = $row->$name;
+                $varName = $var_prefix . $name;
+                $value = $row->$name;
+
+                if ($returnValues) {
+                    $array[$varName] = $value;
+                } else {
+                    $GLOBALS[$varName] = $value;
+                }
             }
         }
+
         $rs->Close();
         if ($returnValues) {
             return $array;
