@@ -724,25 +724,27 @@ class Jp7_Deprecated
             $sql = 'UPDATE '.$table.' SET ';
             $j = 0;
             foreach ($table_columns as $table_field_name) {
-                if (is_array($var_prefix)) {
-                    $var_isset = array_key_exists($table_field_name, $var_prefix);
-                    $table_field_value = $var_prefix[$table_field_name];
-                } else {
-                    $var_isset = isset($GLOBALS[$var_prefix.$table_field_name]);
-                    $table_field_value = $GLOBALS[$var_prefix.$table_field_name];
-                }
-                if (!$var_check || $var_isset) {
-                    //se for definido valor ou campo for inteiro
-                    if (($table_field_value !== '' && !is_null($table_field_value)) || strpos($table_field_name, 'int_') === 0) {
-                        $sql .= ((!$j) ? ' ' : ',').''.$table_field_name.'='.toBase($table_field_value, $force_magic_quotes_gpc);
-                        //se não for definido valor e for mysql salva branco
-                    } elseif (($table_field_value === '' || is_null($table_field_value)) && ($GLOBALS['db_type'] == '' || $GLOBALS['db_type'] == 'mysql')) {
-                        $sql .= ((!$j) ? ' ' : ',').''.$table_field_name."=''";
-                        //se não for definido valor e for != de mysql
+                if (!empty($GLOBALS[$var_prefix.$table_field_name])) {
+                    if (is_array($var_prefix)) {
+                        $var_isset = array_key_exists($table_field_name, $var_prefix);
+                        $table_field_value = $var_prefix[$table_field_name];
                     } else {
-                        $sql .= ((!$j) ? ' ' : ',').''.$table_field_name.'=NULL';
+                        $var_isset = isset($GLOBALS[$var_prefix.$table_field_name]);
+                        $table_field_value = $GLOBALS[$var_prefix.$table_field_name];
                     }
-                    $j++;
+                    if (!$var_check || $var_isset) {
+                        //se for definido valor ou campo for inteiro
+                        if (($table_field_value !== '' && !is_null($table_field_value)) || strpos($table_field_name, 'int_') === 0) {
+                            $sql .= ((!$j) ? ' ' : ',').''.$table_field_name.'='.toBase($table_field_value, $force_magic_quotes_gpc);
+                            //se não for definido valor e for mysql salva branco
+                        } elseif (($table_field_value === '' || is_null($table_field_value)) && ($GLOBALS['db_type'] == '' || $GLOBALS['db_type'] == 'mysql')) {
+                            $sql .= ((!$j) ? ' ' : ',').''.$table_field_name."=''";
+                            //se não for definido valor e for != de mysql
+                        } else {
+                            $sql .= ((!$j) ? ' ' : ',').''.$table_field_name.'=NULL';
+                        }
+                        $j++;
+                    }
                 }
             }
             $sql .= ' WHERE '.$table_id_name.'='.$table_id_value;
