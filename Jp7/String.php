@@ -19,12 +19,12 @@ class Jp7_String
 
     public function startsWith($str)
     {
-        return starts_with($this->str, $str);
+        return str_starts_with($this->str, $str);
     }
 
     public function endsWith($str)
     {
-        return ends_with($this->str, $str);
+        return str_ends_with($this->str, $str);
     }
 
     public function sub($start, $end)

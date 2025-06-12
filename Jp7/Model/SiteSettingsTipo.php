@@ -206,7 +206,7 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract
                         $special_1 = unserialize($registro->special_1);
                     }
                     foreach ($_POST as $key => $values) {
-                        if (starts_with($key, 'css_') && !ends_with($key, '_xtra')) {
+                        if (str_starts_with($key, 'css_') && !str_ends_with($key, '_xtra')) {
                             $special_1[mb_substr($key, 4)] = $values[0];
                         }
                     }
@@ -284,11 +284,11 @@ class Jp7_Model_SiteSettingsTipo extends Jp7_Model_TipoAbstract
     {
         $css = '@base('.$base_id.') {'."\r\n";
         foreach ($properties as $property) {
-            if (ends_with($property, '_border_bottom')) {
+            if (str_ends_with($property, '_border_bottom')) {
                 $cssProperty = 'border-bottom-color';
-            } elseif (ends_with($property, '_background')) {
+            } elseif (str_ends_with($property, '_background')) {
                 $cssProperty = 'background';
-            } elseif (ends_with($property, '_color')) {
+            } elseif (str_ends_with($property, '_color')) {
                 $cssProperty = 'color';
             } else {
                 continue;
