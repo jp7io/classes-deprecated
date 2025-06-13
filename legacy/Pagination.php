@@ -238,8 +238,8 @@ class Pagination
                 '</select>'."\n".'<div class="text">de '.$this->total.'</div>'."\n";
 
             // Buttons
-            $this->htm_back = '<input type="button" class="back'.(($page == 1) ? ' back-off' : '').'" onclick="location=\''.$this->request_uri.'?'.$parameters.$this->query_string.'&p_page='.($page - 1).'\'"'.(($page == 1) ? ' disabled' : '').'>'."\n";
-            $this->htm_go = '<input type="button" class="go'.(($page == $this->total) ? ' go-off' : '').'" onclick="location=\''.$this->request_uri.'?'.$parameters.$this->query_string.'&p_page='.($page + 1).'\'"'.(($page == $this->total) ? ' disabled' : '').'>'."\n";
+            $this->htm_back = '<button type="button" class="btn-back" onclick="location=\''.$this->request_uri.'?'.$parameters.$this->query_string.'&p_page='.($page - 1).'\'"'.(($page == 1) ? ' disabled' : '').'></button>'."\n";
+            $this->htm_go = '<button type="button" class="btn-go" onclick="location=\''.$this->request_uri.'?'.$parameters.$this->query_string.'&p_page='.($page + 1).'\'"'.(($page == $this->total) ? ' disabled' : '').'></button>'."\n";
 
             // Types
             $this->htm = '<div class="jp7_db_pages" style="width:auto"><div class="'.$type.'">'."\n";
