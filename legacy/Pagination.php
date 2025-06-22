@@ -125,7 +125,7 @@ class Pagination
         $this->sql_limit = ' LIMIT '.$this->init.','.$this->limit;
 
         // HTM
-        $this->query_string = preg_replace('([&]?p_page=[0-9]+)', '', $_SERVER['QUERY_STRING']); // Retira a pagina atual da Query String
+        $this->query_string = preg_replace('([&]?p_page=[0-9]+)', '', $_SERVER['QUERY_STRING'] ?? ''); // Retira a pagina atual da Query String
         if ($seo) {
             $this->query_string = preg_replace('([&]?baseurl=true)', '', $this->query_string); // Retira a baseurl se a pagina tiver S.E.O.
         }
@@ -133,7 +133,7 @@ class Pagination
         $go_url = isset($_GET['go_url']) ? $_GET['go_url'] : '';
 
         $this->query_string = preg_replace('([&]?go_url='.$go_url.')', '', $this->query_string); // Retira a GO Url da Query String
-        if ($this->query_string[0] == '&') {
+        if (!empty($this->query_string[0]) && $this->query_string[0] == '&') {
             $this->query_string = mb_substr($this->query_string, 1); // Limpa & que sobrou no começo da string
         }
         $this->parameters = $parameters;
