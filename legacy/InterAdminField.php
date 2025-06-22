@@ -122,7 +122,7 @@ class InterAdminField
             $form = '<textarea'.(($xtra) ? ' textarea_trigger="true"' : '').' name="'.$campo.'[]" id="'.$campo.'_'.$j.'"'.
                 ' label="'.$campo_nome.'"'.
                 (($obrigatorio) ? ' obligatory="yes"' : '').' rows='.($tamanho + (($xtra) ? ((($xtra == 'html_light' && $tamanho <= 5) || $quantidade > 1) ? 2 : 5) : 0)).(($xtra) ? ' wrap="off"' : '').
-                ' xtra="'.$xtra.'" class="inputs_width" style="width:'.(($s_session['screenwidth'] <= 800) ? '400px;' : '').(($xtra) ? ';color:#000066;font-family:courier new;font-size:11px;visibility:hidden' : '').'"'.(((($campo == 'text_0' || $campo == 'text_1') && $tamanho <= 5) || $quantidade > 1) ? ' smallToolbar="true"' : '').$readonly.'>'.$valor.'</textarea>';
+                ' xtra="'.$xtra.'" class="inputs_width" style="'.(($xtra) ? ';color:#000066;font-family:courier new;font-size:11px;visibility:hidden' : '').'"'.(((($campo == 'text_0' || $campo == 'text_1') && $tamanho <= 5) || $quantidade > 1) ? ' smallToolbar="true"' : '').$readonly.'>'.$valor.'</textarea>';
             if ($xtra) {
                 $form .= '<script type="text/javascript">interadmin_iframes['.$iframes_i."]='".$campo.'_'.$iframes_i++."'</script>";
             }
@@ -383,7 +383,7 @@ class InterAdminField
                 echo '</tbody>';
                 $tit_start = false;
             }
-            echo '<tr class="separator-tr"><td height="'.(($quantidade > 1 || $s_session['screenwidth'] <= 800) ? 5 : 10)."\" colspan=\"4\" style=\"padding:0px\"></td></tr>\n";
+            echo '<tr class="separator-tr"><td height="'.(($quantidade > 1) ? 5 : 10)."\" colspan=\"4\" style=\"padding:0px\"></td></tr>\n";
         }
     }
     /**
