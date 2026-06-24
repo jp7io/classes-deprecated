@@ -1,6 +1,7 @@
 <?php
 
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 
 /**
  * JP7's PHP Functions.
@@ -40,17 +41,17 @@ class Jp7_Date extends Carbon
         return parent::__construct($time, $timezone);
     }
 
-    public static function setTestNow($testNow = null)
+    public static function setTestNow($testNow = null): void
     {
         static::$testNow = $testNow;
     }
 
-    public static function getTestNow()
+    public static function getTestNow(): Closure|CarbonInterface|null
     {
         return static::$testNow;
     }
 
-    public static function hasTestNow()
+    public static function hasTestNow(): bool
     {
         return static::getTestNow() !== null;
     }
@@ -64,7 +65,7 @@ class Jp7_Date extends Carbon
      *
      * @return Jp7_Date
      */
-    public static function createFromFormat($format, $time, $timezone = null)
+    public static function createFromFormat($format, $time, $timezone = null): ?static
     {
         if ($timezone) {
             $date = parent::createFromFormat($format, $time, $timezone);
@@ -104,7 +105,7 @@ class Jp7_Date extends Carbon
      * @param DateInterval|string $interval
      * @return Date|bool
      */
-    public function add($interval, $value = 1, $overflow = null)
+    public function add($interval, $value = 1, $overflow = null, $anchorDay = null): static
     {
         if (is_string($interval)) {
             // Check for ISO 8601
@@ -114,7 +115,9 @@ class Jp7_Date extends Carbon
                 $interval = DateInterval::createFromDateString($interval);
             }
         }
-        return parent::add($interval) ? $this : false;
+        parent::add($interval);
+
+        return $this;
     }
     /**
      * Subtracts an amount of days, months, years, hours, minutes and seconds from a DateTime object.
@@ -122,7 +125,7 @@ class Jp7_Date extends Carbon
      * @param DateInterval|string $interval
      * @return Date|bool
      */
-    public function sub($interval, $value = 1, $overflow = null)
+    public function sub($interval, $value = 1, $overflow = null, $anchorDay = null): static
     {
         if (is_string($interval)) {
             // Check for ISO 8601
@@ -132,7 +135,9 @@ class Jp7_Date extends Carbon
                 $interval = DateInterval::createFromDateString($interval);
             }
         }
-        return parent::sub($interval) ? $this : false;
+        parent::sub($interval);
+
+        return $this;
     }
 
     /**
@@ -272,7 +277,7 @@ class Jp7_Date extends Carbon
      *
      * @return
      */
-    public function format($format)
+    public function format($format): string
     {
         // InterAdmin trabalha com data zerada
         if (!$this->isValid()) {
@@ -322,7 +327,7 @@ class Jp7_Date extends Carbon
         }
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->format('Y-m-d H:i:s');
     }
