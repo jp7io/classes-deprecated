@@ -119,7 +119,7 @@ class Jp7_Interadmin_Util
      * @param bool           $use_id_string   defaults to FALSE
      * @param bool           $bind_children   Children 1 has a relationship with Children 2, when copying, this relationship needs to be recreated
      */
-    public static function import(array $records, InterAdminTipo $tipoObj, InterAdmin $parent = null, $import_children = true, $use_id_string = false, $bind_children = false)
+    public static function import(array $records, InterAdminTipo $tipoObj, ?InterAdmin $parent = null, $import_children = true, $use_id_string = false, $bind_children = false)
     {
         $returnIds = [];
         foreach ($records as $record) {
@@ -180,7 +180,7 @@ class Jp7_Interadmin_Util
         }
     }
 
-    public static function copy(InterAdminTipo $tipoObj, array $ids, InterAdminTipo $tipoDestino, InterAdmin $parent = null)
+    public static function copy(InterAdminTipo $tipoObj, array $ids, InterAdminTipo $tipoDestino, ?InterAdmin $parent = null)
     {
         global $use_id_string, $bind_children; // FIXME usado no intermail
         global $s_user;

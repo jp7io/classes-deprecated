@@ -2,7 +2,7 @@
 
 abstract class Jp7_Box_BoxAbstract
 {
-    public function __construct(InterAdmin $record = null)
+    public function __construct(?InterAdmin $record = null)
     {
         if ($record) {
             foreach ($record->getAliasedAttributes() as $key => $value) {

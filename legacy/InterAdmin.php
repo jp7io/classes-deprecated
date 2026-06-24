@@ -187,7 +187,7 @@ class InterAdmin extends Record implements InterAdminAbstract
      *
      * @param InterAdminTipo $tipo
      */
-    public function setTipo(InterAdminTipo $tipo = null)
+    public function setTipo(?InterAdminTipo $tipo = null)
     {
         return $this->setType($tipo);
     }

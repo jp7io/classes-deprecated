@@ -324,7 +324,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
      *
      * @param InterAdminTipo $tipo
      */
-    public static function setTipo(InterAdminTipo $tipo = null)
+    public static function setTipo(?InterAdminTipo $tipo = null)
     {
         static::$tipo = $tipo;
     }
@@ -334,7 +334,7 @@ class Jp7_Controller_Action extends Zend_Controller_Action
         return static::$record;
     }
 
-    public static function setRecord(InterAdmin $record = null)
+    public static function setRecord(?InterAdmin $record = null)
     {
         static::$record = $record;
     }

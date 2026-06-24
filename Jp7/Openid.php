@@ -122,7 +122,7 @@ class Jp7_Openid extends Zend_OpenId_Consumer
      * @return bool
      */
     protected function _checkId($immediate, $id, $returnTo = null, $root = null,
-        $extensions = null, Zend_Controller_Response_Abstract $response = null)
+        $extensions = null, ?Zend_Controller_Response_Abstract $response = null)
     {
         $this->_setError('');
 
